@@ -30,20 +30,32 @@ def get_recordings(scientific_name, max_recordings=5):
     genus = parts[0]
     species = parts[1]
     
-    # v3 uses gen: and sp: tags separately
-    query = f"gen:{genus} sp:{species} cnt:Kenya q:A"
-    url = "https://xeno-canto.org/api/3/recordings"
-    params = {
-        "query": query,
-        "key": XC_API_KEY
-    }
-    try:
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        return response.json().get("recordings", [])[:max_recordings]
-    except Exception as e:
-        print(f"  API error for {scientific_name}: {e}")
-        return []
+    # First try Kenya specifically
+    queries = [
+        f"gen:{genus} sp:{species} cnt:Kenya q:A",
+        f"gen:{genus} sp:{species} area:africa q:A",
+        f"gen:{genus} sp:{species} q:A",  # global fallback
+    ]
+    
+    for query in queries:
+        url = "https://xeno-canto.org/api/3/recordings"
+        params = {
+            "query": query,
+            "key": XC_API_KEY
+        }
+        try:
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+            recordings = response.json().get("recordings", [])
+            if recordings:
+                print(f"  Found {len(recordings)} recordings with: {query}")
+                return recordings[:max_recordings]
+            else:
+                print(f"  No results for: {query}, trying broader search...")
+        except Exception as e:
+            print(f"  API error: {str(e).replace(XC_API_KEY, '***')}")
+    
+    return []
 
 def download_recording(recording, species_folder):
     file_url = recording["file"]  # v3 already has full URL, no need to add "https:"
