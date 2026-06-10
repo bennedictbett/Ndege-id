@@ -1,0 +1,25 @@
+# HTTP requests
+requests==2.32.3
+
+# Environment variables
+python-dotenv==1.0.1
+
+# Data handling
+pandas==2.2.3
+
+# Supabase
+supabase==2.10.0
+
+# Audio processing (for later - model training)
+librosa==0.10.2
+soundfile==0.12.1
+
+# ML (for later - model training)
+#torch==2.3.1
+#torchaudio==2.3.1
+numpy==1.26.4
+
+# API backend (for later)
+fastapi==0.115.0
+uvicorn==0.30.6
+python-multipart==0.0.9
