@@ -23,8 +23,17 @@ GITKEEPS = [
 
 FILES = {
     "backend/__init__.py": "",
+    "backend/main.py": "",
     "ml/__init__.py": "",
+    "ml/prepare_data.py": "",
+    "ml/train.py": "",
+    "ml/evaluate.py": "",
+    "ml/predict.py": "",
     "scripts/__init__.py": "",
+    "scripts/download_xeno_canto.py": "",
+    "scripts/populate_birds.py": "",
+    "scripts/process_images.py": "",
+    "scripts/upload_images.py": "",
 }
 
 def create_structure():
@@ -43,7 +52,9 @@ def create_structure():
         if not os.path.exists(filepath):
             with open(filepath, "w") as f:
                 f.write(content)
-            print(f"  ✓ {filepath}")
+            print(f"  ✓ Created: {filepath}")
+        else:
+            print(f"  → Exists:  {filepath}")
 
     print("\n✓ Project structure ready.")
 
