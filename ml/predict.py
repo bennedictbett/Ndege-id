@@ -8,7 +8,9 @@ from PIL import Image
 import torch.nn as nn
 import tempfile
 
-MODEL_PATH = "ml/models/best_model.pth"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MODEL_PATH = os.path.join(BASE_DIR, "ml", "models", "best_model.pth")
+
 SAMPLE_RATE = 22050
 DURATION = 5
 N_MELS = 128

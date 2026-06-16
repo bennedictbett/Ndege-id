@@ -1,8 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from supabase import create_client
 import os
+import sys
+import tempfile
+import shutil
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from ml.predict import predict
 
 load_dotenv()
 
@@ -57,3 +63,42 @@ def get_bird(bird_id: int):
     result = bird.data[0]
     result["images"] = images.data
     return result
+
+@app.post("/identify")
+async def identify_bird(audio: UploadFile = File(...)):
+    # Save uploaded file to temp location
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
+        shutil.copyfileobj(audio.file, tmp)
+        tmp_path = tmp.name
+
+    try:
+        # Run prediction
+        result = predict(tmp_path)
+
+        # Get bird details from database
+        scientific_name = result["scientific_name"].replace("_", " ")
+        bird_response = supabase.table("birds")\
+            .select("*")\
+            .eq("scientific_name", scientific_name)\
+            .execute()
+
+        bird_data = bird_response.data[0] if bird_response.data else None
+
+        # Get bird images
+        if bird_data:
+            images = supabase.table("bird_images")\
+                .select("*")\
+                .eq("bird_id", bird_data["id"])\
+                .execute()
+            bird_data["images"] = images.data
+
+        return {
+            "prediction": result,
+            "bird": bird_data
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
+    finally:
+        os.unlink(tmp_path)
