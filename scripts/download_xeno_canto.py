@@ -25,37 +25,48 @@ SPECIES = [
     "Cossypha heuglini",
 ]
 
-def get_recordings(scientific_name, max_recordings=5):
+def get_recordings(scientific_name, max_recordings=20):
     parts = scientific_name.split(" ")
     genus = parts[0]
     species = parts[1]
     
-    # First try Kenya specifically
     queries = [
         f"gen:{genus} sp:{species} cnt:Kenya q:A",
+        f"gen:{genus} sp:{species} cnt:Kenya q:B",
+        f"gen:{genus} sp:{species} cnt:Tanzania q:A",
+        f"gen:{genus} sp:{species} cnt:Tanzania q:B",
+        f"gen:{genus} sp:{species} cnt:Uganda q:A",
+        f"gen:{genus} sp:{species} cnt:Uganda q:B",
         f"gen:{genus} sp:{species} area:africa q:A",
-        f"gen:{genus} sp:{species} q:A",  # global fallback
+        f"gen:{genus} sp:{species} area:africa q:B",
+        f"gen:{genus} sp:{species} q:A",
+        f"gen:{genus} sp:{species} q:B",
     ]
     
+    all_recordings = []
+    seen_ids = set()
+    
     for query in queries:
+        if len(all_recordings) >= max_recordings:
+            break
         url = "https://xeno-canto.org/api/3/recordings"
-        params = {
-            "query": query,
-            "key": XC_API_KEY
-        }
+        params = {"query": query, "key": XC_API_KEY}
         try:
             response = requests.get(url, params=params)
             response.raise_for_status()
             recordings = response.json().get("recordings", [])
+            for rec in recordings:
+                if rec["id"] not in seen_ids:
+                    seen_ids.add(rec["id"])
+                    all_recordings.append(rec)
             if recordings:
-                print(f"  Found {len(recordings)} recordings with: {query}")
-                return recordings[:max_recordings]
-            else:
-                print(f"  No results for: {query}, trying broader search...")
+                print(f"  Found {len(all_recordings)} so far with: {query}")
         except Exception as e:
             print(f"  API error: {str(e).replace(XC_API_KEY, '***')}")
+        time.sleep(0.5)
     
-    return []
+    return all_recordings[:max_recordings]
+
 
 def download_recording(recording, species_folder):
     file_url = recording["file"]  # v3 already has full URL, no need to add "https:"
