@@ -7,7 +7,7 @@ import sys
 import tempfile
 import shutil
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ml.predict import predict
 
 load_dotenv()
