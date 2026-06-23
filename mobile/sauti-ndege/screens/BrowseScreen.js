@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import {
+  View, Text, FlatList, TouchableOpacity,
+  Image, StyleSheet, ActivityIndicator, Alert
+} from 'react-native';
+import { addToLifeList } from './LifeListScreen';
 
 const API_URL = 'https://ndege-id-production.up.railway.app';
 
 export default function BrowseScreen({ navigation }) {
   const [birds, setBirds] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [added, setAdded] = useState({});
 
   useEffect(() => {
     fetch(`${API_URL}/birds`)
@@ -13,6 +18,16 @@ export default function BrowseScreen({ navigation }) {
       .then(data => { setBirds(data.birds); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
+
+  const handleAddToLifeList = async (bird) => {
+    const wasAdded = await addToLifeList(bird);
+    if (wasAdded) {
+      setAdded(prev => ({ ...prev, [bird.id]: true }));
+      Alert.alert('Added!', `${bird.common_name} added to your Life List 🎉`);
+    } else {
+      Alert.alert('Already Added', `${bird.common_name} is already in your Life List`);
+    }
+  };
 
   if (loading) return (
     <View style={styles.centered}>
@@ -43,6 +58,14 @@ export default function BrowseScreen({ navigation }) {
               <Text style={styles.commonName}>{item.common_name}</Text>
               <Text style={styles.scientificName}>{item.scientific_name}</Text>
               <Text style={styles.family}>{item.family}</Text>
+              <TouchableOpacity
+                style={[styles.addButton, added[item.id] && styles.addedButton]}
+                onPress={() => handleAddToLifeList(item)}
+              >
+                <Text style={styles.addButtonText}>
+                  {added[item.id] ? '✓ Added' : '+ Life List'}
+                </Text>
+              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         );
@@ -61,8 +84,7 @@ const styles = StyleSheet.create({
   },
   image: { width: 100, height: 100 },
   imagePlaceholder: {
-    width: 100, height: 100,
-    backgroundColor: '#E8F5E9',
+    width: 100, height: 100, backgroundColor: '#E8F5E9',
     alignItems: 'center', justifyContent: 'center',
   },
   placeholderText: { fontSize: 40 },
@@ -70,4 +92,12 @@ const styles = StyleSheet.create({
   commonName: { fontSize: 16, fontWeight: 'bold', color: '#1B5E20' },
   scientificName: { fontSize: 13, fontStyle: 'italic', color: '#558B2F', marginTop: 2 },
   family: { fontSize: 12, color: '#888', marginTop: 4 },
+  addButton: {
+    backgroundColor: '#E8F5E9', borderRadius: 8,
+    paddingHorizontal: 10, paddingVertical: 4,
+    alignSelf: 'flex-start', marginTop: 8,
+    borderWidth: 1, borderColor: '#2E7D32',
+  },
+  addedButton: { backgroundColor: '#2E7D32' },
+  addButtonText: { fontSize: 12, color: '#2E7D32', fontWeight: '600' },
 });
