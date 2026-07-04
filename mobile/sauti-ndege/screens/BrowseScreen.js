@@ -1,103 +1,225 @@
 import { useEffect, useState } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity,
-  Image, StyleSheet, ActivityIndicator, Alert
+  StyleSheet, ActivityIndicator, TextInput
 } from 'react-native';
+import { theme } from '../constants/theme';
 import { addToLifeList } from './LifeListScreen';
 
 const API_URL = 'https://ndege-id-production.up.railway.app';
 
 export default function BrowseScreen({ navigation }) {
   const [birds, setBirds] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
   const [added, setAdded] = useState({});
 
   useEffect(() => {
     fetch(`${API_URL}/birds`)
       .then(res => res.json())
-      .then(data => { setBirds(data.birds); setLoading(false); })
+      .then(data => {
+        setBirds(data.birds);
+        setFiltered(data.birds);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, []);
 
-  const handleAddToLifeList = async (bird) => {
+  const handleSearch = (text) => {
+    setSearch(text);
+    const q = text.toLowerCase();
+    setFiltered(birds.filter(b =>
+      b.common_name.toLowerCase().includes(q) ||
+      b.scientific_name.toLowerCase().includes(q) ||
+      b.family?.toLowerCase().includes(q)
+    ));
+  };
+
+  const handleAdd = async (bird) => {
     const wasAdded = await addToLifeList(bird);
     if (wasAdded) {
       setAdded(prev => ({ ...prev, [bird.id]: true }));
-      Alert.alert('Added!', `${bird.common_name} added to your Life List 🎉`);
     } else {
-      Alert.alert('Already Added', `${bird.common_name} is already in your Life List`);
+      setAdded(prev => ({ ...prev, [bird.id]: true }));
     }
   };
 
   if (loading) return (
     <View style={styles.centered}>
-      <ActivityIndicator size="large" color="#2E7D32" />
+      <ActivityIndicator size="large" color={theme.colors.primary} />
+      <Text style={styles.loadingText}>Loading birds...</Text>
     </View>
   );
 
   return (
-    <FlatList
-      data={birds}
-      keyExtractor={item => item.id.toString()}
-      contentContainerStyle={styles.list}
-      renderItem={({ item }) => {
-        const primaryImage = item.images?.find(img => img.is_primary);
-        return (
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() => navigation.navigate('BirdDetail', { bird: item })}
-          >
-            {primaryImage ? (
-              <Image source={{ uri: primaryImage.image_url }} style={styles.image} />
-            ) : (
-              <View style={styles.imagePlaceholder}>
-                <Text style={styles.placeholderText}>🦅</Text>
+    <View style={styles.container}>
+      {/* Search */}
+      <View style={styles.searchContainer}>
+        <Text style={styles.searchIcon}>🔍</Text>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search species..."
+          placeholderTextColor={theme.colors.textDim}
+          value={search}
+          onChangeText={handleSearch}
+        />
+        {search.length > 0 && (
+          <TouchableOpacity onPress={() => handleSearch('')}>
+            <Text style={styles.clearIcon}>✕</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <Text style={styles.countText}>{filtered.length} species</Text>
+
+      <FlatList
+        data={filtered}
+        keyExtractor={item => item.id.toString()}
+        contentContainerStyle={styles.list}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => {
+          const primaryImage = item.images?.find(img => img.is_primary);
+          return (
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => navigation.navigate('BirdDetail', { bird: item })}
+              activeOpacity={0.8}
+            >
+              {/* Image */}
+              <View style={styles.imageContainer}>
+                {primaryImage ? (
+                  <img
+                    src={primaryImage.image_url}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    alt={item.common_name}
+                  />
+                ) : (
+                  <View style={styles.imagePlaceholder}>
+                    <Text style={styles.placeholderIcon}>🦅</Text>
+                  </View>
+                )}
               </View>
-            )}
-            <View style={styles.info}>
-              <Text style={styles.commonName}>{item.common_name}</Text>
-              <Text style={styles.scientificName}>{item.scientific_name}</Text>
-              <Text style={styles.family}>{item.family}</Text>
+
+              {/* Info */}
+              <View style={styles.info}>
+                <Text style={styles.commonName}>{item.common_name}</Text>
+                <Text style={styles.scientificName}>{item.scientific_name}</Text>
+                <View style={styles.tags}>
+                  <View style={styles.tag}>
+                    <Text style={styles.tagText}>{item.family}</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Add button */}
               <TouchableOpacity
                 style={[styles.addButton, added[item.id] && styles.addedButton]}
-                onPress={() => handleAddToLifeList(item)}
+                onPress={() => handleAdd(item)}
               >
                 <Text style={styles.addButtonText}>
-                  {added[item.id] ? '✓ Added' : '+ Life List'}
+                  {added[item.id] ? '✓' : '+'}
                 </Text>
               </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        );
-      }}
-    />
+            </TouchableOpacity>
+          );
+        }}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  list: { padding: 16 },
+  container: { flex: 1, backgroundColor: theme.colors.background },
+  centered: {
+    flex: 1, alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.background,
+  },
+  loadingText: { color: theme.colors.textSecondary, marginTop: 12 },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    margin: theme.spacing.md,
+    borderRadius: theme.radius.full,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.cardBorder,
+  },
+  searchIcon: { fontSize: 16, marginRight: theme.spacing.sm },
+  searchInput: {
+    flex: 1,
+    color: theme.colors.text,
+    fontSize: 15,
+    outline: 'none',
+  },
+  clearIcon: { color: theme.colors.textDim, fontSize: 16, padding: 4 },
+  countText: {
+    color: theme.colors.textDim,
+    fontSize: 13,
+    paddingHorizontal: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
+  },
+  list: { paddingHorizontal: theme.spacing.md, paddingBottom: 100 },
   card: {
-    flexDirection: 'row', backgroundColor: '#fff',
-    borderRadius: 12, marginBottom: 12,
-    overflow: 'hidden', elevation: 2,
+    flexDirection: 'row',
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    marginBottom: theme.spacing.sm,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: theme.colors.cardBorder,
+    alignItems: 'center',
   },
-  image: { width: 100, height: 100 },
+  imageContainer: {
+    width: 90, height: 90,
+    backgroundColor: theme.colors.surface,
+  },
   imagePlaceholder: {
-    width: 100, height: 100, backgroundColor: '#E8F5E9',
-    alignItems: 'center', justifyContent: 'center',
+    width: 90, height: 90,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.surface,
   },
-  placeholderText: { fontSize: 40 },
-  info: { flex: 1, padding: 12, justifyContent: 'center' },
-  commonName: { fontSize: 16, fontWeight: 'bold', color: '#1B5E20' },
-  scientificName: { fontSize: 13, fontStyle: 'italic', color: '#558B2F', marginTop: 2 },
-  family: { fontSize: 12, color: '#888', marginTop: 4 },
+  placeholderIcon: { fontSize: 36 },
+  info: { flex: 1, padding: theme.spacing.md },
+  commonName: {
+    fontSize: 15, fontWeight: '600',
+    color: theme.colors.text,
+  },
+  scientificName: {
+    fontSize: 12, fontStyle: 'italic',
+    color: theme.colors.textSecondary,
+    marginTop: 2,
+  },
+  tags: { flexDirection: 'row', marginTop: 6 },
+  tag: {
+    backgroundColor: '#0A2A0A',
+    borderRadius: theme.radius.full,
+    paddingHorizontal: 8, paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+  },
+  tagText: { color: theme.colors.primary, fontSize: 10, fontWeight: '500' },
   addButton: {
-    backgroundColor: '#E8F5E9', borderRadius: 8,
-    paddingHorizontal: 10, paddingVertical: 4,
-    alignSelf: 'flex-start', marginTop: 8,
-    borderWidth: 1, borderColor: '#2E7D32',
+    width: 36, height: 36,
+    borderRadius: 18,
+    backgroundColor: theme.colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: theme.colors.cardBorder,
   },
-  addedButton: { backgroundColor: '#2E7D32' },
-  addButtonText: { fontSize: 12, color: '#2E7D32', fontWeight: '600' },
+  addedButton: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  addButtonText: {
+    color: theme.colors.text,
+    fontSize: 18,
+    fontWeight: '300',
+  },
 });
