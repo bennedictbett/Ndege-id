@@ -58,12 +58,12 @@ export default function BrowseScreen({ navigation }) {
       <View style={styles.searchContainer}>
         <Text style={styles.searchIcon}>🔍</Text>
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, { outline: 'none' }]}
           placeholder="Search species..."
           placeholderTextColor={theme.colors.textDim}
           value={search}
           onChangeText={handleSearch}
-        />
+        />  
         {search.length > 0 && (
           <TouchableOpacity onPress={() => handleSearch('')}>
             <Text style={styles.clearIcon}>✕</Text>
@@ -150,10 +150,9 @@ const styles = StyleSheet.create({
   },
   searchIcon: { fontSize: 16, marginRight: theme.spacing.sm },
   searchInput: {
-    flex: 1,
-    color: theme.colors.text,
-    fontSize: 15,
-    outline: 'none',
+  flex: 1,
+  color: theme.colors.text,
+  fontSize: 15,
   },
   clearIcon: { color: theme.colors.textDim, fontSize: 16, padding: 4 },
   countText: {

@@ -9,6 +9,7 @@ import BrowseScreen from './screens/BrowseScreen';
 import BirdDetailScreen from './screens/BirdDetailScreen';
 import ResultScreen from './screens/ResultScreen';
 import LifeListScreen from './screens/LifeListScreen';
+import CustomTabBar from './components/CustomTabBar';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -51,45 +52,15 @@ export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        screenOptions={{
-          headerShown: false,
-          tabBarStyle: {
-            backgroundColor: theme.colors.surface,
-            borderTopColor: theme.colors.cardBorder,
-            borderTopWidth: 1,
-            height: 60,
-            paddingBottom: 8,
-          },
-          tabBarActiveTintColor: theme.colors.primary,
-          tabBarInactiveTintColor: theme.colors.textDim,
-          tabBarLabelStyle: { fontSize: 12 },
-        }}
-      >
-        <Tab.Screen
-          name="HomeTab"
-          component={HomeStack}
-          options={{
-            tabBarLabel: 'Home',
-            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🏠</Text>,
-          }}
-        />
-        <Tab.Screen
-          name="BrowseTab"
-          component={BrowseStack}
-          options={{
-            tabBarLabel: 'Browse',
-            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🦅</Text>,
-          }}
-        />
-        <Tab.Screen
-          name="LifeListTab"
-          component={LifeListStack}
-          options={{
-            tabBarLabel: 'Life List',
-            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>📋</Text>,
-          }}
-        />
-      </Tab.Navigator>
+  tabBar={(props) => <CustomTabBar {...props} />}
+  screenOptions={{
+    headerShown: false,
+  }}
+>
+  <Tab.Screen name="HomeTab" component={HomeStack} />
+  <Tab.Screen name="BrowseTab" component={BrowseStack} />
+  <Tab.Screen name="LifeListTab" component={LifeListStack} />
+</Tab.Navigator>
     </NavigationContainer>
   );
 }

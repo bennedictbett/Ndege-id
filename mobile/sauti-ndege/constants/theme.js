@@ -1,30 +1,51 @@
 export const theme = {
   colors: {
-    background: '#0A0A0A',
-    surface: '#141414',
-    card: '#1A1A1A',
-    cardBorder: '#2A2A2A',
-    primary: '#00C853',
-    primaryBright: '#00E676',
-    primaryDim: '#1B5E20',
+    // Backgrounds
+    background: '#090C09',
+    surface: '#111411',
+    card: '#171A17',
+    cardBorder: '#252B25',
+
+    // Brand
+    primary: '#3C8B5E',       // Forest Green 🌿
+    primaryLight: '#56A878',
+    primaryDark: '#2E6D49',
+    primaryDim: '#163224',
+
+    // Accent
+    accent: '#B9FF66',        // Used sparingly
+
+    // Text
     text: '#FFFFFF',
-    textSecondary: '#AAAAAA',
-    textDim: '#666666',
-    accent: '#FFD600',
-    danger: '#FF1744',
+    textSecondary: '#B8C0B8',
+    textDim: '#707870',
+
+    // Status
+    success: '#5CB85C',
+    warning: '#F4C542',
+    danger: '#E85D5D',
+
+    // Extra
+    divider: '#202520',
+    overlay: 'rgba(0,0,0,0.55)',
+    shadow: 'rgba(0,0,0,0.35)',
   },
+
   spacing: {
     xs: 4,
     sm: 8,
     md: 16,
     lg: 24,
     xl: 32,
+    xxl: 48,
   },
+
   radius: {
     sm: 8,
     md: 12,
-    lg: 16,
+    lg: 18,
     xl: 24,
+    xxl: 32,
     full: 999,
-  }
+  },
 };

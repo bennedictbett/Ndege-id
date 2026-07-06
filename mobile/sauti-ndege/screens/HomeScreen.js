@@ -108,13 +108,29 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       {/* Hero */}
-      <View style={styles.hero}>
-        <Text style={styles.heroTitle}>Know every bird.{'\n'}Anywhere in</Text>
-        <Text style={styles.heroAccent}>East Africa.</Text>
-        <Text style={styles.heroSubtitle}>
-          AI-powered bird recognition{'\n'}by sound, photo or sighting.
-        </Text>
-      </View>
+<View style={styles.heroContainer}>
+  <img
+   src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/birds/superb_starling_1.jpg"
+    style={{
+      width: '100%',
+      height: '100%',
+      resizeMode: 'cover',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+    }}
+  />
+  <View style={[styles.heroOverlay, { 
+  background: 'linear-gradient(to bottom, rgba(7,10,7,0.3) 0%, rgba(7,10,7,0.95) 100%)' 
+}]} />
+  <View style={styles.heroText}>
+    <Text style={styles.heroTitle}>Know every bird.{'\n'}Anywhere in</Text>
+    <Text style={styles.heroAccent}>East Africa.</Text>
+    <Text style={styles.heroSubtitle}>
+      AI-powered bird recognition{'\n'}by sound, photo or sighting.
+    </Text>
+  </View>
+</View>
 
       {/* Search Bar */}
       <View style={styles.searchBar}>
@@ -214,9 +230,23 @@ const styles = StyleSheet.create({
   logoText: { fontSize: 18, fontWeight: 'bold', color: theme.colors.text },
   logoAccent: { color: theme.colors.primary },
   notifIcon: { fontSize: 24 },
-  hero: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.lg,
+  
+  heroContainer: {
+  height: 320,
+  position: 'relative',
+  marginBottom: theme.spacing.md,
+  },
+  heroOverlay: {
+  position: 'absolute',
+  top: 0, left: 0, right: 0, bottom: 0,
+  zIndex: 1,
+  },
+  heroText: {
+    position: 'absolute',
+    bottom: 24,
+    left: theme.spacing.md,
+    right: theme.spacing.md,
+    zIndex: 2,
   },
   heroTitle: {
     fontSize: 36,
