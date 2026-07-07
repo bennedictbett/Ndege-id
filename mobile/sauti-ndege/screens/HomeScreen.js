@@ -5,6 +5,7 @@ import {
   Animated
 } from 'react-native';
 import { theme } from '../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 
 const API_URL = 'https://ndege-id-production.up.railway.app';
 
@@ -133,10 +134,20 @@ export default function HomeScreen({ navigation }) {
 </View>
 
       {/* Search Bar */}
-      <View style={styles.searchBar}>
-        <Text style={styles.searchIcon}>🔍</Text>
-        <Text style={styles.searchPlaceholder}>Search birds, calls, places...</Text>
-      </View>
+    <View style={styles.searchBar}>
+      <Ionicons 
+        name="search" 
+        size={18} 
+        color={theme.colors.textDim} 
+        style={{ marginRight: theme.spacing.sm }}
+      />
+      <Text style={styles.searchPlaceholder}>Search birds, calls, places...</Text>
+      <Ionicons 
+        name="options-outline" 
+        size={18} 
+        color={theme.colors.textDim} 
+      />
+    </View>
 
       {/* Identify Section */}
       <View style={styles.section}>

@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { theme } from '../constants/theme';
 import { addToLifeList } from './LifeListScreen';
+import { Ionicons } from '@expo/vector-icons';
 
 const API_URL = 'https://ndege-id-production.up.railway.app';
 
@@ -55,21 +56,26 @@ export default function BrowseScreen({ navigation }) {
   return (
     <View style={styles.container}>
       {/* Search */}
-      <View style={styles.searchContainer}>
-        <Text style={styles.searchIcon}>🔍</Text>
-        <TextInput
-          style={[styles.searchInput, { outline: 'none' }]}
-          placeholder="Search species..."
-          placeholderTextColor={theme.colors.textDim}
-          value={search}
-          onChangeText={handleSearch}
-        />  
-        {search.length > 0 && (
-          <TouchableOpacity onPress={() => handleSearch('')}>
-            <Text style={styles.clearIcon}>✕</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+    <View style={styles.searchContainer}>
+      <Ionicons
+        name="search"
+        size={18}
+        color={theme.colors.textDim}
+        style={{ marginRight: theme.spacing.sm }}
+      />
+      <TextInput
+        style={[styles.searchInput, { outline: 'none' }]}
+        placeholder="Search species..."
+        placeholderTextColor={theme.colors.textDim}
+        value={search}
+        onChangeText={handleSearch}
+      />
+      {search.length > 0 && (
+        <TouchableOpacity onPress={() => handleSearch('')}>
+          <Ionicons name="close" size={18} color={theme.colors.textDim} />
+        </TouchableOpacity>
+      )}
+    </View>
 
       <Text style={styles.countText}>{filtered.length} species</Text>
 
