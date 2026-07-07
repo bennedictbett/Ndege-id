@@ -31,7 +31,9 @@ export default function BirdDetailScreen({ route, navigation }) {
             alt={bird.common_name}
           />
         )}
-        <View style={styles.heroOverlay} />
+        <View style={[styles.heroOverlay, {
+          background: 'linear-gradient(to bottom, rgba(7,10,7,0.3) 0%, rgba(7,10,7,0.95) 100%)'
+        }]} />
 
         {/* Back button */}
         <TouchableOpacity
@@ -142,7 +144,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0, left: 0, right: 0,
     height: '50%',
-    background: 'linear-gradient(transparent, rgba(0,0,0,0.95))',
     zIndex: 1,
   },
   backButton: {
