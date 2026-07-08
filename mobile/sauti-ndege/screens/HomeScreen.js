@@ -1,11 +1,10 @@
 import { useState, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet,
-  ScrollView, ActivityIndicator, Platform,
-  Animated
+  ScrollView, Animated
 } from 'react-native';
-import { theme } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { theme } from '../constants/theme';
 
 const API_URL = 'https://ndege-id-production.up.railway.app';
 
@@ -95,61 +94,52 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Hero */}
-<View style={styles.heroContainer}>
-  <img
-    src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/birds/superb_starling_1.jpg"
-    style={{
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-    }}
-  />
-  <View style={[styles.heroOverlay, {
-    background: 'linear-gradient(to bottom, rgba(7,10,7,0.2) 0%, rgba(7,10,7,0.95) 100%)'
-  }]} />
 
-  {/* Header floats over image */}
-  <View style={styles.header}>
-    <TouchableOpacity>
-      <Text style={styles.menuIcon}>☰</Text>
-    </TouchableOpacity>
-    <View style={styles.logoContainer}>
-      <Text style={styles.logoText}>🦅 Sauti ya <Text style={styles.logoAccent}>Ndege</Text></Text>
-    </View>
-    <TouchableOpacity>
-      <Text style={styles.notifIcon}>🔔</Text>
-    </TouchableOpacity>
-  </View>
+      {/* Hero with header inside */}
+      <View style={styles.heroContainer}>
+        <img
+          src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/birds/superb_starling_1.jpg"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+          }}
+          alt="hero bird"
+        />
+        <View style={[styles.heroOverlay, {
+          background: 'linear-gradient(to bottom, rgba(7,10,7,0.4) 0%, rgba(7,10,7,0.98) 100%)'
+        }]} />
 
-  {/* Hero text */}
-  <View style={styles.heroText}>
-    <Text style={styles.heroTitle}>Know every bird.{'\n'}Anywhere in</Text>
-    <Text style={styles.heroAccent}>East Africa.</Text>
-    <Text style={styles.heroSubtitle}>
-      AI-powered bird recognition{'\n'}by sound, photo or sighting.
-    </Text>
-  </View>
-</View>
+        {/* Header floats over image */}
+        <View style={styles.header}>
+          <TouchableOpacity>
+            <Text style={styles.menuIcon}>☰</Text>
+          </TouchableOpacity>
+          <View style={styles.logoContainer}>
+            <Text style={styles.logoText}>🦅 Sauti ya <Text style={styles.logoAccent}>Ndege</Text></Text>
+          </View>
+          <TouchableOpacity>
+            <Text style={styles.notifIcon}>🔔</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Search Bar */}
-    <View style={styles.searchBar}>
-      <Ionicons 
-        name="search" 
-        size={18} 
-        color={theme.colors.textDim} 
-        style={{ marginRight: theme.spacing.sm }}
-      />
-      <Text style={styles.searchPlaceholder}>Search birds, calls, places...</Text>
-      <Ionicons 
-        name="options-outline" 
-        size={18} 
-        color={theme.colors.textDim} 
-      />
-    </View>
+        {/* Hero text + search */}
+        <View style={styles.heroText}>
+          <Text style={styles.heroTitle}>Know every bird.{'\n'}Anywhere in</Text>
+          <Text style={styles.heroAccent}>East Africa.</Text>
+          <Text style={styles.heroSubtitle}>
+            AI-powered bird recognition by sound, photo or sighting.
+          </Text>
+          <View style={styles.searchBar}>
+            <Ionicons name="search" size={18} color={theme.colors.textDim} style={{ marginRight: 8 }} />
+            <Text style={styles.searchPlaceholder}>Search birds, calls, places...</Text>
+            <Ionicons name="options-outline" size={18} color={theme.colors.textDim} />
+          </View>
+        </View>
+      </View>
 
       {/* Identify Section */}
       <View style={styles.section}>
@@ -185,7 +175,7 @@ export default function HomeScreen({ navigation }) {
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionIcon}>📍</Text>
             <Text style={styles.sectionTitle}>Recent Sightings</Text>
-            <TouchableOpacity style={styles.viewAll}>
+            <TouchableOpacity>
               <Text style={styles.viewAllText}>View all →</Text>
             </TouchableOpacity>
           </View>
@@ -230,72 +220,69 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
+  heroContainer: {
+    height: 440,
+    position: 'relative',
+    marginBottom: theme.spacing.md,
+  },
+  heroOverlay: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
+    zIndex: 1,
+  },
   header: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  paddingHorizontal: theme.spacing.md,
-  paddingTop: 50,
-  paddingBottom: theme.spacing.md,
-  position: 'absolute',
-  top: 0, left: 0, right: 0,
-  zIndex: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: theme.spacing.md,
+    paddingTop: 50,
+    paddingBottom: theme.spacing.md,
+    position: 'absolute',
+    top: 0, left: 0, right: 0,
+    zIndex: 3,
   },
   menuIcon: { fontSize: 24, color: theme.colors.text },
   logoContainer: { alignItems: 'center' },
   logoText: { fontSize: 18, fontWeight: 'bold', color: theme.colors.text },
   logoAccent: { color: theme.colors.primary },
   notifIcon: { fontSize: 24 },
-  
-  heroContainer: {
-  height: 420,
-  position: 'relative',
-  marginBottom: theme.spacing.md,
-  },
-  heroOverlay: {
-  position: 'absolute',
-  top: 0, left: 0, right: 0, bottom: 0,
-  zIndex: 1,
-  },
   heroText: {
     position: 'absolute',
-    bottom: 24,
+    bottom: 20,
     left: theme.spacing.md,
     right: theme.spacing.md,
     zIndex: 2,
   },
   heroTitle: {
-    fontSize: 36,
+    fontSize: 34,
     fontWeight: 'bold',
     color: theme.colors.text,
-    lineHeight: 44,
+    lineHeight: 42,
   },
   heroAccent: {
-    fontSize: 36,
+    fontSize: 34,
     fontWeight: 'bold',
     color: theme.colors.primary,
-    lineHeight: 44,
+    lineHeight: 42,
   },
   heroSubtitle: {
-    fontSize: 15,
+    fontSize: 14,
     color: theme.colors.textSecondary,
-    marginTop: theme.spacing.sm,
-    lineHeight: 22,
+    marginTop: 6,
+    marginBottom: 16,
+    lineHeight: 20,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.surface,
-    marginHorizontal: theme.spacing.md,
+    backgroundColor: 'rgba(17,20,17,0.9)',
     borderRadius: theme.radius.full,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: 12,
     borderWidth: 1,
     borderColor: theme.colors.cardBorder,
-    marginBottom: theme.spacing.lg,
   },
-  searchIcon: { fontSize: 16, marginRight: theme.spacing.sm },
-  searchPlaceholder: { color: theme.colors.textDim, fontSize: 15 },
+  searchPlaceholder: { color: theme.colors.textDim, fontSize: 14, flex: 1 },
   section: {
     paddingHorizontal: theme.spacing.md,
     marginBottom: theme.spacing.lg,
@@ -312,7 +299,6 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     flex: 1,
   },
-  viewAll: {},
   viewAllText: { color: theme.colors.primary, fontSize: 14 },
   identifyCards: {
     flexDirection: 'row',
@@ -354,7 +340,7 @@ const styles = StyleSheet.create({
   },
   recentCard: {
     width: 160,
-    height: 200,
+    height: 220,
     borderRadius: theme.radius.lg,
     overflow: 'hidden',
     marginRight: theme.spacing.sm,
@@ -387,7 +373,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: theme.spacing.sm,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(0,0,0,0.75)',
   },
   recentBirdName: {
     color: theme.colors.text,
