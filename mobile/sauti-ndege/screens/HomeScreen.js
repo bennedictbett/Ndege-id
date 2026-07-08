@@ -95,35 +95,37 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity>
-          <Text style={styles.menuIcon}>☰</Text>
-        </TouchableOpacity>
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>🦅 Sauti ya <Text style={styles.logoAccent}>Ndege</Text></Text>
-        </View>
-        <TouchableOpacity>
-          <Text style={styles.notifIcon}>🔔</Text>
-        </TouchableOpacity>
-      </View>
-
       {/* Hero */}
 <View style={styles.heroContainer}>
   <img
-   src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/birds/superb_starling_1.jpg"
+    src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/birds/superb_starling_1.jpg"
     style={{
       width: '100%',
       height: '100%',
-      resizeMode: 'cover',
+      objectFit: 'cover',
       position: 'absolute',
       top: 0,
       left: 0,
     }}
   />
-  <View style={[styles.heroOverlay, { 
-  background: 'linear-gradient(to bottom, rgba(7,10,7,0.3) 0%, rgba(7,10,7,0.95) 100%)' 
-}]} />
+  <View style={[styles.heroOverlay, {
+    background: 'linear-gradient(to bottom, rgba(7,10,7,0.2) 0%, rgba(7,10,7,0.95) 100%)'
+  }]} />
+
+  {/* Header floats over image */}
+  <View style={styles.header}>
+    <TouchableOpacity>
+      <Text style={styles.menuIcon}>☰</Text>
+    </TouchableOpacity>
+    <View style={styles.logoContainer}>
+      <Text style={styles.logoText}>🦅 Sauti ya <Text style={styles.logoAccent}>Ndege</Text></Text>
+    </View>
+    <TouchableOpacity>
+      <Text style={styles.notifIcon}>🔔</Text>
+    </TouchableOpacity>
+  </View>
+
+  {/* Hero text */}
   <View style={styles.heroText}>
     <Text style={styles.heroTitle}>Know every bird.{'\n'}Anywhere in</Text>
     <Text style={styles.heroAccent}>East Africa.</Text>
@@ -229,12 +231,15 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.md,
-    paddingTop: 50,
-    paddingBottom: theme.spacing.md,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingHorizontal: theme.spacing.md,
+  paddingTop: 50,
+  paddingBottom: theme.spacing.md,
+  position: 'absolute',
+  top: 0, left: 0, right: 0,
+  zIndex: 3,
   },
   menuIcon: { fontSize: 24, color: theme.colors.text },
   logoContainer: { alignItems: 'center' },
@@ -243,7 +248,7 @@ const styles = StyleSheet.create({
   notifIcon: { fontSize: 24 },
   
   heroContainer: {
-  height: 320,
+  height: 420,
   position: 'relative',
   marginBottom: theme.spacing.md,
   },
