@@ -97,6 +97,25 @@ export default function HomeScreen({ navigation }) {
 
       {/* Hero */}
 <View style={styles.heroContainer}>
+  {/* Layered background */}
+  <img
+    src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/birds/white_browed_robin_chat_1.jpg"
+    style={{
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover',
+      position: 'absolute',
+      top: 0, left: 0,
+      filter: 'blur(8px) brightness(0.3)',
+      transform: 'scale(1.1)',
+    }}
+    alt=""
+  />
+  {/* Green radial gradient overlay */}
+  <View style={[styles.heroGradient, {
+    background: 'radial-gradient(ellipse at 70% 50%, rgba(126,217,87,0.15) 0%, rgba(7,10,7,0.0) 70%)',
+  }]} />
+
   {/* Header */}
   <View style={styles.header}>
     <TouchableOpacity>
@@ -110,11 +129,11 @@ export default function HomeScreen({ navigation }) {
     </TouchableOpacity>
   </View>
 
-  {/* Split layout */}
+  {/* Split content */}
   <View style={styles.heroContent}>
     {/* Left - Text */}
     <View style={styles.heroLeft}>
-      <Text style={styles.heroTitle}>Know{'\n'}every{'\n'}bird.</Text>
+      <Text style={styles.heroTitle}>Know{'\n'}Every{'\n'}Bird.</Text>
       <Text style={styles.heroSub}>Anywhere in</Text>
       <Text style={styles.heroAccent}>East Africa.</Text>
       <Text style={styles.heroSubtitle}>
@@ -122,26 +141,29 @@ export default function HomeScreen({ navigation }) {
       </Text>
     </View>
 
-    {/* Right - Bird image */}
+    {/* Right - Transparent bird PNG floating */}
     <View style={styles.heroRight}>
       <img
-        src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/birds/superb_starling_1.jpg"
+        src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/hero/white_browed_robin_chat_1-removebg-preview.png"
         style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          borderRadius: 20,
+          width: '160%',
+          height: '160%',
+          objectFit: 'contain',
+          position: 'absolute',
+          bottom: -40,
+          right: -30,
+          filter: 'drop-shadow(0px 12px 32px rgba(126,217,87,0.4))',
         }}
         alt="hero bird"
       />
     </View>
   </View>
 
-  {/* Search bar */}
+  {/* Search bar - full width */}
   <View style={styles.searchBar}>
-    <Ionicons name="search" size={18} color={theme.colors.textDim} style={{ marginRight: 8 }} />
+    <Ionicons name="search" size={16} color={theme.colors.primary} style={{ marginRight: 8 }} />
     <Text style={styles.searchPlaceholder}>Search birds, calls, places...</Text>
-    <Ionicons name="options-outline" size={18} color={theme.colors.textDim} />
+    <Ionicons name="options-outline" size={16} color={theme.colors.textDim} />
   </View>
 </View>
 
@@ -225,8 +247,21 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   heroContainer: {
-  backgroundColor: theme.colors.background,
-  paddingBottom: theme.spacing.md,
+  position: 'relative',
+  overflow: 'hidden',
+  paddingBottom: theme.spacing.lg,
+  borderBottomWidth: 1,
+  borderBottomColor: theme.colors.cardBorder,
+  minHeight: 340,
+  },
+  heroGradient: {
+  position: 'absolute',
+  top: 0, left: 0, right: 0, bottom: 0,
+  zIndex: 1,
+  },
+  heroBg: {
+  position: 'absolute',
+  top: 0, left: 0, right: 0, bottom: 0,
   },
   heroOverlay: {
     position: 'absolute',
@@ -239,14 +274,18 @@ const styles = StyleSheet.create({
   justifyContent: 'space-between',
   paddingHorizontal: theme.spacing.md,
   paddingTop: 50,
-  paddingBottom: theme.spacing.md,
+  paddingBottom: theme.spacing.sm,
+  zIndex: 3,
+  position: 'relative',
   },
   heroContent: {
   flexDirection: 'row',
   paddingHorizontal: theme.spacing.md,
-  paddingVertical: theme.spacing.md,
+  paddingTop: theme.spacing.sm,
   alignItems: 'center',
-  gap: theme.spacing.md,
+  minHeight: 220,
+  zIndex: 2,
+  position: 'relative',
   },
   menuIcon: { fontSize: 24, color: theme.colors.text },
   logoContainer: { alignItems: 'center' },
@@ -261,52 +300,59 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   heroLeft: {
-  flex: 1,
+  flex: 1.2,
+  zIndex: 2,
+  paddingRight: theme.spacing.sm,
   },
   heroRight: {
-  width: 160,
-  height: 200,
-  borderRadius: 20,
-  overflow: 'hidden',
+  flex: 0.9,
+  height: 220,
+  position: 'relative',
+  overflow: 'visible',
+  zIndex: 2,
   },
   heroTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-    lineHeight: 38,
+  fontSize: 38,
+  fontWeight: 'bold',
+  color: theme.colors.text,
+  lineHeight: 44,
+  letterSpacing: -1,
   },
   heroSub: {
-  fontSize: 14,
+  fontSize: 13,
   color: theme.colors.textSecondary,
-  marginTop: 4,
+  marginTop: 6,
   },
   heroAccent: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: theme.colors.primary,
-    marginBottom: 8,
+  fontSize: 22,
+  fontWeight: 'bold',
+  color: theme.colors.primary,
+  marginBottom: 8,
   },
   heroSubtitle: {
   fontSize: 12,
   color: theme.colors.textDim,
   lineHeight: 18,
+  marginBottom: 0,
   },
   searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(17,20,17,0.9)',
-    borderRadius: theme.radius.full,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.cardBorder,
-    marginHorizontal: theme.spacing.md,  
-    marginBottom: theme.spacing.md,   
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: 'rgba(255,255,255,0.06)',
+  borderRadius: 30,
+  paddingHorizontal: 16,
+  paddingVertical: 12,
+  borderWidth: 1,
+  borderColor: 'rgba(126,217,87,0.3)',
+  marginHorizontal: theme.spacing.md,
+  marginTop: theme.spacing.md,
+  zIndex: 3,
+  position: 'relative',
   },
-  searchPlaceholder: { color: theme.colors.textDim, fontSize: 14, flex: 1 },
-  section: {
-    paddingHorizontal: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
+  searchPlaceholder: {
+  color: theme.colors.textDim,
+  fontSize: 13,
+  flex: 1,
   },
   sectionHeader: {
     flexDirection: 'row',
