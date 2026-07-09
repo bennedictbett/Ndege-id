@@ -97,24 +97,29 @@ export default function HomeScreen({ navigation }) {
 
       {/* Hero */}
 <View style={styles.heroContainer}>
-  {/* Layered background */}
-  <img
-    src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/birds/white_browed_robin_chat_1.jpg"
-    style={{
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover',
-      position: 'absolute',
-      top: 0, left: 0,
-      filter: 'blur(8px) brightness(0.3)',
-      transform: 'scale(1.1)',
-    }}
-    alt=""
-  />
-  {/* Green radial gradient overlay */}
-  <View style={[styles.heroGradient, {
-    background: 'radial-gradient(ellipse at 70% 50%, rgba(126,217,87,0.15) 0%, rgba(7,10,7,0.0) 70%)',
-  }]} />
+
+  {/* Layered background - clipped */}
+  <View style={{
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
+    overflow: 'hidden',
+    zIndex: 0,
+  }}>
+    <img
+      src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/birds/white_browed_robin_chat_1.jpg"
+      style={{
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        filter: 'blur(4px) brightness(0.25)',
+        transform: 'scale(1.05)',
+      }}
+      alt=""
+    />
+    <View style={[styles.heroGradient, {
+      background: 'radial-gradient(ellipse at 70% 50%, rgba(126,217,87,0.15) 0%, rgba(7,10,7,0.0) 70%)',
+    }]} />
+  </View>
 
   {/* Header */}
   <View style={styles.header}>
@@ -141,7 +146,7 @@ export default function HomeScreen({ navigation }) {
       </Text>
     </View>
 
-    {/* Right - Transparent bird PNG floating */}
+    {/* Right - Transparent bird PNG */}
     <View style={styles.heroRight}>
       <img
         src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/hero/white_browed_robin_chat_1-removebg-preview.png"
@@ -159,12 +164,13 @@ export default function HomeScreen({ navigation }) {
     </View>
   </View>
 
-  {/* Search bar - full width */}
+  {/* Search bar */}
   <View style={styles.searchBar}>
     <Ionicons name="search" size={16} color={theme.colors.primary} style={{ marginRight: 8 }} />
     <Text style={styles.searchPlaceholder}>Search birds, calls, places...</Text>
     <Ionicons name="options-outline" size={16} color={theme.colors.textDim} />
   </View>
+
 </View>
 
       {/* Identify Section */}
@@ -248,7 +254,7 @@ const styles = StyleSheet.create({
   },
   heroContainer: {
   position: 'relative',
-  overflow: 'hidden',
+  overflow: 'visible', 
   paddingBottom: theme.spacing.lg,
   borderBottomWidth: 1,
   borderBottomColor: theme.colors.cardBorder,
