@@ -151,13 +151,14 @@ export default function HomeScreen({ navigation }) {
       <img
         src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/white_browed_robin_chat_1-removebg-preview.png"
         style={{
-          width: '160%',
-          height: '160%',
+          width: '140%',
+          height: '140%',
           objectFit: 'contain',
           position: 'absolute',
-          bottom: -40,
-          right: -30,
-          filter: 'drop-shadow(0px 12px 32px rgba(126,217,87,0.4))',
+          bottom: -10,
+          right: -10,
+          filter: 'blur(2px) brightness(0.2)',
+          transform: 'scale(1.02)',
         }}
         alt="hero bird"
       />
@@ -314,7 +315,7 @@ const styles = StyleSheet.create({
   flex: 0.9,
   height: 220,
   position: 'relative',
-  overflow: 'visible',
+  overflow: 'hidden',
   zIndex: 2,
   },
   heroTitle: {
