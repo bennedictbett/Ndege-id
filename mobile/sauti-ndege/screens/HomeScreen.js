@@ -149,7 +149,7 @@ export default function HomeScreen({ navigation }) {
     {/* Right - Transparent bird PNG */}
     <View style={styles.heroRight}>
       <img
-        src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/hero/white_browed_robin_chat_1-removebg-preview.png"
+        src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/white_browed_robin_chat_1-removebg-preview.png"
         style={{
           width: '160%',
           height: '160%',
