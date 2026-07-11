@@ -391,10 +391,10 @@ const styles = StyleSheet.create({
   alignItems: 'center',
   },
   identifySectionCard: {
-  backgroundColor: 'rgba(255,255,255,0.04)', // subtle lightening vs pure black
+  backgroundColor: theme.colors.card,
   borderRadius: theme.radius.lg,
   borderWidth: 1,
-  borderColor: 'rgba(126,217,87,0.15)', // faint green-tinted border, matches your accent color
+  borderColor: theme.colors.cardBorder,
   padding: theme.spacing.md,
   },
   identifyIconGlow: {
