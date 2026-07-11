@@ -177,32 +177,35 @@ export default function HomeScreen({ navigation }) {
 </View>
 
       {/* Identify Section */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionIcon}>✨</Text>
-          <Text style={styles.sectionTitle}>Identify a bird</Text>
-        </View>
-        <View style={styles.identifyCards}>
-          <IdentifyCard
-            icon="mic"
-            title="By Sound"
-            subtitle="Record or upload a bird sound"
-            onPress={handleIdentifyBySound}
-          />
-          <IdentifyCard
-            icon="camera"
-            title="By Photo"
-            subtitle="Take or upload a photo"
-            onPress={() => alert('Coming soon!')}
-          />
-          <IdentifyCard
-            icon="eye-outline"
-            title="By Sight"
-            subtitle="Describe what you saw"
-            onPress={() => navigation.navigate('BrowseTab')}
-          />
-        </View>
-      </View>
+<View style={styles.section}>
+  <View style={styles.identifySectionCard}>
+    <View style={styles.sectionHeader}>
+      <Ionicons name="sparkles" size={18} color={theme.colors.primary} style={{ marginRight: theme.spacing.sm }} />
+      <Text style={styles.sectionTitle}>Identify a bird</Text>
+      <Ionicons name="chevron-forward" size={18} color={theme.colors.textDim} />
+    </View>
+    <View style={styles.identifyCards}>
+      <IdentifyCard
+        icon="mic"
+        title="By Sound"
+        subtitle="Record or upload a bird sound"
+        onPress={handleIdentifyBySound}
+      />
+      <IdentifyCard
+        icon="camera"
+        title="By Photo"
+        subtitle="Take or upload a photo"
+        onPress={() => alert('Coming soon!')}
+      />
+      <IdentifyCard
+        icon="eye-outline"
+        title="By Sight"
+        subtitle="Describe what you saw"
+        onPress={() => navigation.navigate('BrowseTab')}
+      />
+    </View>
+  </View>
+</View>
 
       {/* Recent Sightings */}
       {recentBirds.length > 0 && (
@@ -225,7 +228,7 @@ export default function HomeScreen({ navigation }) {
       {/* Explore Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionIcon}>🧭</Text>
+          <Ionicons name="compass-outline" size={18} color={theme.colors.primary} />
           <Text style={styles.sectionTitle}>Explore</Text>
         </View>
         <View style={styles.exploreGrid}>
@@ -381,13 +384,18 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   identifyCard: {
-    flex: 1,
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
-    padding: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.cardBorder,
-    alignItems: 'center',
+  flex: 1,
+  backgroundColor: 'transparent',
+  borderRadius: theme.radius.lg,
+  padding: theme.spacing.sm,
+  alignItems: 'center',
+  },
+  identifySectionCard: {
+  backgroundColor: 'rgba(255,255,255,0.04)', // subtle lightening vs pure black
+  borderRadius: theme.radius.lg,
+  borderWidth: 1,
+  borderColor: 'rgba(126,217,87,0.15)', // faint green-tinted border, matches your accent color
+  padding: theme.spacing.md,
   },
   identifyIconGlow: {
   width: 60,
