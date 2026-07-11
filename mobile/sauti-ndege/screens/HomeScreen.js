@@ -1,10 +1,10 @@
 import { useState, useRef } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet,
-  ScrollView, Animated
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../constants/theme';
+import {
+  View, Text, TouchableOpacity, StyleSheet,
+  ScrollView, Animated, ImageBackground
+} from 'react-native';
 
 const API_URL = 'https://ndege-id-production.up.railway.app';
 
@@ -233,18 +233,23 @@ export default function HomeScreen({ navigation }) {
         </View>
         <View style={styles.exploreGrid}>
           {[
-            { icon: '🔭', title: 'Birds', subtitle: 'Explore species in East Africa', onPress: () => navigation.navigate('BrowseTab') },
-            { icon: '📖', title: 'Field Guide', subtitle: 'Learn calls, behaviors and habitats', onPress: () => navigation.navigate('BrowseTab') },
-            { icon: '🗺️', title: 'Hotspots', subtitle: 'Discover best places for birding', onPress: () => alert('Coming soon!') },
-            { icon: '🏆', title: 'Life List', subtitle: 'Track your streaks and achievements', onPress: () => navigation.navigate('LifeListTab') },
+            { icon: 'binoculars-outline', title: 'Birds', subtitle: 'Explore species in East Africa', image: 'YOUR_IMAGE_URL_1', onPress: () => navigation.navigate('BrowseTab') },
+            { icon: 'book-outline', title: 'Field Guide', subtitle: 'Learn calls, behaviors and habitats', image: 'YOUR_IMAGE_URL_2', onPress: () => navigation.navigate('BrowseTab') },
+            { icon: 'map-outline', title: 'Hotspots', subtitle: 'Discover best places for birding', image: 'YOUR_IMAGE_URL_3', onPress: () => alert('Coming soon!') },
+            { icon: 'trophy-outline', title: 'Life List', subtitle: 'Track your streaks and achievements', image: 'YOUR_IMAGE_URL_4', onPress: () => navigation.navigate('LifeListTab') },
           ].map((item, index) => (
-            <TouchableOpacity key={index} style={styles.exploreCard} onPress={item.onPress}>
-              <Text style={styles.exploreIcon}>{item.icon}</Text>
+              <TouchableOpacity key={index} style={styles.exploreCard} onPress={item.onPress}>
+              <ImageBackground source={{ uri: item.image }} style={styles.exploreCardBg} imageStyle={{ borderRadius: theme.radius.lg }}>
+              <View style={styles.exploreOverlay} />
+              <Ionicons name={item.icon} size={26} color={theme.colors.primary} style={{ marginBottom: theme.spacing.sm }} />
               <Text style={styles.exploreTitle}>{item.title}</Text>
               <Text style={styles.exploreSubtitle}>{item.subtitle}</Text>
-              <Text style={styles.exploreArrow}>→</Text>
-            </TouchableOpacity>
-          ))}
+              <View style={styles.exploreArrowCircle}>
+                <Ionicons name="arrow-forward" size={14} color={theme.colors.text} />
+              </View>
+                </ImageBackground>
+                </TouchableOpacity>
+                ))}
         </View>
       </View>
 
@@ -486,30 +491,39 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   exploreCard: {
-    width: '47%',
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
-    padding: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.cardBorder,
-    minHeight: 130,
+  width: '47%',
+  borderRadius: theme.radius.lg,
+  overflow: 'hidden',
+  minHeight: 160,
   },
-  exploreIcon: { fontSize: 28, marginBottom: theme.spacing.sm },
+  exploreCardBg: {
+  flex: 1,
+  padding: theme.spacing.md,
+  justifyContent: 'flex-start',
+  },
+  exploreOverlay: {
+  position: 'absolute',
+  top: 0, left: 0, right: 0, bottom: 0,
+  backgroundColor: 'rgba(0,0,0,0.5)', // dark scrim so text/icons stay readable over the photo
+  },
   exploreTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: theme.colors.text,
-    marginBottom: 4,
+  fontSize: 15,
+  fontWeight: '600',
+  color: theme.colors.text,
+  marginBottom: 4,
   },
   exploreSubtitle: {
-    fontSize: 11,
-    color: theme.colors.textDim,
-    lineHeight: 15,
-    flex: 1,
+  fontSize: 11,
+  color: theme.colors.textSecondary,
+  lineHeight: 15,
   },
-  exploreArrow: {
-    color: theme.colors.primary,
-    fontSize: 16,
-    marginTop: theme.spacing.sm,
+  exploreArrowCircle: {
+  width: 26,
+  height: 26,
+  borderRadius: 13,
+  backgroundColor: 'rgba(255,255,255,0.15)',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginTop: theme.spacing.sm,
   },
 });
