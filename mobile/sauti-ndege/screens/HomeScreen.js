@@ -385,8 +385,8 @@ const styles = StyleSheet.create({
   },
   identifyCard: {
   flex: 1,
-  backgroundColor: 'transparent',
-  borderRadius: theme.radius.lg,
+  backgroundColor: 'rgba(255,255,255,0.02)', // very faint lift, not fully transparent
+  borderRadius: theme.radius.md,
   padding: theme.spacing.sm,
   alignItems: 'center',
   },
