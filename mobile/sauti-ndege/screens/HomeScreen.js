@@ -10,8 +10,10 @@ const API_URL = 'https://ndege-id-production.up.railway.app';
 
 const IdentifyCard = ({ icon, title, subtitle, onPress }) => (
   <TouchableOpacity style={styles.identifyCard} onPress={onPress}>
-    <View style={styles.identifyIconContainer}>
-      <Text style={styles.identifyIcon}>{icon}</Text>
+    <View style={styles.identifyIconGlow}>
+      <View style={styles.identifyIconContainer}>
+        <Ionicons name={icon} size={24} color={theme.colors.primary} />
+      </View>
     </View>
     <Text style={styles.identifyTitle}>{title}</Text>
     <Text style={styles.identifySubtitle}>{subtitle}</Text>
@@ -182,19 +184,19 @@ export default function HomeScreen({ navigation }) {
         </View>
         <View style={styles.identifyCards}>
           <IdentifyCard
-            icon="🎙️"
+            icon="mic"
             title="By Sound"
             subtitle="Record or upload a bird sound"
             onPress={handleIdentifyBySound}
           />
           <IdentifyCard
-            icon="📷"
+            icon="camera"
             title="By Photo"
             subtitle="Take or upload a photo"
             onPress={() => alert('Coming soon!')}
           />
           <IdentifyCard
-            icon="🔭"
+            icon="eye-outline"
             title="By Sight"
             subtitle="Describe what you saw"
             onPress={() => navigation.navigate('BrowseTab')}
@@ -387,18 +389,29 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.cardBorder,
     alignItems: 'center',
   },
-  identifyIconContainer: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: '#0A2A0A',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.primary,
+  identifyIconGlow: {
+  width: 60,
+  height: 60,
+  borderRadius: 30,
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: theme.spacing.sm,
+  shadowColor: theme.colors.primary,
+  shadowOffset: { width: 0, height: 0 },
+  shadowOpacity: 0.5,
+  shadowRadius: 12,
+  elevation: 6, // Android glow approximation
   },
-  identifyIcon: { fontSize: 24 },
+  identifyIconContainer: {
+  width: 52,
+  height: 52,
+  borderRadius: 26,
+  backgroundColor: '#0A2A0A',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderWidth: 1,
+  borderColor: theme.colors.primary,
+  },
   identifyTitle: {
     fontSize: 13,
     fontWeight: '600',
