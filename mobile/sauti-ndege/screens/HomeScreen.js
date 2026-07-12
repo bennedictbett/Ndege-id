@@ -101,27 +101,25 @@ export default function HomeScreen({ navigation }) {
 <View style={styles.heroContainer}>
 
   {/* Layered background - clipped */}
-  <View style={{
+<View style={{
     position: 'absolute',
     top: 0, left: 0, right: 0, bottom: 0,
     overflow: 'hidden',
     zIndex: 0,
   }}>
     <img
-      src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/birds/white_browed_robin_chat_1.jpg"
+      src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/hero/lilac-breasted-roller-hero.jpg"
       style={{
         width: '100%',
         height: '100%',
         objectFit: 'cover',
-        filter: 'blur(4px) brightness(0.25)',
-        transform: 'scale(1.05)',
       }}
-      alt=""
+      alt="Lilac-breasted roller"
     />
     <View style={[styles.heroGradient, {
-      background: 'radial-gradient(ellipse at 70% 50%, rgba(126,217,87,0.15) 0%, rgba(7,10,7,0.0) 70%)',
+      background: 'linear-gradient(90deg, rgba(9,12,9,0.95) 0%, rgba(9,12,9,0.6) 40%, rgba(9,12,9,0.1) 70%, rgba(9,12,9,0) 100%)',
     }]} />
-  </View>
+</View>
 
   {/* Header */}
   <View style={styles.header}>
@@ -146,24 +144,6 @@ export default function HomeScreen({ navigation }) {
       <Text style={styles.heroSubtitle}>
         AI-powered bird recognition by sound, photo or sighting.
       </Text>
-    </View>
-
-    {/* Right - Transparent bird PNG */}
-    <View style={styles.heroRight}>
-      <img
-        src="https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/white_browed_robin_chat_1-removebg-preview.png"
-        style={{
-          width: '140%',
-          height: '140%',
-          objectFit: 'contain',
-          position: 'absolute',
-          bottom: -10,
-          right: -10,
-          filter: 'blur(2px) brightness(0.2)',
-          transform: 'scale(1.02)',
-        }}
-        alt="hero bird"
-      />
     </View>
   </View>
 
@@ -239,20 +219,17 @@ export default function HomeScreen({ navigation }) {
             { icon: 'trophy-outline', title: 'Life List', subtitle: 'Track your streaks and achievements', image: 'https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/explore-cards/life-list-card.jpg', onPress: () => navigation.navigate('LifeListTab') },
           ].map((item, index) => (
               <TouchableOpacity key={index} style={styles.exploreCard} onPress={item.onPress}>
-              <ImageBackground
-                source={{ uri: item.image }}
-                style={styles.exploreCardBg}
-                imageStyle={{ borderRadius: theme.radius.lg }}
-                resizeMode="cover"
-              >
-              <View style={styles.exploreOverlay} />
-              <Ionicons name={item.icon} size={26} color={theme.colors.primary} style={{ marginBottom: theme.spacing.sm }} />
-              <Text style={styles.exploreTitle}>{item.title}</Text>
-              <Text style={styles.exploreSubtitle}>{item.subtitle}</Text>
-              <View style={styles.exploreArrowCircle}>
-                <Ionicons name="arrow-forward" size={14} color={theme.colors.text} />
-              </View>
-                </ImageBackground>
+              <ImageBackground source={{ uri: item.image }} style={styles.exploreCardBg} imageStyle={{ borderRadius: theme.radius.lg }} resizeMode="cover">
+                <View style={styles.exploreOverlay} />
+                <View>
+                  <Ionicons name={item.icon} size={26} color={theme.colors.primary} style={{ marginBottom: theme.spacing.sm }} />
+                  <Text style={styles.exploreTitle}>{item.title}</Text>
+                  <Text style={styles.exploreSubtitle}>{item.subtitle}</Text>
+                </View>
+                <View style={styles.exploreArrowCircle}>
+                  <Ionicons name="arrow-forward" size={14} color={theme.colors.text} />
+                </View>
+              </ImageBackground>
                 </TouchableOpacity>
                 ))}
         </View>
@@ -322,7 +299,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   heroLeft: {
-  flex: 1.2,
+  flex: 1, 
   zIndex: 2,
   paddingRight: theme.spacing.sm,
   },
@@ -503,7 +480,7 @@ const styles = StyleSheet.create({
   exploreCardBg: {
   flex: 1,
   padding: theme.spacing.md,
-  justifyContent: 'flex-start',
+  justifyContent: 'space-between', 
   },
   exploreOverlay: {
   position: 'absolute',
