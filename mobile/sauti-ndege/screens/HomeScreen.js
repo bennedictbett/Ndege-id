@@ -239,7 +239,12 @@ export default function HomeScreen({ navigation }) {
             { icon: 'trophy-outline', title: 'Life List', subtitle: 'Track your streaks and achievements', image: 'https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/explore-cards/life-list-card.jpg', onPress: () => navigation.navigate('LifeListTab') },
           ].map((item, index) => (
               <TouchableOpacity key={index} style={styles.exploreCard} onPress={item.onPress}>
-              <ImageBackground source={{ uri: item.image }} style={styles.exploreCardBg} imageStyle={{ borderRadius: theme.radius.lg }}>
+              <ImageBackground
+                source={{ uri: item.image }}
+                style={styles.exploreCardBg}
+                imageStyle={{ borderRadius: theme.radius.lg }}
+                resizeMode="cover"
+              >
               <View style={styles.exploreOverlay} />
               <Ionicons name={item.icon} size={26} color={theme.colors.primary} style={{ marginBottom: theme.spacing.sm }} />
               <Text style={styles.exploreTitle}>{item.title}</Text>
@@ -487,14 +492,13 @@ const styles = StyleSheet.create({
   },
   exploreGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: theme.spacing.sm,
   },
   exploreCard: {
-  width: '47%',
+  flex: 1,
+  height: 170, 
   borderRadius: theme.radius.lg,
   overflow: 'hidden',
-  minHeight: 160,
   },
   exploreCardBg: {
   flex: 1,
