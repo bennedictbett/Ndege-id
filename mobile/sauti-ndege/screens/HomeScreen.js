@@ -233,10 +233,10 @@ export default function HomeScreen({ navigation }) {
         </View>
         <View style={styles.exploreGrid}>
           {[
-            { icon: 'binoculars-outline', title: 'Birds', subtitle: 'Explore species in East Africa', image: 'YOUR_IMAGE_URL_1', onPress: () => navigation.navigate('BrowseTab') },
-            { icon: 'book-outline', title: 'Field Guide', subtitle: 'Learn calls, behaviors and habitats', image: 'YOUR_IMAGE_URL_2', onPress: () => navigation.navigate('BrowseTab') },
-            { icon: 'map-outline', title: 'Hotspots', subtitle: 'Discover best places for birding', image: 'YOUR_IMAGE_URL_3', onPress: () => alert('Coming soon!') },
-            { icon: 'trophy-outline', title: 'Life List', subtitle: 'Track your streaks and achievements', image: 'YOUR_IMAGE_URL_4', onPress: () => navigation.navigate('LifeListTab') },
+            { icon: 'binoculars-outline', title: 'Birds', subtitle: 'Explore species in East Africa', image: 'https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/explore-cards/birds-card.jpg', onPress: () => navigation.navigate('BrowseTab') },
+            { icon: 'book-outline', title: 'Field Guide', subtitle: 'Learn calls, behaviors and habitats', image: 'https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/explore-cards/field-guide-card.jpg', onPress: () => navigation.navigate('BrowseTab') },
+            { icon: 'navigate-outline', title: 'Hotspots', subtitle: 'Discover best places for birding', image: 'https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/explore-cards/hotspots-card.jpg', onPress: () => alert('Coming soon!') },
+            { icon: 'trophy-outline', title: 'Life List', subtitle: 'Track your streaks and achievements', image: 'https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/explore-cards/life-list-card.jpg', onPress: () => navigation.navigate('LifeListTab') },
           ].map((item, index) => (
               <TouchableOpacity key={index} style={styles.exploreCard} onPress={item.onPress}>
               <ImageBackground source={{ uri: item.image }} style={styles.exploreCardBg} imageStyle={{ borderRadius: theme.radius.lg }}>
