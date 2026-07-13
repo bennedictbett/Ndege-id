@@ -113,11 +113,15 @@ export default function HomeScreen({ navigation }) {
         width: '100%',
         height: '100%',
         objectFit: 'cover',
+        objectPosition: 'center 30%'
       }}
       alt="Lilac-breasted roller"
     />
     <View style={[styles.heroGradient, {
-      background: 'linear-gradient(90deg, rgba(9,12,9,0.95) 0%, rgba(9,12,9,0.6) 40%, rgba(9,12,9,0.1) 70%, rgba(9,12,9,0) 100%)',
+      background: `
+        linear-gradient(180deg, rgba(9,12,9,0.75) 0%, rgba(9,12,9,0.25) 30%, rgba(9,12,9,0.55) 100%),
+        linear-gradient(90deg, rgba(9,12,9,0.9) 0%, rgba(9,12,9,0.4) 50%, rgba(9,12,9,0.15) 100%)
+      `,
     }]} />
 </View>
 
@@ -485,7 +489,7 @@ const styles = StyleSheet.create({
   exploreOverlay: {
   position: 'absolute',
   top: 0, left: 0, right: 0, bottom: 0,
-  backgroundColor: 'rgba(0,0,0,0.5)', // dark scrim so text/icons stay readable over the photo
+   backgroundColor: 'rgba(0,0,0,0.65)', 
   },
   exploreTitle: {
   fontSize: 15,
