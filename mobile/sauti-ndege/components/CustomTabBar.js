@@ -1,79 +1,56 @@
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../constants/theme';
 
 export default function CustomTabBar({ state, descriptors, navigation }) {
-  const tabs = [
-    { name: 'HomeTab', label: 'Home', icon: '🏠' },
-    { name: 'BrowseTab', label: 'Explore', icon: '🧭' },
-    { name: 'LifeListTab', label: 'Life List', icon: '📋' },
-  ];
-
   return (
     <View style={styles.container}>
-      {/* Left tabs */}
-      <TouchableOpacity
-        style={styles.tab}
-        onPress={() => navigation.navigate('HomeTab')}
-      >
-        <Text style={[
-          styles.tabIcon,
-          state.index === 0 && styles.activeIcon
-        ]}>🏠</Text>
-        <Text style={[
-          styles.tabLabel,
-          state.index === 0 && styles.activeLabel
-        ]}>Home</Text>
+      {/* Home */}
+      <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('HomeTab')}>
+        <Ionicons
+          name={state.index === 0 ? 'home' : 'home-outline'}
+          size={22}
+          color={state.index === 0 ? theme.colors.primary : theme.colors.textDim}
+        />
+        <Text style={[styles.tabLabel, state.index === 0 && styles.activeLabel]}>Home</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.tab}
-        onPress={() => navigation.navigate('BrowseTab')}
-      >
-        <Text style={[
-          styles.tabIcon,
-          state.index === 1 && styles.activeIcon
-        ]}>🧭</Text>
-        <Text style={[
-          styles.tabLabel,
-          state.index === 1 && styles.activeLabel
-        ]}>Explore</Text>
+      {/* Explore */}
+      <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('BrowseTab')}>
+        <Ionicons
+          name={state.index === 1 ? 'compass' : 'compass-outline'}
+          size={22}
+          color={state.index === 1 ? theme.colors.primary : theme.colors.textDim}
+        />
+        <Text style={[styles.tabLabel, state.index === 1 && styles.activeLabel]}>Explore</Text>
       </TouchableOpacity>
 
       {/* Center mic button */}
       <View style={styles.centerButtonContainer}>
-        <TouchableOpacity
-          style={styles.centerButton}
-          onPress={() => navigation.navigate('HomeTab')}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.centerButtonIcon}>🎙️</Text>
+        <TouchableOpacity style={styles.centerButton} onPress={() => navigation.navigate('HomeTab')} activeOpacity={0.85}>
+          <Ionicons name="mic" size={28} color={theme.colors.text} />
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
-        style={styles.tab}
-        onPress={() => navigation.navigate('LifeListTab')}
-      >
-        <Text style={[
-          styles.tabIcon,
-          state.index === 2 && styles.activeIcon
-        ]}>📋</Text>
-        <Text style={[
-          styles.tabLabel,
-          state.index === 2 && styles.activeLabel
-        ]}>Life List</Text>
+      {/* Life List */}
+      <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('LifeListTab')}>
+        <Ionicons
+          name={state.index === 2 ? 'list' : 'list-outline'}
+          size={22}
+          color={state.index === 2 ? theme.colors.primary : theme.colors.textDim}
+        />
+        <Text style={[styles.tabLabel, state.index === 2 && styles.activeLabel]}>Life List</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.tab}
-        onPress={() => {}}
-      >
-        <Text style={styles.tabIcon}>👤</Text>
+      {/* Profile — not yet wired to a real screen */}
+      <TouchableOpacity style={styles.tab} onPress={() => {}}>
+        <Ionicons name="person-outline" size={22} color={theme.colors.textDim} />
         <Text style={styles.tabLabel}>Profile</Text>
       </TouchableOpacity>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -91,13 +68,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 8,
-  },
-  tabIcon: {
-    fontSize: 22,
-    opacity: 0.5,
-  },
-  activeIcon: {
-    opacity: 1,
   },
   tabLabel: {
     fontSize: 10,
@@ -127,8 +97,5 @@ const styles = StyleSheet.create({
     elevation: 8,
     borderWidth: 4,
     borderColor: theme.colors.surface,
-  },
-  centerButtonIcon: {
-    fontSize: 28,
   },
 });
