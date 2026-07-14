@@ -382,10 +382,10 @@ const styles = StyleSheet.create({
   alignItems: 'center',
   },
   identifySectionCard: {
-  backgroundColor: theme.colors.card,
+  backgroundColor: theme.colors.surface, // #111411, a step brighter than card
   borderRadius: theme.radius.lg,
   borderWidth: 1,
-  borderColor: theme.colors.cardBorder,
+  borderColor: 'rgba(126,217,87,0.15)', // green-tinted border instead of near-invisible cardBorder
   padding: theme.spacing.md,
   },
   identifyIconGlow: {

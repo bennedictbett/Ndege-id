@@ -26,6 +26,7 @@ function HomeStack() {
       <Stack.Screen name="HomeMain" component={HomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Result" component={ResultScreen} options={{ title: 'Identification Result' }} />
       <Stack.Screen name="BirdDetail" component={BirdDetailScreen} options={{ title: 'Bird Detail' }} />
+      <Stack.Screen name="LifeList" component={LifeListScreen} options={{ title: 'My Life List' }} />
     </Stack.Navigator>
   );
 }
@@ -39,28 +40,19 @@ function BrowseStack() {
   );
 }
 
-function LifeListStack() {
-  return (
-    <Stack.Navigator screenOptions={screenOptions}>
-      <Stack.Screen name="LifeListMain" component={LifeListScreen} options={{ title: 'My Life List' }} />
-      <Stack.Screen name="BirdDetail" component={BirdDetailScreen} options={{ title: 'Bird Detail' }} />
-    </Stack.Navigator>
-  );
-}
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-  tabBar={(props) => <CustomTabBar {...props} />}
-  screenOptions={{
-    headerShown: false,
-  }}
->
-  <Tab.Screen name="HomeTab" component={HomeStack} />
-  <Tab.Screen name="BrowseTab" component={BrowseStack} />
-  <Tab.Screen name="LifeListTab" component={LifeListStack} />
-</Tab.Navigator>
-    </NavigationContainer>
+  <NavigationContainer>
+    <Tab.Navigator
+      tabBar={(props) => <CustomTabBar {...props} />}
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Tab.Screen name="HomeTab" component={HomeStack} />
+      <Tab.Screen name="BrowseTab" component={BrowseStack} />
+    </Tab.Navigator>
+  </NavigationContainer>
   );
 }

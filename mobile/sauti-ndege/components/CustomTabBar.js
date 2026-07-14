@@ -32,15 +32,15 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
         </TouchableOpacity>
       </View>
 
-      {/* Life List */}
-      <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('LifeListTab')}>
-        <Ionicons
-          name={state.index === 2 ? 'list' : 'list-outline'}
-          size={22}
-          color={state.index === 2 ? theme.colors.primary : theme.colors.textDim}
-        />
-        <Text style={[styles.tabLabel, state.index === 2 && styles.activeLabel]}>Life List</Text>
-      </TouchableOpacity>
+      {/* Map */}
+  <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('MapTab')}>
+    <Ionicons
+      name={state.index === 2 ? 'map' : 'map-outline'}
+      size={22}
+      color={state.index === 2 ? theme.colors.primary : theme.colors.textDim}
+    />
+    <Text style={[styles.tabLabel, state.index === 2 && styles.activeLabel]}>Map</Text>
+  </TouchableOpacity>
 
       {/* Profile — not yet wired to a real screen */}
       <TouchableOpacity style={styles.tab} onPress={() => {}}>
