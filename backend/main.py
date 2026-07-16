@@ -1,7 +1,8 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from supabase import create_client
+
 import os
 import sys
 import tempfile
@@ -64,8 +65,22 @@ def get_bird(bird_id: int):
     result["images"] = images.data
     return result
 
+@app.get("/sightings/recent")
+def get_recent_sightings(limit: int = 10):
+    sightings = supabase.table("sightings")\
+        .select("*, birds(*)")\
+        .order("created_at", desc=True)\
+        .limit(limit)\
+        .execute()
+    return {"sightings": sightings.data}
+
 @app.post("/identify")
-async def identify_bird(audio: UploadFile = File(...)):
+async def identify_bird(
+    audio: UploadFile = File(...),
+    latitude: float = Form(None),
+    longitude: float = Form(None),
+    location_name: str = Form(None),
+):
     # Save uploaded file to temp location
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
         shutil.copyfileobj(audio.file, tmp)
@@ -91,6 +106,15 @@ async def identify_bird(audio: UploadFile = File(...)):
                 .eq("bird_id", bird_data["id"])\
                 .execute()
             bird_data["images"] = images.data
+
+            # Save the sighting
+            supabase.table("sightings").insert({
+                "bird_id": bird_data["id"],
+                "confidence": result["confidence"],
+                "latitude": latitude,
+                "longitude": longitude,
+                "location_name": location_name,
+            }).execute()
 
         return {
             "prediction": result,
