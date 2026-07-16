@@ -22,3 +22,16 @@
     }
   }
 }
+
+{
+  "expo": {
+    "ios": {
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Sauti ya Ndege uses your location to show nearby bird sightings and hotspots."
+      }
+    },
+    "android": {
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+    }
+  }
+}
