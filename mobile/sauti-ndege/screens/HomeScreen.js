@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../constants/theme';
 import {
   View, Text, TouchableOpacity, StyleSheet,
   ScrollView, Animated, ImageBackground
 } from 'react-native';
+import { supabase } from '../lib/supabase';
 
 const API_URL = 'https://ndege-id-production.up.railway.app';
 
@@ -46,17 +47,41 @@ const RecentCard = ({ bird, confidence }) => {
 
 export default function HomeScreen({ navigation }) {
   const [isIdentifying, setIsIdentifying] = useState(false);
-  const [recentBirds, setRecentBirds] = useState([]);
-  const pulseAnim = useRef(new Animated.Value(1)).current;
+const [recentBirds, setRecentBirds] = useState([]);
 
-  const startPulse = () => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1.15, duration: 600, useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
-      ])
-    ).start();
+useEffect(() => {
+  const fetchRecentBirds = async () => {
+    const { data, error } = await supabase
+      .from('birds')
+      .select('*, images:bird_images(*)')
+      .limit(4);
+
+    if (error) {
+      console.error('Error fetching birds:', error);
+      return;
+    }
+
+    const withFakeConfidence = data.map((bird) => ({
+      bird,
+      confidence: Math.floor(Math.random() * (99 - 90 + 1)) + 90,
+    }));
+
+    setRecentBirds(withFakeConfidence);
   };
+
+  fetchRecentBirds();
+}, []);
+
+const pulseAnim = useRef(new Animated.Value(1)).current;
+
+const startPulse = () => {
+  Animated.loop(
+    Animated.sequence([
+      Animated.timing(pulseAnim, { toValue: 1.15, duration: 600, useNativeDriver: true }),
+      Animated.timing(pulseAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+    ])
+  ).start();
+};
 
   const stopPulse = () => {
     pulseAnim.stopAnimation();
