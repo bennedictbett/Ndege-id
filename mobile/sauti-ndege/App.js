@@ -10,6 +10,7 @@ import BirdDetailScreen from './screens/BirdDetailScreen';
 import ResultScreen from './screens/ResultScreen';
 import LifeListScreen from './screens/LifeListScreen';
 import CustomTabBar from './components/CustomTabBar';
+import ProfileScreen from './screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -40,6 +41,14 @@ function BrowseStack() {
   );
 }
 
+function ProfileStack() {
+  return (
+    <Stack.Navigator screenOptions={screenOptions}>
+      <Stack.Screen name="ProfileMain" component={ProfileScreen} options={{ title: 'Profile' }} />
+    </Stack.Navigator>
+  );
+}
+
 
 export default function App() {
   return (
@@ -52,6 +61,7 @@ export default function App() {
     >
       <Tab.Screen name="HomeTab" component={HomeStack} />
       <Tab.Screen name="BrowseTab" component={BrowseStack} />
+      <Tab.Screen name="ProfileTab" component={ProfileStack} />
     </Tab.Navigator>
   </NavigationContainer>
   );

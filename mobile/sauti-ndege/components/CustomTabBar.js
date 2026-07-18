@@ -32,21 +32,25 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
         </TouchableOpacity>
       </View>
 
-      {/* Map */}
-  <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('MapTab')}>
-    <Ionicons
-      name={state.index === 2 ? 'map' : 'map-outline'}
-      size={22}
-      color={state.index === 2 ? theme.colors.primary : theme.colors.textDim}
-    />
-    <Text style={[styles.tabLabel, state.index === 2 && styles.activeLabel]}>Map</Text>
-  </TouchableOpacity>
-
-      {/* Profile — not yet wired to a real screen */}
-      <TouchableOpacity style={styles.tab} onPress={() => {}}>
-        <Ionicons name="person-outline" size={22} color={theme.colors.textDim} />
-        <Text style={styles.tabLabel}>Profile</Text>
+      {/* Map — not yet a real screen */}
+      <TouchableOpacity style={styles.tab} onPress={() => alert('Map view coming soon!')}>
+        <Ionicons
+          name="map-outline"
+          size={22}
+          color={theme.colors.textDim}
+        />
+        <Text style={styles.tabLabel}>Map</Text>
       </TouchableOpacity>
+
+      {/* Profile */}
+    <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('ProfileTab')}>
+      <Ionicons
+        name={state.index === 2 ? 'person' : 'person-outline'}
+        size={22}
+        color={state.index === 2 ? theme.colors.primary : theme.colors.textDim}
+      />
+      <Text style={[styles.tabLabel, state.index === 2 && styles.activeLabel]}>Profile</Text>
+    </TouchableOpacity>
     </View>
   );
 }
