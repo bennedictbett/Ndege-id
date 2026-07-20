@@ -74,6 +74,15 @@ def get_recent_sightings(limit: int = 10):
         .execute()
     return {"sightings": sightings.data}
 
+@app.get("/sightings/recent")
+def get_recent_sightings(limit: int = 10):
+    sightings = supabase.table("sightings")\
+        .select("*, birds(*)")\
+        .order("created_at", desc=True)\
+        .limit(limit)\
+        .execute()
+    return {"sightings": sightings.data}
+
 @app.post("/identify")
 async def identify_bird(
     audio: UploadFile = File(...),
@@ -81,16 +90,13 @@ async def identify_bird(
     longitude: float = Form(None),
     location_name: str = Form(None),
 ):
-    # Save uploaded file to temp location
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
         shutil.copyfileobj(audio.file, tmp)
         tmp_path = tmp.name
 
     try:
-        # Run prediction
         result = predict(tmp_path)
 
-        # Get bird details from database
         scientific_name = result["scientific_name"].replace("_", " ")
         bird_response = supabase.table("birds")\
             .select("*")\
@@ -99,7 +105,6 @@ async def identify_bird(
 
         bird_data = bird_response.data[0] if bird_response.data else None
 
-        # Get bird images
         if bird_data:
             images = supabase.table("bird_images")\
                 .select("*")\
@@ -107,7 +112,6 @@ async def identify_bird(
                 .execute()
             bird_data["images"] = images.data
 
-            # Save the sighting
             supabase.table("sightings").insert({
                 "bird_id": bird_data["id"],
                 "confidence": result["confidence"],
