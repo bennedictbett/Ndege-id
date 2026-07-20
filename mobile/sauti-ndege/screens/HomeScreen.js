@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { supabase } from '../lib/supabase';
 
-const API_URL = 'https://ndege-id-production.up.railway.app';
+const API_URL = 'https://ndege-id.onrender.com';
 
 const IdentifyCard = ({ icon, title, subtitle, onPress }) => (
   <TouchableOpacity style={styles.identifyCard} onPress={onPress}>
