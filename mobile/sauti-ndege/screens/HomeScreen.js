@@ -6,6 +6,8 @@ import {
   ScrollView, Animated, ImageBackground
 } from 'react-native';
 import { supabase } from '../lib/supabase';
+import { Audio } from 'expo-av';
+import * as Location from 'expo-location';
 
 const API_URL = 'https://ndege-id.onrender.com';
 
@@ -88,34 +90,77 @@ const startPulse = () => {
     Animated.timing(pulseAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
   };
 
+  const [recording, setRecording] = useState(null);
+
   const handleIdentifyBySound = async () => {
-    const confirmed = window.confirm('Test identification with a sample bird call?');
-    if (!confirmed) return;
-    setIsIdentifying(true);
-    startPulse();
+    if (recording) {
+      // Currently recording — stop and process
+      setIsIdentifying(true);
+      startPulse();
+      try {
+        await recording.stopAndUnloadAsync();
+        const uri = recording.getURI();
+        setRecording(null);
+
+        // Get location (best-effort — proceed even if denied)
+        let latitude = null;
+        let longitude = null;
+        let locationName = null;
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === 'granted') {
+          const loc = await Location.getCurrentPositionAsync({});
+          latitude = loc.coords.latitude;
+          longitude = loc.coords.longitude;
+          const geocode = await Location.reverseGeocodeAsync(loc.coords);
+          locationName = geocode[0]?.city || geocode[0]?.region || null;
+        }
+
+        // Build multipart form data
+        const formData = new FormData();
+        formData.append('audio', {
+          uri,
+          name: 'recording.m4a',
+          type: 'audio/m4a',
+        });
+        if (latitude) formData.append('latitude', String(latitude));
+        if (longitude) formData.append('longitude', String(longitude));
+        if (locationName) formData.append('location_name', locationName);
+
+        const response = await fetch(`${API_URL}/identify`, {
+          method: 'POST',
+          body: formData,
+        });
+        const result = await response.json();
+
+        if (result.bird) {
+          setRecentBirds(prev => [{ bird: result.bird, confidence: result.prediction.confidence }, ...prev.slice(0, 4)]);
+          navigation.navigate('Result', { result });
+        } else {
+          alert('Could not identify a bird from that recording.');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Something went wrong processing the recording.');
+      } finally {
+        setIsIdentifying(false);
+        stopPulse();
+      }
+      return;
+    }
+
+    // Not currently recording — start
     try {
-      const response = await fetch(`${API_URL}/birds/2`);
-      const bird = await response.json();
-      const result = {
-        prediction: {
-          predicted_species: bird.common_name,
-          scientific_name: bird.scientific_name,
-          confidence: 94.5,
-          top3: [
-            { common_name: bird.common_name, scientific_name: bird.scientific_name, confidence: 94.5 },
-            { common_name: 'Hadada Ibis', scientific_name: 'Bostrychia hagedash', confidence: 3.2 },
-            { common_name: 'Black Kite', scientific_name: 'Milvus migrans', confidence: 2.3 },
-          ]
-        },
-        bird
-      };
-      setRecentBirds(prev => [{ bird, confidence: 94.5 }, ...prev.slice(0, 4)]);
-      navigation.navigate('Result', { result });
+      const { status } = await Audio.requestPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Microphone permission is required to identify by sound.');
+        return;
+      }
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+      const { recording: newRecording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      setRecording(newRecording);
     } catch (e) {
       console.error(e);
-    } finally {
-      setIsIdentifying(false);
-      stopPulse();
+      alert('Could not start recording.');
     }
   };
 
