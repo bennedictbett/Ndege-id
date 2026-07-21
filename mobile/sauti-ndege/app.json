@@ -9,7 +9,8 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Sauti ya Ndege uses your location to show nearby bird sightings and hotspots."
+        "NSLocationWhenInUseUsageDescription": "Sauti ya Ndege uses your location to show nearby bird sightings and hotspots.",
+        "NSMicrophoneUsageDescription": "Sauti ya Ndege needs microphone access to record bird calls for identification."
       }
     },
     "android": {
@@ -19,7 +20,7 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION", "RECORD_AUDIO"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
