@@ -11,15 +11,21 @@ import * as Location from 'expo-location';
 
 const API_URL = 'https://ndege-id.onrender.com';
 
-const IdentifyCard = ({ icon, title, subtitle, onPress }) => (
+const IdentifyCard = ({ icon, title, subtitle, onPress, isRecording, pulseAnim }) => (
   <TouchableOpacity style={styles.identifyCard} onPress={onPress}>
-    <View style={styles.identifyIconGlow}>
-      <View style={styles.identifyIconContainer}>
-        <Ionicons name={icon} size={24} color={theme.colors.primary} />
+    <Animated.View
+      style={[
+        styles.identifyIconGlow,
+        isRecording && styles.identifyIconGlowRecording,
+        isRecording && { transform: [{ scale: pulseAnim }] },
+      ]}
+    >
+      <View style={[styles.identifyIconContainer, isRecording && styles.identifyIconContainerRecording]}>
+        <Ionicons name={isRecording ? 'stop' : icon} size={24} color={isRecording ? theme.colors.danger : theme.colors.primary} />
       </View>
-    </View>
-    <Text style={styles.identifyTitle}>{title}</Text>
-    <Text style={styles.identifySubtitle}>{subtitle}</Text>
+    </Animated.View>
+    <Text style={styles.identifyTitle}>{isRecording ? 'Recording...' : title}</Text>
+    <Text style={styles.identifySubtitle}>{isRecording ? 'Tap to stop' : subtitle}</Text>
   </TouchableOpacity>
 );
 
