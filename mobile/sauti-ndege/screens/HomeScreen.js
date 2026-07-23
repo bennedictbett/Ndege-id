@@ -250,6 +250,8 @@ const startPulse = () => {
         title="By Sound"
         subtitle="Record or upload a bird sound"
         onPress={handleIdentifyBySound}
+        isRecording={!!recording}
+        pulseAnim={pulseAnim}
       />
       <IdentifyCard
         icon="camera"
@@ -586,5 +588,12 @@ const styles = StyleSheet.create({
   alignItems: 'center',
   justifyContent: 'center',
   marginTop: theme.spacing.sm,
+  },
+  identifyIconGlowRecording: {
+  shadowColor: theme.colors.danger,
+  },
+  identifyIconContainerRecording: {
+  backgroundColor: '#2A0A0A',
+  borderColor: theme.colors.danger,
   },
 });
