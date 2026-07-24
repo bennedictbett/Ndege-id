@@ -11,21 +11,15 @@ import * as Location from 'expo-location';
 
 const API_URL = 'https://ndege-id.onrender.com';
 
-const IdentifyCard = ({ icon, title, subtitle, onPress, isRecording, pulseAnim }) => (
+const IdentifyCard = ({ icon, title, subtitle, onPress }) => (
   <TouchableOpacity style={styles.identifyCard} onPress={onPress}>
-    <Animated.View
-      style={[
-        styles.identifyIconGlow,
-        isRecording && styles.identifyIconGlowRecording,
-        isRecording && { transform: [{ scale: pulseAnim }] },
-      ]}
-    >
-      <View style={[styles.identifyIconContainer, isRecording && styles.identifyIconContainerRecording]}>
-        <Ionicons name={isRecording ? 'stop' : icon} size={24} color={isRecording ? theme.colors.danger : theme.colors.primary} />
+    <View style={styles.identifyIconGlow}>
+      <View style={styles.identifyIconContainer}>
+        <Ionicons name={icon} size={24} color={theme.colors.primary} />
       </View>
-    </Animated.View>
-    <Text style={styles.identifyTitle}>{isRecording ? 'Recording...' : title}</Text>
-    <Text style={styles.identifySubtitle}>{isRecording ? 'Tap to stop' : subtitle}</Text>
+    </View>
+    <Text style={styles.identifyTitle}>{title}</Text>
+    <Text style={styles.identifySubtitle}>{subtitle}</Text>
   </TouchableOpacity>
 );
 
@@ -164,6 +158,7 @@ const startPulse = () => {
       await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
       const { recording: newRecording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
       setRecording(newRecording);
+      startPulse();
     } catch (e) {
       console.error(e);
       alert('Could not start recording.');
@@ -249,9 +244,7 @@ const startPulse = () => {
         icon="mic"
         title="By Sound"
         subtitle="Record or upload a bird sound"
-        onPress={handleIdentifyBySound}
-        isRecording={!!recording}
-        pulseAnim={pulseAnim}
+        onPress={() => navigation.navigate('Recording')}
       />
       <IdentifyCard
         icon="camera"

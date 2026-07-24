@@ -27,10 +27,9 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
 
       {/* Center mic button */}
       <View style={styles.centerButtonContainer}>
-        <TouchableOpacity style={styles.centerButton} onPress={() => navigation.navigate('HomeTab')} activeOpacity={0.85}>
+        <TouchableOpacity style={styles.centerButton} onPress={() => navigation.navigate('HomeTab', { screen: 'Recording' })} activeOpacity={0.85}>
           <Ionicons name="mic" size={28} color={theme.colors.text} />
         </TouchableOpacity>
-      </View>
 
       {/* Map — not yet a real screen */}
       <TouchableOpacity style={styles.tab} onPress={() => alert('Map view coming soon!')}>
