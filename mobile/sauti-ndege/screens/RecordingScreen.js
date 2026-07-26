@@ -7,26 +7,93 @@ import { theme } from '../constants/theme';
 
 const API_URL = 'https://ndege-id.onrender.com';
 
+const LISTENING_MESSAGES = [
+  'Listening...',
+  'Detecting bird calls...',
+  'Filtering background noise...',
+  'Comparing with East African species...',
+];
+
+const ANALYZING_MESSAGES = [
+  'Checking Turacos...',
+  'Checking Nightjars...',
+  'Checking Sunbirds...',
+  'Checking Weavers...',
+  'Checking Kingfishers...',
+];
+
+const BAR_COUNT = 12;
+
 export default function RecordingScreen({ navigation }) {
   const [phase, setPhase] = useState('listening'); // 'listening' | 'analyzing'
   const [seconds, setSeconds] = useState(0);
   const [recording, setRecording] = useState(null);
-  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const [listeningMsgIndex, setListeningMsgIndex] = useState(0);
+  const [analyzingMsgIndex, setAnalyzingMsgIndex] = useState(0);
+
+  const pulseScale = useRef(new Animated.Value(1)).current;
+  const pulseOpacity = useRef(new Animated.Value(0.5)).current;
+  const progressAnim = useRef(new Animated.Value(0)).current;
+  const barAnims = useRef(Array.from({ length: BAR_COUNT }, () => new Animated.Value(0.3))).current;
+
   const timerRef = useRef(null);
+  const msgIntervalRef = useRef(null);
+  const barIntervalRef = useRef(null);
 
   useEffect(() => {
     startRecording();
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1.15, duration: 600, useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
-      ])
-    ).start();
+    startBreathingPulse();
+    startWaveform();
+
+    msgIntervalRef.current = setInterval(() => {
+      setListeningMsgIndex((i) => (i + 1) % LISTENING_MESSAGES.length);
+    }, 2200);
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (msgIntervalRef.current) clearInterval(msgIntervalRef.current);
+      if (barIntervalRef.current) clearInterval(barIntervalRef.current);
     };
   }, []);
+
+  const startBreathingPulse = () => {
+    Animated.loop(
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(pulseScale, { toValue: 1.3, duration: 1200, useNativeDriver: true }),
+          Animated.timing(pulseScale, { toValue: 1, duration: 0, useNativeDriver: true }),
+        ]),
+        Animated.sequence([
+          Animated.timing(pulseOpacity, { toValue: 0, duration: 1200, useNativeDriver: true }),
+          Animated.timing(pulseOpacity, { toValue: 0.5, duration: 0, useNativeDriver: true }),
+        ]),
+      ])
+    ).start();
+  };
+
+  const startWaveform = () => {
+    barIntervalRef.current = setInterval(() => {
+      barAnims.forEach((anim) => {
+        Animated.timing(anim, {
+          toValue: 0.2 + Math.random() * 0.8,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      });
+    }, 250);
+  };
+
+  const startAnalyzingCycle = () => {
+    Animated.timing(progressAnim, {
+      toValue: 0.9,
+      duration: 4000,
+      useNativeDriver: false,
+    }).start();
+
+    msgIntervalRef.current = setInterval(() => {
+      setAnalyzingMsgIndex((i) => (i + 1) % ANALYZING_MESSAGES.length);
+    }, 900);
+  };
 
   const startRecording = async () => {
     try {
@@ -52,6 +119,8 @@ export default function RecordingScreen({ navigation }) {
 
   const handleCancel = async () => {
     if (timerRef.current) clearInterval(timerRef.current);
+    if (msgIntervalRef.current) clearInterval(msgIntervalRef.current);
+    if (barIntervalRef.current) clearInterval(barIntervalRef.current);
     if (recording) {
       try { await recording.stopAndUnloadAsync(); } catch (e) {}
     }
@@ -60,7 +129,11 @@ export default function RecordingScreen({ navigation }) {
 
   const handleStop = async () => {
     if (timerRef.current) clearInterval(timerRef.current);
+    if (msgIntervalRef.current) clearInterval(msgIntervalRef.current);
+    if (barIntervalRef.current) clearInterval(barIntervalRef.current);
+
     setPhase('analyzing');
+    startAnalyzingCycle();
 
     try {
       await recording.stopAndUnloadAsync();
@@ -85,14 +158,20 @@ export default function RecordingScreen({ navigation }) {
       const response = await fetch(`${API_URL}/identify`, { method: 'POST', body: formData });
       const result = await response.json();
 
-      if (result.bird) {
-        navigation.replace('Result', { result });
-      } else {
-        alert('Could not identify a bird from that recording.');
-        navigation.goBack();
-      }
+      if (msgIntervalRef.current) clearInterval(msgIntervalRef.current);
+      Animated.timing(progressAnim, { toValue: 1, duration: 300, useNativeDriver: false }).start();
+
+      setTimeout(() => {
+        if (result.bird) {
+          navigation.replace('Result', { result });
+        } else {
+          alert('Could not identify a bird from that recording.');
+          navigation.goBack();
+        }
+      }, 400);
     } catch (e) {
       console.error(e);
+      if (msgIntervalRef.current) clearInterval(msgIntervalRef.current);
       alert('Something went wrong processing the recording.');
       navigation.goBack();
     }
@@ -110,11 +189,38 @@ export default function RecordingScreen({ navigation }) {
 
       {phase === 'listening' ? (
         <>
-          <Animated.View style={[styles.micCircle, { transform: [{ scale: pulseAnim }] }]}>
-            <Ionicons name="mic" size={48} color={theme.colors.primary} />
-          </Animated.View>
-          <Text style={styles.statusText}>Listening...</Text>
+          <View style={styles.micWrapper}>
+            <Animated.View
+              style={[
+                styles.pulseRing,
+                { transform: [{ scale: pulseScale }], opacity: pulseOpacity },
+              ]}
+            />
+            <View style={styles.micCircle}>
+              <Ionicons name="mic" size={48} color={theme.colors.primary} />
+            </View>
+          </View>
+
+          <Text style={styles.statusText}>{LISTENING_MESSAGES[listeningMsgIndex]}</Text>
           <Text style={styles.timer}>{formatTime(seconds)}</Text>
+
+          <View style={styles.waveformRow}>
+            {barAnims.map((anim, i) => (
+              <Animated.View
+                key={i}
+                style={[
+                  styles.waveBar,
+                  {
+                    height: anim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [6, 40],
+                    }),
+                  },
+                ]}
+              />
+            ))}
+          </View>
+
           <Text style={styles.hint}>Point your phone toward the bird</Text>
 
           <View style={styles.actions}>
@@ -128,10 +234,25 @@ export default function RecordingScreen({ navigation }) {
         </>
       ) : (
         <>
-          <Ionicons name="mic" size={48} color={theme.colors.primary} style={{ marginBottom: theme.spacing.lg }} />
+          <Ionicons name="checkmark-circle" size={48} color={theme.colors.primary} style={{ marginBottom: theme.spacing.md }} />
           <Text style={styles.statusText}>Recording Complete</Text>
-          <Text style={styles.hint}>Analyzing bird call...</Text>
-          <Text style={styles.hint}>Comparing against East African birds</Text>
+          <Text style={styles.hint}>{ANALYZING_MESSAGES[analyzingMsgIndex]}</Text>
+
+          <View style={styles.progressTrack}>
+            <Animated.View
+              style={[
+                styles.progressFill,
+                {
+                  width: progressAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['0%', '100%'],
+                  }),
+                },
+              ]}
+            />
+          </View>
+
+          <Text style={styles.hintSmall}>Comparing against 2,300 East African birds...</Text>
         </>
       )}
     </View>
@@ -157,6 +278,20 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     marginBottom: theme.spacing.xl,
   },
+  micWrapper: {
+    width: 140,
+    height: 140,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: theme.spacing.lg,
+  },
+  pulseRing: {
+    position: 'absolute',
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: theme.colors.primary,
+  },
   micCircle: {
     width: 120,
     height: 120,
@@ -166,13 +301,13 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: theme.spacing.lg,
   },
   statusText: {
     fontSize: 18,
     fontWeight: '600',
     color: theme.colors.text,
     marginBottom: theme.spacing.sm,
+    textAlign: 'center',
   },
   timer: {
     fontSize: 32,
@@ -180,11 +315,30 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
     marginBottom: theme.spacing.md,
   },
+  waveformRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    height: 40,
+    marginBottom: theme.spacing.md,
+  },
+  waveBar: {
+    width: 4,
+    borderRadius: 2,
+    backgroundColor: theme.colors.primary,
+  },
   hint: {
     fontSize: 13,
     color: theme.colors.textDim,
     textAlign: 'center',
     marginBottom: theme.spacing.xs,
+  },
+  hintSmall: {
+    fontSize: 12,
+    color: theme.colors.textDim,
+    textAlign: 'center',
+    marginTop: theme.spacing.md,
   },
   actions: {
     flexDirection: 'row',
@@ -211,5 +365,18 @@ const styles = StyleSheet.create({
   stopText: {
     color: theme.colors.text,
     fontWeight: '600',
+  },
+  progressTrack: {
+    width: '80%',
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: theme.colors.cardBorder,
+    overflow: 'hidden',
+    marginTop: theme.spacing.md,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: theme.colors.primary,
+    borderRadius: 3,
   },
 });
