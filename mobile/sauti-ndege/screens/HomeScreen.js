@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react'; 
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../constants/theme';
 import {
@@ -6,10 +6,8 @@ import {
   ScrollView, Animated, ImageBackground
 } from 'react-native';
 import { supabase } from '../lib/supabase';
-import { Audio } from 'expo-av';
-import * as Location from 'expo-location';
 
-const API_URL = 'https://ndege-id.onrender.com';
+const API_URL = 'https://ndege-id.onrender.com'; 
 
 const IdentifyCard = ({ icon, title, subtitle, onPress }) => (
   <TouchableOpacity style={styles.identifyCard} onPress={onPress}>
@@ -48,122 +46,31 @@ const RecentCard = ({ bird, confidence }) => {
 };
 
 export default function HomeScreen({ navigation }) {
-  const [isIdentifying, setIsIdentifying] = useState(false);
-const [recentBirds, setRecentBirds] = useState([]);
+  const [recentBirds, setRecentBirds] = useState([]);
 
-useEffect(() => {
-  const fetchRecentBirds = async () => {
-    const { data, error } = await supabase
-      .from('birds')
-      .select('*, images:bird_images(*)')
-      .limit(4);
+  useEffect(() => {
+    const fetchRecentBirds = async () => {
+      const { data, error } = await supabase
+        .from('birds')
+        .select('*, images:bird_images(*)')
+        .limit(4);
 
-    if (error) {
-      console.error('Error fetching birds:', error);
-      return;
-    }
-
-    const withFakeConfidence = data.map((bird) => ({
-      bird,
-      confidence: Math.floor(Math.random() * (99 - 90 + 1)) + 90,
-    }));
-
-    setRecentBirds(withFakeConfidence);
-  };
-
-  fetchRecentBirds();
-}, []);
-
-const pulseAnim = useRef(new Animated.Value(1)).current;
-
-const startPulse = () => {
-  Animated.loop(
-    Animated.sequence([
-      Animated.timing(pulseAnim, { toValue: 1.15, duration: 600, useNativeDriver: true }),
-      Animated.timing(pulseAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
-    ])
-  ).start();
-};
-
-  const stopPulse = () => {
-    pulseAnim.stopAnimation();
-    Animated.timing(pulseAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
-  };
-
-  const [recording, setRecording] = useState(null);
-
-  const handleIdentifyBySound = async () => {
-    if (recording) {
-      // Currently recording — stop and process
-      setIsIdentifying(true);
-      startPulse();
-      try {
-        await recording.stopAndUnloadAsync();
-        const uri = recording.getURI();
-        setRecording(null);
-
-        // Get location (best-effort — proceed even if denied)
-        let latitude = null;
-        let longitude = null;
-        let locationName = null;
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status === 'granted') {
-          const loc = await Location.getCurrentPositionAsync({});
-          latitude = loc.coords.latitude;
-          longitude = loc.coords.longitude;
-          const geocode = await Location.reverseGeocodeAsync(loc.coords);
-          locationName = geocode[0]?.city || geocode[0]?.region || null;
-        }
-
-        // Build multipart form data
-        const formData = new FormData();
-        formData.append('audio', {
-          uri,
-          name: 'recording.m4a',
-          type: 'audio/m4a',
-        });
-        if (latitude) formData.append('latitude', String(latitude));
-        if (longitude) formData.append('longitude', String(longitude));
-        if (locationName) formData.append('location_name', locationName);
-
-        const response = await fetch(`${API_URL}/identify`, {
-          method: 'POST',
-          body: formData,
-        });
-        const result = await response.json();
-
-        if (result.bird) {
-          setRecentBirds(prev => [{ bird: result.bird, confidence: result.prediction.confidence }, ...prev.slice(0, 4)]);
-          navigation.navigate('Result', { result });
-        } else {
-          alert('Could not identify a bird from that recording.');
-        }
-      } catch (e) {
-        console.error(e);
-        alert('Something went wrong processing the recording.');
-      } finally {
-        setIsIdentifying(false);
-        stopPulse();
-      }
-      return;
-    }
-
-    // Not currently recording — start
-    try {
-      const { status } = await Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
-        alert('Microphone permission is required to identify by sound.');
+      if (error) {
+        console.error('Error fetching birds:', error);
         return;
       }
-      await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
-      const { recording: newRecording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
-      setRecording(newRecording);
-      startPulse();
-    } catch (e) {
-      console.error(e);
-      alert('Could not start recording.');
-    }
-  };
+
+      const withFakeConfidence = data.map((bird) => ({
+        bird,
+        confidence: Math.floor(Math.random() * (99 - 90 + 1)) + 90,
+      }));
+
+      setRecentBirds(withFakeConfidence);
+    };
+
+    fetchRecentBirds();
+  }, []);
+  
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -581,12 +488,5 @@ const styles = StyleSheet.create({
   alignItems: 'center',
   justifyContent: 'center',
   marginTop: theme.spacing.sm,
-  },
-  identifyIconGlowRecording: {
-  shadowColor: theme.colors.danger,
-  },
-  identifyIconContainerRecording: {
-  backgroundColor: '#2A0A0A',
-  borderColor: theme.colors.danger,
-  },
+  }
 });
