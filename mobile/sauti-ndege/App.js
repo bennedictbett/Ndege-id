@@ -12,6 +12,7 @@ import LifeListScreen from './screens/LifeListScreen';
 import CustomTabBar from './components/CustomTabBar';
 import ProfileScreen from './screens/ProfileScreen';
 import RecordingScreen from './screens/RecordingScreen';
+import HotspotsScreen from './screens/HotspotsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -30,6 +31,7 @@ function HomeStack() {
       <Stack.Screen name="Result" component={ResultScreen} options={{ title: 'Identification Result' }} />
       <Stack.Screen name="BirdDetail" component={BirdDetailScreen} options={{ title: 'Bird Detail' }} />
       <Stack.Screen name="LifeList" component={LifeListScreen} options={{ title: 'My Life List' }} />
+      <Stack.Screen name="Hotspots" component={HotspotsScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }
