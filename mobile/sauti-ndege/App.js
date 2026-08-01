@@ -2,6 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Text, View } from 'react-native';
+import MapScreen from './screens/MapScreen';
 import { theme } from './constants/theme';
 
 import HomeScreen from './screens/HomeScreen';
@@ -67,14 +68,10 @@ function MapStack() {
 export default function App() {
   return (
   <NavigationContainer>
-    <Tab.Navigator
-      tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
+    <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
       <Tab.Screen name="HomeTab" component={HomeStack} />
       <Tab.Screen name="BrowseTab" component={BrowseStack} />
+      <Tab.Screen name="MapTab" component={MapStack} />
       <Tab.Screen name="ProfileTab" component={ProfileStack} />
     </Tab.Navigator>
   </NavigationContainer>
