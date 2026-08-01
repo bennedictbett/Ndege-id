@@ -14,6 +14,7 @@ import ProfileScreen from './screens/ProfileScreen';
 import RecordingScreen from './screens/RecordingScreen';
 import HotspotsScreen from './screens/HotspotsScreen';
 
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +50,15 @@ function ProfileStack() {
   return (
     <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen name="ProfileMain" component={ProfileScreen} options={{ title: 'Profile' }} />
+    </Stack.Navigator>
+  );
+}
+
+function MapStack() {
+  return (
+    <Stack.Navigator screenOptions={screenOptions}>
+      <Stack.Screen name="MapMain" component={MapScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="BirdDetail" component={BirdDetailScreen} options={{ title: 'Bird Detail' }} />
     </Stack.Navigator>
   );
 }
