@@ -2,6 +2,8 @@ import os
 import torch
 import librosa
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from torchvision import transforms, models
 from PIL import Image
