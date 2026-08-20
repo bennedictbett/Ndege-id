@@ -6,9 +6,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+if not SUPABASE_SERVICE_KEY:
+    raise SystemExit(
+        "SUPABASE_SERVICE_KEY is not set. Add it to your local .env "
+        "(copy it from Supabase dashboard -> Settings -> API -> service_role secret). "
+        "This key bypasses RLS, so keep it local-only and never deploy it."
+    )
+
+supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
 def populate_birds():
     with open("data/birds.csv", "r", encoding="utf-8") as f:
@@ -28,7 +35,7 @@ def populate_birds():
             "image_url": bird["image_url"] or None,
             "audio_url": bird["audio_url"] or None,
         }
-        response = supabase.table("birds").upsert(data).execute()
+        response = supabase.table("birds").upsert(data, on_conflict="scientific_name").execute()
         print(f"  ✓ Inserted: {bird['common_name']}")
 
     print(f"\n✓ Done. {len(birds)} birds populated.")
