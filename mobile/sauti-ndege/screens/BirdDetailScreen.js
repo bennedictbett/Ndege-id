@@ -1,26 +1,32 @@
 import { useState } from 'react';
 import {
   ScrollView, View, Text, StyleSheet,
-  TouchableOpacity
+  TouchableOpacity, Modal, Pressable
 } from 'react-native';
 import { theme } from '../constants/theme';
 import { addToLifeList } from './LifeListScreen';
 
 export default function BirdDetailScreen({ route, navigation }) {
   const { bird } = route.params;
-  const primaryImage = bird?.images?.find(img => img.is_primary);
+  const primaryImage = bird?.images?.find(img => img.is_primary)
+    || (bird?.image_url ? { image_url: bird.image_url } : null);
   const otherImages = bird?.images?.filter(img => !img.is_primary) || [];
   const [added, setAdded] = useState(false);
+  const [zoomImage, setZoomImage] = useState(null);
 
   const handleAddToLifeList = async () => {
-    const wasAdded = await addToLifeList(bird);
+    await addToLifeList(bird);
     setAdded(true);
   };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Hero Image */}
-      <View style={styles.heroContainer}>
+      {/* Hero Image -- tap to view full-screen, field-guide plate style */}
+      <TouchableOpacity
+        activeOpacity={0.9}
+        style={styles.heroContainer}
+        onPress={() => primaryImage && setZoomImage(primaryImage.image_url)}
+      >
         {primaryImage && (
           <img
             src={primaryImage.image_url}
@@ -53,12 +59,19 @@ export default function BirdDetailScreen({ route, navigation }) {
           </Text>
         </TouchableOpacity>
 
+        {/* Expand hint */}
+        {primaryImage && (
+          <View style={styles.expandHint}>
+            <Text style={styles.expandHintText}>⤢ Tap to expand</Text>
+          </View>
+        )}
+
         {/* Name overlay */}
         <View style={styles.heroContent}>
           <Text style={styles.commonName}>{bird.common_name}</Text>
           <Text style={styles.scientificName}>{bird.scientific_name}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
 
       <View style={styles.content}>
         {/* Stats Row */}
@@ -101,19 +114,24 @@ export default function BirdDetailScreen({ route, navigation }) {
           </View>
         </View>
 
-        {/* More Photos */}
+        {/* More Photos -- also tappable to expand, like the hero */}
         {otherImages.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Gallery</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {[primaryImage, ...otherImages].filter(Boolean).map((img, index) => (
-                <View key={index} style={styles.galleryImage}>
+                <TouchableOpacity
+                  key={index}
+                  style={styles.galleryImage}
+                  activeOpacity={0.85}
+                  onPress={() => setZoomImage(img.image_url)}
+                >
                   <img
                     src={img.image_url}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     alt=""
                   />
-                </View>
+                </TouchableOpacity>
               ))}
             </ScrollView>
           </View>
@@ -129,6 +147,33 @@ export default function BirdDetailScreen({ route, navigation }) {
 
         <View style={{ height: 60 }} />
       </View>
+
+      {/* Full-screen zoom modal, field-guide plate view */}
+      <Modal
+        visible={!!zoomImage}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setZoomImage(null)}
+      >
+        <Pressable style={styles.zoomBackdrop} onPress={() => setZoomImage(null)}>
+          {zoomImage && (
+            <img
+              src={zoomImage}
+              style={{
+                width: '100%', height: '100%',
+                objectFit: 'contain',
+              }}
+              alt={bird.common_name}
+            />
+          )}
+          <TouchableOpacity
+            style={styles.zoomCloseButton}
+            onPress={() => setZoomImage(null)}
+          >
+            <Text style={styles.backIcon}>✕</Text>
+          </TouchableOpacity>
+        </Pressable>
+      </Modal>
     </ScrollView>
   );
 }
@@ -176,6 +221,19 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     fontSize: 13,
     fontWeight: '600',
+  },
+  expandHint: {
+    position: 'absolute',
+    bottom: 90, right: 16,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: theme.radius.full,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    zIndex: 2,
+  },
+  expandHintText: {
+    color: theme.colors.textSecondary,
+    fontSize: 11,
   },
   heroContent: {
     position: 'absolute',
@@ -257,5 +315,20 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
     fontSize: 16,
     fontWeight: '600',
+  },
+  zoomBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.95)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  zoomCloseButton: {
+    position: 'absolute',
+    top: 50, right: 20,
+    width: 40, height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
