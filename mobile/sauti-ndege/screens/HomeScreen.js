@@ -198,7 +198,7 @@ export default function HomeScreen({ navigation }) {
             { icon: 'binoculars-outline', title: 'Birds', subtitle: 'Explore species in East Africa', image: 'https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/explore-cards/birds-card.jpg', onPress: () => navigation.navigate('BrowseTab') },
             { icon: 'book-outline', title: 'Field Guide', subtitle: 'Learn calls, behaviors and habitats', image: 'https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/explore-cards/field-guide-card.jpg', onPress: () => navigation.navigate('BrowseTab') },
             { icon: 'navigate-outline', title: 'Hotspots', subtitle: 'Discover best places for birding', image: 'https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/explore-cards/hotspots-card.jpg', onPress: () => navigation.navigate('Hotspots') },
-            { icon: 'trophy-outline', title: 'Life List', subtitle: 'Track your streaks and achievements', image: 'https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/explore-cards/life-list-card.jpg', onPress: () => navigation.navigate('LifeListTab') },
+            { icon: 'trophy-outline', title: 'Life List', subtitle: 'Track your streaks and achievements', image: 'https://cbhvaqscbttfdokbktxj.supabase.co/storage/v1/object/public/bird-images/explore-cards/life-list-card.jpg', onPress: () => navigation.navigate('LifeList') },
           ].map((item, index) => (
               <TouchableOpacity key={index} style={styles.exploreCard} onPress={item.onPress}>
               <ImageBackground source={{ uri: item.image }} style={styles.exploreCardBg} imageStyle={{ borderRadius: theme.radius.lg }} resizeMode="cover">
