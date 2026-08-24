@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { theme } from '../constants/theme';
 
 const LIFE_LIST_KEY = 'ndege_life_list';
 
@@ -99,8 +100,10 @@ export default function LifeListScreen({ navigation }) {
         data={lifeList}
         keyExtractor={item => item.id.toString()}
         contentContainerStyle={styles.list}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item }) => {
-          const primaryImage = item.images?.find(img => img.is_primary);
+          const primaryImage = item.images?.find(img => img.is_primary)
+            || (item.image_url ? { image_url: item.image_url } : null);
           const dateSeen = new Date(item.date_seen).toLocaleDateString('en-KE', {
             day: 'numeric', month: 'short', year: 'numeric'
           });
@@ -109,6 +112,7 @@ export default function LifeListScreen({ navigation }) {
               style={styles.card}
               onPress={() => navigation.navigate('BirdDetail', { bird: item })}
               onLongPress={() => removeFromList(item.id)}
+              activeOpacity={0.8}
             >
               {primaryImage ? (
                 <Image source={{ uri: primaryImage.image_url }} style={styles.image} />
@@ -132,41 +136,64 @@ export default function LifeListScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F1F8E9' },
+  container: { flex: 1, backgroundColor: theme.colors.background },
   emptyContainer: {
-    flex: 1, backgroundColor: '#F1F8E9',
+    flex: 1, backgroundColor: theme.colors.background,
     alignItems: 'center', justifyContent: 'center', padding: 40,
   },
   emptyIcon: { fontSize: 80, marginBottom: 16 },
-  emptyTitle: { fontSize: 22, fontWeight: 'bold', color: '#1B5E20', textAlign: 'center' },
-  emptySubtitle: { fontSize: 15, color: '#666', textAlign: 'center', marginTop: 8, lineHeight: 22 },
+  emptyTitle: {
+    fontSize: 22, fontWeight: 'bold',
+    color: theme.colors.text, textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 15, color: theme.colors.textSecondary,
+    textAlign: 'center', marginTop: 8, lineHeight: 22,
+  },
   browseButton: {
-    backgroundColor: '#2E7D32', borderRadius: 12,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.radius.lg,
     paddingHorizontal: 24, paddingVertical: 12, marginTop: 24,
   },
-  browseButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  browseButtonText: { color: theme.colors.text, fontSize: 16, fontWeight: '600' },
   statsCard: {
-    backgroundColor: '#2E7D32', margin: 16,
-    borderRadius: 16, padding: 20, alignItems: 'center',
+    backgroundColor: theme.colors.primaryDim,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+    margin: theme.spacing.md,
+    borderRadius: theme.radius.lg,
+    padding: 20,
+    alignItems: 'center',
   },
-  statsCount: { fontSize: 48, fontWeight: 'bold', color: '#fff' },
-  statsLabel: { fontSize: 16, color: '#A5D6A7', marginTop: 4 },
-  milestone: { fontSize: 18, color: '#fff', marginTop: 8, fontWeight: '600' },
-  list: { paddingHorizontal: 16, paddingBottom: 40 },
+  statsCount: { fontSize: 48, fontWeight: 'bold', color: theme.colors.text },
+  statsLabel: { fontSize: 16, color: theme.colors.primaryLight, marginTop: 4 },
+  milestone: { fontSize: 18, color: theme.colors.text, marginTop: 8, fontWeight: '600' },
+  list: { paddingHorizontal: theme.spacing.md, paddingBottom: 40 },
   card: {
-    flexDirection: 'row', backgroundColor: '#fff',
-    borderRadius: 12, marginBottom: 12,
-    overflow: 'hidden', elevation: 2,
+    flexDirection: 'row',
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    marginBottom: theme.spacing.sm,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: theme.colors.cardBorder,
   },
   image: { width: 90, height: 90 },
   imagePlaceholder: {
-    width: 90, height: 90, backgroundColor: '#E8F5E9',
+    width: 90, height: 90,
+    backgroundColor: theme.colors.surface,
     alignItems: 'center', justifyContent: 'center',
   },
   placeholderText: { fontSize: 36 },
-  info: { flex: 1, padding: 12, justifyContent: 'center' },
-  commonName: { fontSize: 16, fontWeight: 'bold', color: '#1B5E20' },
-  scientificName: { fontSize: 13, fontStyle: 'italic', color: '#558B2F', marginTop: 2 },
-  dateSeen: { fontSize: 12, color: '#888', marginTop: 6 },
-  hint: { textAlign: 'center', color: '#aaa', fontSize: 12, paddingBottom: 8 },
+  info: { flex: 1, padding: theme.spacing.md, justifyContent: 'center' },
+  commonName: { fontSize: 16, fontWeight: 'bold', color: theme.colors.text },
+  scientificName: {
+    fontSize: 13, fontStyle: 'italic',
+    color: theme.colors.primaryLight, marginTop: 2,
+  },
+  dateSeen: { fontSize: 12, color: theme.colors.textDim, marginTop: 6 },
+  hint: {
+    textAlign: 'center', color: theme.colors.textDim,
+    fontSize: 12, paddingBottom: 8,
+  },
 });
