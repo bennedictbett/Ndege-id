@@ -1,13 +1,14 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import {
   View, Text, SectionList, TouchableOpacity,
-  StyleSheet, ActivityIndicator, TextInput
+  StyleSheet, ActivityIndicator, TextInput, useWindowDimensions
 } from 'react-native';
 import { theme } from '../constants/theme';
 import { addToLifeList } from './LifeListScreen';
 import { Ionicons } from '@expo/vector-icons';
 
 const API_URL = 'https://ndege-id.onrender.com';
+const GRID_GAP = 10;
 
 export default function BrowseScreen({ navigation }) {
   const [birds, setBirds] = useState([]);
@@ -15,6 +16,13 @@ export default function BrowseScreen({ navigation }) {
   const [search, setSearch] = useState('');
   const [added, setAdded] = useState({});
   const sectionListRef = useRef(null);
+  const { width } = useWindowDimensions();
+
+  // Responsive column count: more columns as the screen gets wider,
+  // same idea as a photo gallery adapting from phone to tablet/web.
+  const numColumns = width >= 900 ? 5 : width >= 640 ? 4 : width >= 420 ? 3 : 2;
+  const contentPadding = theme.spacing.md * 2;
+  const cardWidth = (width - contentPadding - GRID_GAP * (numColumns - 1)) / numColumns;
 
   useEffect(() => {
     fetch(`${API_URL}/birds`)
@@ -31,10 +39,10 @@ export default function BrowseScreen({ navigation }) {
     setAdded(prev => ({ ...prev, [bird.id]: true }));
   };
 
-  // Field-guide style grouping: filter first, then group alphabetically by
-  // family, with families themselves sorted alphabetically -- this mirrors
-  // how print field guides like eGuide to the Birds of East Africa organize
-  // by taxonomic family rather than a flat species list.
+  // Group alphabetically by family, species alphabetical within each --
+  // same grouping as before, then chunk each family's species into rows
+  // of `numColumns` so SectionList (which has no native grid mode) can
+  // render each chunk as one flex row of side-by-side photo cards.
   const sections = useMemo(() => {
     const q = search.toLowerCase();
     const filtered = birds.filter(b =>
@@ -52,16 +60,18 @@ export default function BrowseScreen({ navigation }) {
 
     return Object.keys(byFamily)
       .sort()
-      .map(family => ({
-        title: family,
-        data: byFamily[family].sort((a, b) =>
+      .map(family => {
+        const sorted = byFamily[family].sort((a, b) =>
           a.common_name.localeCompare(b.common_name)
-        ),
-      }));
-  }, [birds, search]);
+        );
+        const rows = [];
+        for (let i = 0; i < sorted.length; i += numColumns) {
+          rows.push(sorted.slice(i, i + numColumns));
+        }
+        return { title: family, count: sorted.length, data: rows };
+      });
+  }, [birds, search, numColumns]);
 
-  // A-Z-style jump index, but by family initial letter -- lets the user
-  // hop straight to a family group the way a printed index tab would.
   const familyLetters = useMemo(() => {
     const seen = new Set();
     return sections
@@ -91,11 +101,10 @@ export default function BrowseScreen({ navigation }) {
     </View>
   );
 
-  const totalCount = sections.reduce((sum, s) => sum + s.data.length, 0);
+  const totalCount = sections.reduce((sum, s) => sum + s.count, 0);
 
   return (
     <View style={styles.container}>
-      {/* Search */}
       <View style={styles.searchContainer}>
         <Ionicons
           name="search"
@@ -125,7 +134,7 @@ export default function BrowseScreen({ navigation }) {
         <SectionList
           ref={sectionListRef}
           sections={sections}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(row, index) => row.map(b => b.id).join('-') + index}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
           stickySectionHeadersEnabled
@@ -133,51 +142,60 @@ export default function BrowseScreen({ navigation }) {
           renderSectionHeader={({ section }) => (
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>{section.title}</Text>
-              <Text style={styles.sectionCount}>{section.data.length}</Text>
+              <Text style={styles.sectionCount}>{section.count}</Text>
             </View>
           )}
-          renderItem={({ item }) => {
-            const primaryImage = item.images?.find(img => img.is_primary)
-              || (item.image_url ? { image_url: item.image_url } : null);
-            return (
-              <TouchableOpacity
-                style={styles.card}
-                onPress={() => navigation.navigate('BirdDetail', { bird: item })}
-                activeOpacity={0.8}
-              >
-                <View style={styles.imageContainer}>
-                  {primaryImage ? (
-                    <img
-                      src={primaryImage.image_url}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      alt={item.common_name}
-                    />
-                  ) : (
-                    <View style={styles.imagePlaceholder}>
-                      <Text style={styles.placeholderIcon}>🦅</Text>
+          renderItem={({ item: row }) => (
+            <View style={styles.gridRow}>
+              {row.map((bird) => {
+                const primaryImage = bird.images?.find(img => img.is_primary)
+                  || (bird.image_url ? { image_url: bird.image_url } : null);
+                return (
+                  <TouchableOpacity
+                    key={bird.id}
+                    style={[styles.gridCard, { width: cardWidth }]}
+                    onPress={() => navigation.navigate('BirdDetail', { bird })}
+                    activeOpacity={0.85}
+                  >
+                    <View style={[styles.gridImageFrame, { height: cardWidth }]}>
+                      {primaryImage ? (
+                        <img
+                          src={primaryImage.image_url}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          alt={bird.common_name}
+                        />
+                      ) : (
+                        <View style={styles.gridImagePlaceholder}>
+                          <Text style={styles.placeholderIcon}>🦅</Text>
+                        </View>
+                      )}
+                      <TouchableOpacity
+                        style={[styles.addButton, added[bird.id] && styles.addedButton]}
+                        onPress={(e) => { e.stopPropagation(); handleAdd(bird); }}
+                      >
+                        <Text style={styles.addButtonText}>
+                          {added[bird.id] ? '✓' : '+'}
+                        </Text>
+                      </TouchableOpacity>
                     </View>
-                  )}
-                </View>
-
-                <View style={styles.info}>
-                  <Text style={styles.commonName}>{item.common_name}</Text>
-                  <Text style={styles.scientificName}>{item.scientific_name}</Text>
-                </View>
-
-                <TouchableOpacity
-                  style={[styles.addButton, added[item.id] && styles.addedButton]}
-                  onPress={() => handleAdd(item)}
-                >
-                  <Text style={styles.addButtonText}>
-                    {added[item.id] ? '✓' : '+'}
-                  </Text>
-                </TouchableOpacity>
-              </TouchableOpacity>
-            );
-          }}
+                    <Text style={styles.gridCommonName} numberOfLines={1}>
+                      {bird.common_name}
+                    </Text>
+                    <Text style={styles.gridScientificName} numberOfLines={1}>
+                      {bird.scientific_name}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+              {/* Pad the last row so cards stay left-aligned instead of stretching */}
+              {row.length < numColumns &&
+                Array.from({ length: numColumns - row.length }).map((_, i) => (
+                  <View key={`pad-${i}`} style={{ width: cardWidth }} />
+                ))}
+            </View>
+          )}
         />
 
-        {/* Family-letter jump index, field-guide style */}
         {familyLetters.length > 3 && (
           <View style={styles.indexBar}>
             {familyLetters.map(letter => (
@@ -245,55 +263,58 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: theme.colors.textDim,
   },
-  card: {
+  gridRow: {
     flexDirection: 'row',
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
+    justifyContent: 'flex-start',
+    gap: GRID_GAP,
     marginTop: theme.spacing.sm,
+  },
+  gridCard: {},
+  gridImageFrame: {
+    width: '100%',
+    borderRadius: theme.radius.md,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: theme.colors.cardBorder,
-    alignItems: 'center',
-  },
-  imageContainer: {
-    width: 72, height: 72,
     backgroundColor: theme.colors.surface,
+    position: 'relative',
   },
-  imagePlaceholder: {
-    width: 72, height: 72,
+  gridImagePlaceholder: {
+    width: '100%', height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: theme.colors.surface,
   },
-  placeholderIcon: { fontSize: 30 },
-  info: { flex: 1, padding: theme.spacing.md },
-  commonName: {
-    fontSize: 15, fontWeight: '600',
-    color: theme.colors.text,
-  },
-  scientificName: {
-    fontSize: 12, fontStyle: 'italic',
-    color: theme.colors.textSecondary,
-    marginTop: 2,
-  },
+  placeholderIcon: { fontSize: 26 },
   addButton: {
-    width: 32, height: 32,
-    borderRadius: 16,
-    backgroundColor: theme.colors.surface,
+    position: 'absolute',
+    bottom: 6, right: 6,
+    width: 26, height: 26,
+    borderRadius: 13,
+    backgroundColor: 'rgba(0,0,0,0.55)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: theme.spacing.md,
     borderWidth: 1,
-    borderColor: theme.colors.cardBorder,
+    borderColor: 'rgba(255,255,255,0.2)',
   },
   addedButton: {
     backgroundColor: theme.colors.primary,
     borderColor: theme.colors.primary,
   },
   addButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '400',
+  },
+  gridCommonName: {
+    fontSize: 12,
+    fontWeight: '600',
     color: theme.colors.text,
-    fontSize: 16,
-    fontWeight: '300',
+    marginTop: 6,
+  },
+  gridScientificName: {
+    fontSize: 10,
+    fontStyle: 'italic',
+    color: theme.colors.textDim,
+    marginTop: 1,
   },
   indexBar: {
     width: 20,
