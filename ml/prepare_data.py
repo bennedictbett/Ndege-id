@@ -14,6 +14,7 @@ HOP_LENGTH = 512
 os.makedirs(SPECTROGRAM_DIR, exist_ok=True)
 
 SPECIES_LABELS = {
+   # Original
     "Haliaeetus_vocifer": 0,
     "Bostrychia_hagedash": 1,
     "Cuculus_solitarius": 2,
@@ -24,7 +25,52 @@ SPECIES_LABELS = {
     "Pycnonotus_barbatus": 7,
     "Lamprotornis_superbus": 8,
     "Cossypha_heuglini": 9,
-}
+    # Starlings
+    "Lamprotornis_hildebrandti": 10,
+    "Cinnyricinclus_leucogaster": 11,
+    "Lamprotornis_chalybaeus": 12,
+    "Onychognathus_morio": 13,
+    "Creatophora_cinerea": 14,
+    "Lamprotornis_purpuroptera": 15,
+    "Lamprotornis_unicolor": 16,
+    "Onychognathus_tenuirostris": 17,
+    # Doves
+    "Streptopelia_capicola": 18,
+    "Columba_guinea": 19,
+    "Turtur_chalcospilos": 20,
+    # Weavers
+    "Ploceus_cucullatus": 21,
+    "Ploceus_intermedius": 22,
+    "Ploceus_baglafecht": 23,
+    "Ploceus_spekei": 24,
+    "Ploceus_jacksoni": 25,
+    "Ploceus_xanthops": 26,
+    "Ploceus_ocularis": 27,
+    "Ploceus_melanocephalus": 28,
+    # Sunbirds
+    "Cinnyris_venustus": 29,
+    "Chalcomitra_senegalensis": 30,
+    "Nectarinia_kilimensis": 31,
+    "Cinnyris_mediocris": 32,
+    "Cinnyris_erythrocercus": 33,
+    "Cinnyris_mariquensis": 34,
+    "Hedydipna_collaris": 35,
+    "Anthreptes_orientalis": 36,
+    # Kingfishers
+    "Megaceryle_maxima": 37,
+    "Halcyon_senegalensis": 38,
+    "Halcyon_chelicuti": 39,
+    "Halcyon_albiventris": 40,
+    "Halcyon_leucocephala": 41,
+    # Eagles & Raptors
+    "Stephanoaetus_coronatus": 42,
+    "Lophaetus_occipitalis": 43,
+    "Buteo_buteo": 44,
+    "Elanus_caeruleus": 45,
+    "Falco_tinnunculus": 46,
+    "Falco_peregrinus": 47,
+    "Polyboroides_typus": 48,
+    }
 
 def audio_to_spectrogram(audio_path, save_path):
     try:
