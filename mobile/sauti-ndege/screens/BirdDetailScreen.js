@@ -146,6 +146,28 @@ export default function BirdDetailScreen({ route, navigation }) {
         </View>
 
         <View style={styles.content}>
+          {/* --- Voice (right under the photo, since sound is the app's core feature) --- */}
+          <SectionHeader icon="🔊" title="VOICE" />
+          {bird.audio_url ? (
+            <TouchableOpacity style={styles.voiceCard} activeOpacity={0.8}>
+              <View style={styles.playButton}>
+                <Ionicons name="play" size={20} color={theme.colors.text} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.voiceLabel}>Song</Text>
+                <View style={styles.waveformBar} />
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.voicePlaceholder}>
+              <Ionicons name="mic-off-outline" size={20} color={theme.colors.textDim} />
+              <Text style={styles.voicePlaceholderText}>
+                No recording yet for this species
+              </Text>
+            </View>
+          )}
+          <SectionDivider />
+
           {/* --- Know the Bird --- */}
           {bird.description && (
             <>
@@ -170,28 +192,6 @@ export default function BirdDetailScreen({ route, navigation }) {
               <SectionDivider />
             </>
           )}
-
-          {/* --- Voice --- */}
-          <SectionHeader icon="🔊" title="VOICE" />
-          {bird.audio_url ? (
-            <TouchableOpacity style={styles.voiceCard} activeOpacity={0.8}>
-              <View style={styles.playButton}>
-                <Ionicons name="play" size={20} color={theme.colors.text} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.voiceLabel}>Song</Text>
-                <View style={styles.waveformBar} />
-              </View>
-            </TouchableOpacity>
-          ) : (
-            <View style={styles.voicePlaceholder}>
-              <Ionicons name="mic-off-outline" size={20} color={theme.colors.textDim} />
-              <Text style={styles.voicePlaceholderText}>
-                No recording yet for this species
-              </Text>
-            </View>
-          )}
-          <SectionDivider />
 
           {/* --- Classification --- */}
           <SectionHeader icon="🧬" title="CLASSIFICATION" />
