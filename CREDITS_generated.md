@@ -1,0 +1,52 @@
+## Bird photos (auto-fetched from Wikimedia Commons)
+
+- **African Fish Eagle** — Photographer: Derek Keats from Johannesburg, South Africa — License: CC BY 2.0 — Source: https://en.wikipedia.org/wiki/African_Fish_Eagle
+- **Hadada Ibis** — Photographer: Diego Delso — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Hadada_Ibis
+- **Red-chested Cuckoo** — Photographer: Giles Laurent — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Red-chested_Cuckoo
+- **Pied Kingfisher** — Photographer: Charles J. Sharp — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Pied_Kingfisher
+- **Black Kite** — Photographer: Andreas Trepte — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Black_Kite
+- **African Grey Hornbill** — Photographer: Charles J. Sharp — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/African_Grey_Hornbill
+- **Tropical Boubou** — Photographer: Nigel Voaden from UK — License: CC BY-SA 2.0 — Source: https://en.wikipedia.org/wiki/Tropical_Boubou
+- **Common Bulbul** — Photographer: Charles J. Sharp — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Common_Bulbul
+- **Superb Starling** — Photographer: Sumeet Moghe — License: CC BY-SA 3.0 — Source: https://en.wikipedia.org/wiki/Superb_Starling
+- **White-browed Robin-Chat** — Photographer: Alan Manson — License: CC BY-SA 2.0 — Source: https://en.wikipedia.org/wiki/White-browed_Robin-Chat
+- **Hildebrandt's Starling** — Photographer: Lamprotornis hildebrandti -Tanzania-8.jpg: Noel Feans
+derivative work: Snowmanradio — License: CC BY 2.0 — Source: https://en.wikipedia.org/wiki/Hildebrandt's_Starling
+- **Violet-backed Starling** — Photographer: Charles J. Sharp — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Violet-backed_Starling
+- **Greater Blue-eared Starling** — Photographer: Charles J. Sharp — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Greater_Blue-eared_Starling
+- **Red-winged Starling** — Photographer: Charles J. Sharp — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Red-winged_Starling
+- **Wattled Starling** — Photographer: Bernard DUPONT from FRANCE — License: CC BY-SA 2.0 — Source: https://en.wikipedia.org/wiki/Wattled_Starling
+- **Ruppell's Starling** — Photographer: Yoky — License: CC BY-SA 3.0 — Source: https://en.wikipedia.org/wiki/Ruppell's_Starling
+- **Ashy Starling** — Photographer: Yathin S Krishnappa — License: CC BY-SA 3.0 — Source: https://en.wikipedia.org/wiki/Ashy_Starling
+- **Slender-billed Starling** — Photographer: Dwergenpaartje — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Slender-billed_Starling
+- **Ring-necked Dove** — Photographer: Charles J. Sharp — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Ring-necked_Dove
+- **Speckled Pigeon** — Photographer: peterichman from York, Yorkshire — License: CC BY 2.0 — Source: https://en.wikipedia.org/wiki/Speckled_Pigeon
+- **Emerald-spotted Wood-Dove** — Photographer: Bernard DUPONT from FRANCE — License: CC BY-SA 2.0 — Source: https://en.wikipedia.org/wiki/Emerald-spotted_Wood-Dove
+- **Village Weaver** — Photographer: Charles J. Sharp — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Village_Weaver
+- **Lesser Masked Weaver** — Photographer: Francesco Veronesi from Italy — License: CC BY-SA 2.0 — Source: https://en.wikipedia.org/wiki/Lesser_Masked_Weaver
+- **Baglafecht Weaver** — Photographer: Francesco Veronesi from Italy — License: CC BY-SA 2.0 — Source: https://en.wikipedia.org/wiki/Baglafecht_Weaver
+- **Speke's Weaver** — Photographer: Charles J. Sharp — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Speke's_Weaver
+- **Golden-backed Weaver** — Photographer: frederic.salein — License: CC BY-SA 2.0 — Source: https://en.wikipedia.org/wiki/Golden-backed_Weaver
+- **Holub's Golden Weaver** — Photographer: Lip Kee from Singapore, Republic of Singapore — License: CC BY-SA 2.0 — Source: https://en.wikipedia.org/wiki/Holub's_Golden_Weaver
+- **Spectacled Weaver** — Photographer: Charles J. Sharp — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Spectacled_Weaver
+- **Black-headed Weaver** — Photographer: Tom Tarrant — License: CC BY-SA 3.0 — Source: https://en.wikipedia.org/wiki/Black-headed_Weaver
+- **Variable Sunbird** — Photographer: Yathin S Krishnappa — License: CC BY-SA 3.0 — Source: https://en.wikipedia.org/wiki/Variable_Sunbird
+- **Scarlet-chested Sunbird** — Photographer: Derek Keats from Johannesburg, South Africa — License: CC BY 2.0 — Source: https://en.wikipedia.org/wiki/Scarlet-chested_Sunbird
+- **Bronzy Sunbird** — Photographer: Steve Garvie — License: CC BY 2.0 — Source: https://en.wikipedia.org/wiki/Bronzy_Sunbird
+- **Eastern Double-collared Sunbird** — Photographer: Nigel Voaden from UK — License: CC BY-SA 2.0 — Source: https://en.wikipedia.org/wiki/Eastern_Double-collared_Sunbird
+- **Red-chested Sunbird** — Photographer: Charles J. Sharp — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Red-chested_Sunbird
+- **Marico Sunbird** — Photographer: Derek Keats from Johannesburg, South Africa — License: CC BY 2.0 — Source: https://en.wikipedia.org/wiki/Marico_Sunbird
+- **Collared Sunbird** — Photographer: Charles J. Sharp — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Collared_Sunbird
+- **Eastern Violet-backed Sunbird** — Photographer: Francesco Veronesi — License: CC BY-SA 2.0 — Source: https://en.wikipedia.org/wiki/Eastern_Violet-backed_Sunbird
+- **Giant Kingfisher** — Photographer: Charles J. Sharp — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Giant_Kingfisher
+- **Woodland Kingfisher** — Photographer: Bernard DUPONT from FRANCE — License: CC BY-SA 2.0 — Source: https://en.wikipedia.org/wiki/Woodland_Kingfisher
+- **Striped Kingfisher** — Photographer: Francesco Veronesi from Italy — License: CC BY-SA 2.0 — Source: https://en.wikipedia.org/wiki/Striped_Kingfisher
+- **Brown-hooded Kingfisher** — Photographer: Derek Keats from Johannesburg, South Africa — License: CC BY 2.0 — Source: https://en.wikipedia.org/wiki/Brown-hooded_Kingfisher
+- **Grey-headed Kingfisher** — Photographer: Giles Laurent — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Grey-headed_Kingfisher
+- **Crowned Eagle** — Photographer: Bernard DUPONT from FRANCE — License: CC BY-SA 2.0 — Source: https://en.wikipedia.org/wiki/Crowned_Eagle
+- **Long-crested Eagle** — Photographer: Charles J. Sharp — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Long-crested_Eagle
+- **Common Buzzard** — Photographer: caroline legg — License: CC BY 2.0 — Source: https://en.wikipedia.org/wiki/Common_Buzzard
+- **Black-winged Kite** — Photographer: Tisha Mukherjee — License: CC BY-SA 4.0 — Source: https://en.wikipedia.org/wiki/Black-winged_Kite
+- **Common Kestrel** — Photographer: Andreas Trepte — License: CC BY-SA 2.5 — Source: https://en.wikipedia.org/wiki/Common_Kestrel
+- **Peregrine Falcon** — Photographer: Mykola Swarnyk — License: CC BY-SA 3.0 — Source: https://en.wikipedia.org/wiki/Peregrine_Falcon
+- **African Harrier-Hawk** — Photographer: Jenny Varley — License: CC BY-SA 2.0 — Source: https://en.wikipedia.org/wiki/African_Harrier-Hawk
