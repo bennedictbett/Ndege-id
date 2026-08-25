@@ -56,3 +56,8 @@ desktop.ini
 # Logs
 *.log
 logs/
+
+ml/spectrograms/
+data/images/
+data/raw/
+ml/models/
