@@ -13,6 +13,7 @@ DOWNLOAD_DIR = "data/raw"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 SPECIES = [
+    # Original 10
     "Haliaeetus vocifer",
     "Bostrychia hagedash",
     "Cuculus solitarius",
@@ -23,6 +24,82 @@ SPECIES = [
     "Pycnonotus barbatus",
     "Lamprotornis superbus",
     "Cossypha heuglini",
+
+    # Starlings
+    "Lamprotornis hildebrandti",
+    "Cinnyricinclus leucogaster",
+    "Lamprotornis chalybaeus",
+    "Onychognathus morio",
+    "Creatophora cinerea",
+    "Lamprotornis purpuroptera",
+    "Lamprotornis unicolor",
+    "Onychognathus tenuirostris",
+
+    # Doves
+    "Streptopelia capicola",
+    "Streptopelia senegalensis",
+    "Columba guinea",
+    "Turtur chalcospilos",
+
+    # Weavers
+    "Ploceus cucullatus",
+    "Ploceus intermedius",
+    "Ploceus baglafecht",
+    "Ploceus spekei",
+    "Ploceus jacksoni",
+    "Ploceus xanthops",
+    "Ploceus ocularis",
+    "Ploceus melanocephalus",
+
+    # Sunbirds
+    "Cinnyris venustus",
+    "Chalcomitra senegalensis",
+    "Nectarinia kilimensis",
+    "Cinnyris mediocris",
+    "Cinnyris erythrocercus",
+    "Cinnyris mariquensis",
+    "Hedydipna collaris",
+    "Anthreptes orientalis",
+
+    # Kingfishers
+    "Alcedo cristata",
+    "Megaceryle maxima",
+    "Halcyon senegalensis",
+    "Halcyon chelicuti",
+    "Halcyon albiventris",
+    "Halcyon leucocephala",
+    "Corythornis cyanostigma",
+
+    # Eagles
+    "Stephanoaetus coronatus",
+    "Aquila verreauxii",
+    "Lophaetus occipitalis",
+    "Circaetus pectoralis",
+    "Polemaetus bellicosus",
+
+    # Buzzards
+    "Buteo augur",
+    "Buteo buteo",
+
+    # Kites
+    "Elanus caeruleus",
+
+    # Falcons
+    "Falco tinnunculus",
+    "Falco biarmicus",
+    "Falco peregrinus",
+
+    # Hawks
+    "Polyboroides typus",
+
+    # Vultures
+    "Gyps africanus",
+    "Gyps rueppelli",
+    "Necrosyrtes monachus",
+
+    # Secretarybird
+    "Sagittarius serpentarius",
+
 ]
 
 def get_recordings(scientific_name, max_recordings=20):
