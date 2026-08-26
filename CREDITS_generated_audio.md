@@ -1,0 +1,51 @@
+## Bird call recordings (Xeno-canto, uploaded to Supabase)
+
+- **Anthreptes orientalis** (song) — Recordist: Andrew Spencer — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/267764
+- **Bostrychia hagedash** (call) — Recordist: Bram Piot — License: https://creativecommons.org/licenses/by-nc-nd/2.5/ — Source: https://xeno-canto.org/21242
+- **Buteo buteo** (call, flight call) — Recordist: Beatrix Saadi-Varchmin — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1019332
+- **Ceryle rudis** (song) — Recordist: Marc de Bont — License: https://creativecommons.org/licenses/by-nc-nd/2.5/ — Source: https://xeno-canto.org/33808
+- **Chalcomitra senegalensis** (call, song) — Recordist: Stein Ø. Nilsen — License: https://creativecommons.org/licenses/by-nc-nd/3.0/ — Source: https://xeno-canto.org/112588
+- **Cinnyricinclus leucogaster** () — Recordist: Marna Buys — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1141195
+- **Cinnyris erythrocercus** (song) — Recordist: Bernard BOUSQUET — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1064897
+- **Cinnyris mariquensis** (call) — Recordist: Kyle Finn — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1007566
+- **Cinnyris mediocris** (call) — Recordist: Jonathan Onongo — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1063119
+- **Cinnyris venustus** (song) — Recordist: Jonathan Onongo — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1063151
+- **Columba guinea** (song) — Recordist: Frank Lambert — License: https://creativecommons.org/licenses/by-nc-nd/4.0/ — Source: https://xeno-canto.org/1041350
+- **Creatophora cinerea** (call) — Recordist: Oliver Fowler — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1063344
+- **Cuculus solitarius** (song) — Recordist: David Tattersley — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1058732
+- **Elanus caeruleus** (alarm call) — Recordist: Yoann Blanchon — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1059222
+- **Falco peregrinus** (call) — Recordist: Guido O. Keijl — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1106644
+- **Falco tinnunculus** (song, copulation) — Recordist: Stanislas Wroza — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1098001
+- **Halcyon albiventris** (call) — Recordist: Marc Anderson — License: https://creativecommons.org/licenses/by-nc-nd/4.0/ — Source: https://xeno-canto.org/1004827
+- **Halcyon chelicuti** (call) — Recordist: Jonathan Onongo — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1076976
+- **Halcyon leucocephala** (call) — Recordist: James and David Bradley — License: https://creativecommons.org/licenses/by-nc-nd/2.5/ — Source: https://xeno-canto.org/107409
+- **Halcyon senegalensis** (call) — Recordist: Jonathan Onongo — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1009903
+- **Haliaeetus vocifer** (call) — Recordist: James Bradley — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/289490
+- **Hedydipna collaris** (call, song) — Recordist: Louis A. Hansen — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1067973
+- **Lamprotornis chalybaeus** (song) — Recordist: Rory Nefdt — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/206039
+- **Lamprotornis hildebrandti** (song) — Recordist: Rory Nefdt — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/253482
+- **Lamprotornis purpuroptera** (song) — Recordist: James Bradley — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/396427
+- **Lamprotornis superbus** (song) — Recordist: Rory Nefdt — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/205898
+- **Lamprotornis unicolor** (song) — Recordist: Frank Lambert — License: https://creativecommons.org/licenses/by-nc-nd/4.0/ — Source: https://xeno-canto.org/418115
+- **Laniarius aethiopicus** (song) — Recordist: Olivier Matgen — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1055829
+- **Lophaetus occipitalis** (call) — Recordist: Andrew Spencer — License: https://creativecommons.org/licenses/by-nc-nd/4.0/ — Source: https://xeno-canto.org/268790
+- **Lophoceros nasutus** (call) — Recordist: Bernard BOUSQUET — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1056272
+- **Megaceryle maxima** (song) — Recordist: isaac kilusu — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1065290
+- **Milvus migrans** (song) — Recordist: Marc Anderson — License: https://creativecommons.org/licenses/by-nc-nd/4.0/ — Source: https://xeno-canto.org/1001933
+- **Nectarinia kilimensis** (song) — Recordist: Rory Nefdt — License: https://creativecommons.org/licenses/by-nc-nd/2.5/ — Source: https://xeno-canto.org/100229
+- **Onychognathus morio** () — Recordist: African Bioacoustics Community — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1039701
+- **Onychognathus tenuirostris** (call, call and scold) — Recordist: Josh Engel — License: https://creativecommons.org/licenses/by-nc-nd/2.5/ — Source: https://xeno-canto.org/103641
+- **Ploceus baglafecht** (call) — Recordist: Kileo Jumah — License: https://creativecommons.org/publicdomain/zero/1.0/ — Source: https://xeno-canto.org/1148946
+- **Ploceus cucullatus** (song) — Recordist: isaac kilusu — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/390403
+- **Ploceus intermedius** (call) — Recordist: Martin St-Michel — License: https://creativecommons.org/licenses/by-nc-nd/2.5/ — Source: https://xeno-canto.org/107541
+- **Ploceus melanocephalus** (song) — Recordist: Alain Malengreau — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1041207
+- **Ploceus ocularis** () — Recordist: African Bioacoustics Community — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1000773
+- **Ploceus spekei** (song) — Recordist: Thomas Holmberg — License: https://creativecommons.org/licenses/by-nc-nd/2.5/ — Source: https://xeno-canto.org/109636
+- **Ploceus xanthops** (call) — Recordist: Richard White — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1009699
+- **Polyboroides typus** (uncertain) — Recordist: François Morand — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1012176
+- **Pycnonotus barbatus** (song) — Recordist: Bernard BOUSQUET — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1053549
+- **Stephanoaetus coronatus** (song) — Recordist: isaac kilusu — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1052748
+- **Streptopelia capicola** (song) — Recordist: Frank Lambert — License: https://creativecommons.org/licenses/by-nc-nd/4.0/ — Source: https://xeno-canto.org/451512
+- **Turtur chalcospilos** (call) — Recordist: Anne  — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/364462
+- **Cossypha heuglini** (song) — Recordist: isaac kilusu — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1095762
+- **Ploceus jacksoni** (song) — Recordist: Jonathan Onongo — License: https://creativecommons.org/licenses/by-nc-sa/4.0/ — Source: https://xeno-canto.org/1105356
