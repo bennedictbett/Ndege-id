@@ -11,6 +11,7 @@ import { addToLifeList } from './LifeListScreen';
 import { Ionicons } from '@expo/vector-icons';
 
 const LIFE_LIST_KEY = 'ndege_life_list';
+const API_URL = 'https://ndege-id.onrender.com';
 
 function SectionDivider() {
   return <View style={styles.divider} />;
@@ -69,6 +70,39 @@ export default function BirdDetailScreen({ route, navigation }) {
         setSightingEntry(entry);
       }
     });
+  }, [bird.id]);
+
+  // Similar Birds: no dedicated relationship data exists, so this uses
+  // genus as the similarity signal -- species in the same genus are
+  // visually similar by taxonomic definition (e.g. all Lamprotornis
+  // starlings). Falls back to same-family matches when a genus has too
+  // few other members in the current 49-species set.
+  const [similarBirds, setSimilarBirds] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API_URL}/birds`)
+      .then(res => res.json())
+      .then(data => {
+        const allBirds = data.birds || [];
+        const genus = bird.scientific_name?.split(' ')[0] || '';
+
+        const sameGenus = allBirds.filter(b =>
+          b.id !== bird.id && b.scientific_name?.split(' ')[0] === genus
+        );
+
+        let similar = sameGenus;
+        if (similar.length < 3) {
+          const sameFamily = allBirds.filter(b =>
+            b.id !== bird.id &&
+            b.family === bird.family &&
+            !similar.some(s => s.id === b.id)
+          );
+          similar = [...similar, ...sameFamily];
+        }
+
+        setSimilarBirds(similar.slice(0, 6));
+      })
+      .catch(() => setSimilarBirds([]));
   }, [bird.id]);
 
   const handleAddToLifeList = async () => {
@@ -239,6 +273,41 @@ export default function BirdDetailScreen({ route, navigation }) {
                   </View>
                 ))}
               </View>
+              <SectionDivider />
+            </>
+          )}
+
+          {/* --- Similar Birds --- */}
+          {similarBirds.length > 0 && (
+            <>
+              <SectionHeader icon="🔎" title="SIMILAR BIRDS" />
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: theme.spacing.sm }}>
+                {similarBirds.map((sim) => {
+                  const simImage = sim.images?.find(img => img.is_primary)
+                    || (sim.image_url ? { image_url: sim.image_url } : null);
+                  return (
+                    <TouchableOpacity
+                      key={sim.id}
+                      style={styles.similarCard}
+                      activeOpacity={0.85}
+                      onPress={() => navigation.push('BirdDetail', { bird: sim })}
+                    >
+                      <View style={styles.similarImageFrame}>
+                        {simImage ? (
+                          <img
+                            src={simImage.image_url}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            alt={sim.common_name}
+                          />
+                        ) : (
+                          <Text style={{ fontSize: 24 }}>🦅</Text>
+                        )}
+                      </View>
+                      <Text style={styles.similarName} numberOfLines={1}>{sim.common_name}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
               <SectionDivider />
             </>
           )}
@@ -427,6 +496,21 @@ const styles = StyleSheet.create({
     marginLeft: 10, fontSize: 13, color: theme.colors.textDim, fontStyle: 'italic',
   },
 
+  similarCard: {
+    width: 84, marginRight: theme.spacing.sm,
+  },
+  similarImageFrame: {
+    width: 84, height: 84,
+    borderRadius: theme.radius.md,
+    overflow: 'hidden',
+    backgroundColor: theme.colors.card,
+    borderWidth: 1, borderColor: theme.colors.cardBorder,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  similarName: {
+    fontSize: 11, color: theme.colors.text,
+    marginTop: 6, textAlign: 'center',
+  },
   classificationTable: {
     backgroundColor: theme.colors.card,
     borderWidth: 1, borderColor: theme.colors.cardBorder,
