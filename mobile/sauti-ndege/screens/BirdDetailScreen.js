@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import {
   ScrollView, View, Text, StyleSheet,
-  TouchableOpacity, Modal, Pressable, useWindowDimensions
+  TouchableOpacity, Modal, Pressable, useWindowDimensions,
+  ActivityIndicator
 } from 'react-native';
+import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { theme } from '../constants/theme';
 import { addToLifeList } from './LifeListScreen';
@@ -35,6 +37,27 @@ export default function BirdDetailScreen({ route, navigation }) {
   const [zoomImage, setZoomImage] = useState(null);
   const [activeSlide, setActiveSlide] = useState(0);
   const [sightingEntry, setSightingEntry] = useState(null);
+
+  // expo-audio: hook must be called unconditionally, so pass the URL
+  // (or undefined if none) directly -- it works across web/iOS/Android,
+  // unlike the deprecated expo-av used elsewhere in this app.
+  const player = useAudioPlayer(bird.audio_url || undefined);
+  const status = useAudioPlayerStatus(player);
+  const isPlaying = !!status?.playing;
+  const isLoadingAudio = bird.audio_url && !status?.isLoaded;
+
+  const handlePlayVoice = () => {
+    if (!bird.audio_url || !player) return;
+    if (isPlaying) {
+      player.pause();
+    } else {
+      // Replay from the start once a clip has finished
+      if (status?.didJustFinish || (status?.duration && status?.currentTime >= status.duration)) {
+        player.seekTo(0);
+      }
+      player.play();
+    }
+  };
 
   useEffect(() => {
     AsyncStorage.getItem(LIFE_LIST_KEY).then(data => {
@@ -149,13 +172,40 @@ export default function BirdDetailScreen({ route, navigation }) {
           {/* --- Voice (right under the photo, since sound is the app's core feature) --- */}
           <SectionHeader icon="🔊" title="VOICE" />
           {bird.audio_url ? (
-            <TouchableOpacity style={styles.voiceCard} activeOpacity={0.8}>
+            <TouchableOpacity
+              style={styles.voiceCard}
+              activeOpacity={0.8}
+              onPress={handlePlayVoice}
+              disabled={isLoadingAudio}
+            >
               <View style={styles.playButton}>
-                <Ionicons name="play" size={20} color={theme.colors.text} />
+                {isLoadingAudio ? (
+                  <ActivityIndicator size="small" color={theme.colors.text} />
+                ) : (
+                  <Ionicons
+                    name={isPlaying ? 'pause' : 'play'}
+                    size={20}
+                    color={theme.colors.text}
+                  />
+                )}
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.voiceLabel}>Song</Text>
-                <View style={styles.waveformBar} />
+                <Text style={styles.voiceLabel}>
+                  {isPlaying ? 'Playing...' : 'Song'}
+                </Text>
+                <View style={styles.waveformTrack}>
+                  <View
+                    style={[
+                      styles.waveformFill,
+                      {
+                        width: status?.duration
+                          ? `${Math.min(100, (status.currentTime / status.duration) * 100)}%`
+                          : '0%',
+                      },
+                    ]}
+                  />
+                </View>
+
               </View>
             </TouchableOpacity>
           ) : (
@@ -360,9 +410,12 @@ const styles = StyleSheet.create({
     marginRight: theme.spacing.md,
   },
   voiceLabel: { fontSize: 13, color: theme.colors.textDim, marginBottom: 6 },
-  waveformBar: {
+  waveformTrack: {
     height: 3, backgroundColor: theme.colors.cardBorder,
-    borderRadius: 2,
+    borderRadius: 2, overflow: 'hidden',
+  },
+  waveformFill: {
+    height: '100%', backgroundColor: theme.colors.primary,
   },
   voicePlaceholder: {
     flexDirection: 'row', alignItems: 'center',
