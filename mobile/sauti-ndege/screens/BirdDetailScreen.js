@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { theme } from '../constants/theme';
 import { addToLifeList } from './LifeListScreen';
 import { Ionicons } from '@expo/vector-icons';
+import SpeciesMap from '../components/SpeciesMap';
 
 const LIFE_LIST_KEY = 'ndege_life_list';
 const API_URL = 'https://ndege-id.onrender.com';
@@ -78,6 +79,50 @@ export default function BirdDetailScreen({ route, navigation }) {
   // starlings). Falls back to same-family matches when a genus has too
   // few other members in the current 49-species set.
   const [similarBirds, setSimilarBirds] = useState([]);
+
+  // Distribution map data: GBIF gives real, broad occurrence records
+  // (base layer); the app's own /sightings/recent gives this user's own
+  // logged sightings of this specific bird (highlighted layer). There's
+  // no species filter on the backend yet, so this filters client-side --
+  // fine at current data volume, worth revisiting if sightings grow large.
+  const [gbifPoints, setGbifPoints] = useState([]);
+  const [sightingPoints, setSightingPoints] = useState([]);
+
+  useEffect(() => {
+    if (!bird.scientific_name) return;
+    const query = new URLSearchParams({
+      scientificName: bird.scientific_name,
+      country: 'KE',
+      hasCoordinate: 'true',
+      limit: '200',
+    });
+    fetch(`https://api.gbif.org/v1/occurrence/search?${query}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const points = (data.results || [])
+          .filter((r) => r.decimalLatitude != null && r.decimalLongitude != null)
+          .map((r) => ({ lat: r.decimalLatitude, lon: r.decimalLongitude }));
+        setGbifPoints(points);
+      })
+      .catch(() => setGbifPoints([]));
+  }, [bird.scientific_name]);
+
+  useEffect(() => {
+    fetch(`${API_URL}/sightings/recent?limit=200`)
+      .then((res) => res.json())
+      .then((data) => {
+        const mine = (data.sightings || [])
+          .filter((s) => s.bird_id === bird.id && s.latitude != null && s.longitude != null)
+          .map((s) => ({
+            lat: s.latitude,
+            lon: s.longitude,
+            location_name: s.location_name,
+          }));
+        setSightingPoints(mine);
+      })
+      .catch(() => setSightingPoints([]));
+  }, [bird.id]);
+
 
   useEffect(() => {
     fetch(`${API_URL}/birds`)
@@ -272,6 +317,27 @@ export default function BirdDetailScreen({ route, navigation }) {
                     <Text style={styles.tagText}>{tag}</Text>
                   </View>
                 ))}
+              </View>
+              <SectionDivider />
+            </>
+          )}
+
+          {/* --- Where to Find It --- */}
+          {(gbifPoints.length > 0 || sightingPoints.length > 0) && (
+            <>
+              <SectionHeader icon="📍" title="WHERE TO FIND IT" />
+              <SpeciesMap gbifPoints={gbifPoints} sightingPoints={sightingPoints} />
+              <View style={styles.mapLegendRow}>
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendDot, { backgroundColor: '#4CAF50' }]} />
+                  <Text style={styles.legendText}>Recorded sightings (GBIF)</Text>
+                </View>
+                {sightingPoints.length > 0 && (
+                  <View style={styles.legendItem}>
+                    <View style={[styles.legendDot, { backgroundColor: theme.colors.primary }]} />
+                    <Text style={styles.legendText}>Your sightings</Text>
+                  </View>
+                )}
               </View>
               <SectionDivider />
             </>
@@ -496,6 +562,13 @@ const styles = StyleSheet.create({
     marginLeft: 10, fontSize: 13, color: theme.colors.textDim, fontStyle: 'italic',
   },
 
+  mapLegendRow: {
+    flexDirection: 'row', gap: theme.spacing.md,
+    marginTop: theme.spacing.sm,
+  },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  legendDot: { width: 8, height: 8, borderRadius: 4 },
+  legendText: { fontSize: 12, color: theme.colors.textDim },
   similarCard: {
     width: 84, marginRight: theme.spacing.sm,
   },
