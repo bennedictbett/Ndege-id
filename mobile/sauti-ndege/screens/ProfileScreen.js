@@ -1,16 +1,34 @@
 import { useState, useCallback } from 'react';
 import {
-  View, Text, ScrollView, Image, TouchableOpacity, StyleSheet
+  View, Text, ScrollView, Image, TouchableOpacity, Platform, Share, Alert, StyleSheet
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
 import { theme } from '../constants/theme';
 import { LIFE_LIST_KEY } from './LifeListScreen';
+import SettingsRow from '../components/SettingsRow';
+import OptionsSheet from '../components/OptionsSheet';
 
-// Roadmap target — update this as the species roster grows (see README roadmap).
-const TARGET_SPECIES = 50;
 const RECENT_COUNT = 4;
+const DEFAULT_TARGET = 50;
+const APP_VERSION = Constants.expoConfig?.version ?? '1.0.0';
+
+const TARGET_KEY = 'setting_life_list_target';
+const DISTANCE_UNIT_KEY = 'setting_distance_unit';
+const NOTIFICATIONS_KEY = 'setting_notifications_enabled';
+const NEARBY_BIRDS_KEY = 'setting_show_nearby_birds';
+
+const TARGET_OPTIONS = [
+  { label: '10 species — MVP roster', value: 10 },
+  { label: '50 species — roadmap goal', value: 50 },
+  { label: '100 species', value: 100 },
+];
+const DISTANCE_OPTIONS = [
+  { label: 'Kilometers', value: 'km' },
+  { label: 'Miles', value: 'mi' },
+];
 
 function formatMonthDay(dateString) {
   return new Date(dateString).toLocaleDateString('en-KE', { month: 'short', day: 'numeric' });
@@ -20,9 +38,17 @@ export default function ProfileScreen({ navigation }) {
   const [lifeList, setLifeList] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
+  const [lifeListTarget, setLifeListTarget] = useState(DEFAULT_TARGET);
+  const [distanceUnit, setDistanceUnit] = useState('km');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [showNearbyBirds, setShowNearbyBirds] = useState(true);
+
+  const [activeSheet, setActiveSheet] = useState(null); // 'target' | 'distance' | null
+
   useFocusEffect(
     useCallback(() => {
       loadLifeList();
+      loadSettings();
     }, [])
   );
 
@@ -37,8 +63,42 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
+  const loadSettings = async () => {
+    try {
+      const [target, unit, notif, nearby] = await Promise.all([
+        AsyncStorage.getItem(TARGET_KEY),
+        AsyncStorage.getItem(DISTANCE_UNIT_KEY),
+        AsyncStorage.getItem(NOTIFICATIONS_KEY),
+        AsyncStorage.getItem(NEARBY_BIRDS_KEY),
+      ]);
+      if (target) setLifeListTarget(Number(target));
+      if (unit) setDistanceUnit(unit);
+      if (notif !== null) setNotificationsEnabled(notif === 'true');
+      if (nearby !== null) setShowNearbyBirds(nearby === 'true');
+    } catch (e) {
+      console.error('Failed to load profile settings', e);
+    }
+  };
+
+  const persistTarget = async (val) => {
+    setLifeListTarget(val);
+    await AsyncStorage.setItem(TARGET_KEY, String(val));
+  };
+  const persistDistanceUnit = async (val) => {
+    setDistanceUnit(val);
+    await AsyncStorage.setItem(DISTANCE_UNIT_KEY, val);
+  };
+  const toggleNotifications = async (val) => {
+    setNotificationsEnabled(val);
+    await AsyncStorage.setItem(NOTIFICATIONS_KEY, String(val));
+  };
+  const toggleNearbyBirds = async (val) => {
+    setShowNearbyBirds(val);
+    await AsyncStorage.setItem(NEARBY_BIRDS_KEY, String(val));
+  };
+
   const speciesCount = lifeList.length;
-  const progress = Math.min(speciesCount / TARGET_SPECIES, 1);
+  const progress = Math.min(speciesCount / lifeListTarget, 1);
 
   const now = new Date();
   const thisMonthCount = lifeList.filter(b => {
@@ -49,144 +109,241 @@ export default function ProfileScreen({ navigation }) {
   const oldestEntry = lifeList.length > 0 ? lifeList[lifeList.length - 1] : null;
   const memberSinceLabel = oldestEntry ? formatMonthDay(oldestEntry.date_seen) : '—';
 
-  // lifeList is unshifted on add, so index 0 is most recent.
   const recent = lifeList.slice(0, RECENT_COUNT);
 
   const goToLifeList = () => navigation.navigate('HomeTab', { screen: 'LifeList' });
 
-  const SETTINGS_ROWS = [
-    { icon: 'notifications-outline', label: 'Notifications' },
-    { icon: 'location-outline', label: 'Location' },
-    { icon: 'mic-outline', label: 'Audio & recording' },
-    { icon: 'color-palette-outline', label: 'Appearance' },
-    { icon: 'information-circle-outline', label: 'About Sauti ya Ndege' },
+  const handleExport = async () => {
+    if (lifeList.length === 0) {
+      Alert.alert('Nothing to export yet', 'Identify a bird first to start your life list.');
+      return;
+    }
+    const payload = JSON.stringify(lifeList, null, 2);
+    try {
+      if (Platform.OS === 'web') {
+        const blob = new Blob([payload], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'sauti-ya-ndege-life-list.json';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } else {
+        await Share.share({
+          title: 'My Sauti ya Ndege Life List',
+          message: payload,
+        });
+      }
+    } catch (e) {
+      console.error('Export failed', e);
+    }
+  };
+
+  const showAbout = () => {
+    Alert.alert(
+      'Sauti ya Ndege',
+      `Version ${APP_VERSION}\n\nA bird identification and life-listing app built for Kenyan birders — identify by sound or photo, and track every species you discover.`
+    );
+  };
+
+  const SETTINGS_GROUPS = [
+    {
+      title: 'Account',
+      rows: [
+        { key: 'editProfile', icon: 'person-outline', title: 'Edit Profile', description: 'Update your birding profile', type: 'disabled' },
+        { key: 'profilePhoto', icon: 'image-outline', title: 'Profile Photo', description: 'Choose a profile picture', type: 'disabled' },
+        { key: 'birdingName', icon: 'create-outline', title: 'Birding Name', description: 'How you appear in the app', type: 'disabled' },
+      ],
+    },
+    {
+      title: 'Birding Preferences',
+      rows: [
+        { key: 'defaultLocation', icon: 'compass-outline', title: 'Default Location', description: 'Used for nearby species suggestions', type: 'disabled' },
+        { key: 'distanceUnits', icon: 'resize-outline', title: 'Distance Units', description: distanceUnit === 'km' ? 'Kilometers' : 'Miles', type: 'chevron', onPress: () => setActiveSheet('distance') },
+        { key: 'nearbyBirds', icon: 'radio-outline', title: 'Show Nearby Birds', description: 'Surface sightings reported near you', type: 'toggle', value: showNearbyBirds, onToggle: toggleNearbyBirds },
+        { key: 'lifeListPrefs', icon: 'list-outline', title: 'Life List Preferences', description: `Goal: ${lifeListTarget} species`, type: 'chevron', onPress: () => setActiveSheet('target') },
+      ],
+    },
+    {
+      title: 'App Preferences',
+      rows: [
+        { key: 'notifications', icon: 'notifications-outline', title: 'Notifications', description: 'Get notified about new features', type: 'toggle', value: notificationsEnabled, onToggle: toggleNotifications },
+        { key: 'darkMode', icon: 'moon-outline', title: 'Dark Mode', description: 'Dark theme is the only option for now', type: 'value', rightText: 'On' },
+        { key: 'language', icon: 'language-outline', title: 'Language', description: 'English', type: 'disabled' },
+      ],
+    },
+    {
+      title: 'Identification',
+      rows: [
+        { key: 'soundId', icon: 'mic-outline', title: 'Sound Identification', description: 'Identify birds from audio recordings', type: 'disabled' },
+        { key: 'photoId', icon: 'camera-outline', title: 'Photo Identification', description: 'Identify birds from photos', type: 'disabled' },
+        { key: 'locationSighting', icon: 'pin-outline', title: 'Location & Sighting Settings', description: "Control what's captured with each sighting", type: 'disabled' },
+      ],
+    },
+    {
+      title: 'Data & Privacy',
+      rows: [
+        { key: 'mySightings', icon: 'albums-outline', title: 'My Sightings', description: `${speciesCount} logged`, type: 'chevron', onPress: goToLifeList },
+        { key: 'exportData', icon: 'download-outline', title: 'Export Data', description: 'Download your life list as JSON', type: 'chevron', onPress: handleExport },
+        { key: 'privacy', icon: 'shield-checkmark-outline', title: 'Privacy', description: 'How your data is handled', type: 'disabled' },
+      ],
+    },
+    {
+      title: 'About',
+      rows: [
+        { key: 'help', icon: 'help-circle-outline', title: 'Help & Support', description: 'Get help using the app', type: 'disabled' },
+        { key: 'about', icon: 'information-circle-outline', title: 'About Sauti ya Ndege', description: 'Learn more about the project', type: 'chevron', onPress: showAbout },
+        { key: 'version', icon: 'apps-outline', title: 'App Version', description: 'Current release', type: 'value', rightText: APP_VERSION },
+      ],
+    },
   ];
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.scrollContent}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Identity block — no accounts yet, so this stays generic */}
-      <View style={styles.header}>
-        <View style={styles.avatarRing}>
-          <Ionicons name="person" size={36} color={theme.colors.primary} />
-        </View>
-        <Text style={styles.headerTitle}>Bird Explorer</Text>
-        <Text style={styles.headerSubtitle}>Tracking sightings on this device</Text>
-      </View>
+    <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.pageInner}>
 
-      {/* Life List hero */}
-      <View style={styles.heroCard}>
-        <Text style={styles.heroLabel}>Your life list</Text>
-        <Text style={styles.heroNumber}>{speciesCount}</Text>
-        <Text style={styles.heroSub}>species discovered</Text>
+          {/* Identity block — no accounts yet, so this stays generic */}
+          <View style={styles.header}>
+            <View style={styles.avatarRing}>
+              <Ionicons name="person" size={36} color={theme.colors.primary} />
+            </View>
+            <Text style={styles.headerTitle}>Bird Explorer</Text>
+            <Text style={styles.headerSubtitle}>Tracking sightings on this device</Text>
+          </View>
 
-        <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${Math.max(progress * 100, speciesCount > 0 ? 4 : 0)}%` }]} />
-        </View>
-        <Text style={styles.heroCaption}>
-          <Text style={styles.heroCaptionStrong}>{speciesCount} of {TARGET_SPECIES}</Text> species on the roadmap
-        </Text>
+          {/* Life List hero */}
+          <View style={styles.heroCard}>
+            <Text style={styles.heroLabel}>Your life list</Text>
+            <Text style={styles.heroNumber}>{speciesCount}</Text>
+            <Text style={styles.heroSub}>species discovered</Text>
 
-        <TouchableOpacity style={styles.heroCta} onPress={goToLifeList} activeOpacity={0.85}>
-          <Text style={styles.heroCtaText}>View life list</Text>
-          <Ionicons name="chevron-forward" size={16} color={theme.colors.background} />
-        </TouchableOpacity>
-      </View>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${Math.max(progress * 100, speciesCount > 0 ? 4 : 0)}%` }]} />
+            </View>
+            <Text style={styles.heroCaption}>
+              <Text style={styles.heroCaptionStrong}>{speciesCount} of {lifeListTarget}</Text> species on your goal
+            </Text>
 
-      {/* Stats — only things we can actually compute from stored data */}
-      <View style={styles.statsRow}>
-        <View style={styles.statChip}>
-          <Text style={styles.statNumber}>{speciesCount}</Text>
-          <Text style={styles.statLabel}>Species identified</Text>
-        </View>
-        <View style={styles.statChip}>
-          <Text style={styles.statNumber}>{thisMonthCount}</Text>
-          <Text style={styles.statLabel}>This month</Text>
-        </View>
-        <View style={styles.statChip}>
-          <Text style={styles.statNumber}>{memberSinceLabel}</Text>
-          <Text style={styles.statLabel}>First sighting</Text>
-        </View>
-      </View>
-
-      {/* Recent discoveries */}
-      {recent.length > 0 && (
-        <View style={styles.section}>
-          <View style={styles.sectionHead}>
-            <Text style={styles.sectionTitle}>Recent discoveries</Text>
-            <TouchableOpacity onPress={goToLifeList}>
-              <Text style={styles.sectionLink}>View all</Text>
+            <TouchableOpacity style={styles.heroCta} onPress={goToLifeList} activeOpacity={0.85}>
+              <Text style={styles.heroCtaText}>View life list</Text>
+              <Ionicons name="chevron-forward" size={16} color={theme.colors.background} />
             </TouchableOpacity>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.recentRow}>
-            {recent.map((bird, index) => {
-              const primaryImage = bird.images?.find(img => img.is_primary)
-                || (bird.image_url ? { image_url: bird.image_url } : null);
-              return (
-                <TouchableOpacity
-                  key={`${bird.id}-${index}`}
-                  style={styles.birdCard}
-                  onPress={() => navigation.navigate('HomeTab', { screen: 'BirdDetail', params: { bird } })}
-                  activeOpacity={0.8}
-                >
-                  {primaryImage ? (
-                    <Image source={{ uri: primaryImage.image_url }} style={styles.birdPhoto} />
-                  ) : (
-                    <View style={[styles.birdPhoto, styles.birdPhotoPlaceholder]}>
-                      <Text style={{ fontSize: 26 }}>🦅</Text>
-                    </View>
-                  )}
-                  <Text style={styles.birdName} numberOfLines={2}>{bird.common_name}</Text>
+
+          {/* Stats — only things we can actually compute from stored data */}
+          <View style={styles.statsRow}>
+            <View style={styles.statChip}>
+              <Text style={styles.statNumber}>{speciesCount}</Text>
+              <Text style={styles.statLabel}>Species identified</Text>
+            </View>
+            <View style={styles.statChip}>
+              <Text style={styles.statNumber}>{thisMonthCount}</Text>
+              <Text style={styles.statLabel}>This month</Text>
+            </View>
+            <View style={styles.statChip}>
+              <Text style={styles.statNumber}>{memberSinceLabel}</Text>
+              <Text style={styles.statLabel}>First sighting</Text>
+            </View>
+          </View>
+
+          {/* Recent discoveries */}
+          {recent.length > 0 && (
+            <View style={styles.section}>
+              <View style={styles.sectionHead}>
+                <Text style={styles.sectionTitle}>Recent discoveries</Text>
+                <TouchableOpacity onPress={goToLifeList}>
+                  <Text style={styles.sectionLink}>View all</Text>
                 </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
-      )}
-
-      {/* Empty state nudge when there's nothing tracked yet */}
-      {loaded && speciesCount === 0 && (
-        <View style={styles.emptyNudge}>
-          <Text style={styles.emptyNudgeText}>
-            Identify your first bird to start building your life list.
-          </Text>
-        </View>
-      )}
-
-      {/* Settings */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Settings</Text>
-        <View style={styles.settingsList}>
-          {SETTINGS_ROWS.map((row, index) => (
-            <TouchableOpacity
-              key={row.label}
-              style={[
-                styles.settingsRow,
-                index < SETTINGS_ROWS.length - 1 && styles.settingsRowBorder,
-              ]}
-              activeOpacity={0.7}
-            >
-              <View style={styles.settingsRowLeft}>
-                <View style={styles.settingsIcon}>
-                  <Ionicons name={row.icon} size={16} color={theme.colors.textSecondary} />
-                </View>
-                <Text style={styles.settingsLabel}>{row.label}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={16} color={theme.colors.textDim} />
-            </TouchableOpacity>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.recentRow}>
+                {recent.map((bird, index) => {
+                  const primaryImage = bird.images?.find(img => img.is_primary)
+                    || (bird.image_url ? { image_url: bird.image_url } : null);
+                  return (
+                    <TouchableOpacity
+                      key={`${bird.id}-${index}`}
+                      style={styles.birdCard}
+                      onPress={() => navigation.navigate('HomeTab', { screen: 'BirdDetail', params: { bird } })}
+                      activeOpacity={0.8}
+                    >
+                      {primaryImage ? (
+                        <Image source={{ uri: primaryImage.image_url }} style={styles.birdPhoto} />
+                      ) : (
+                        <View style={[styles.birdPhoto, styles.birdPhotoPlaceholder]}>
+                          <Text style={{ fontSize: 26 }}>🦅</Text>
+                        </View>
+                      )}
+                      <Text style={styles.birdName} numberOfLines={2}>{bird.common_name}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
+
+          {loaded && speciesCount === 0 && (
+            <View style={styles.emptyNudge}>
+              <Text style={styles.emptyNudgeText}>
+                Identify your first bird to start building your life list.
+              </Text>
+            </View>
+          )}
+
+          {/* Settings — grouped, eBird-style */}
+          <View style={styles.settingsHeading}>
+            <Text style={styles.settingsHeadingText}>Settings</Text>
+          </View>
+
+          {SETTINGS_GROUPS.map((group) => (
+            <View key={group.title} style={styles.group}>
+              <Text style={styles.groupTitle}>{group.title}</Text>
+              <View style={styles.groupCard}>
+                {group.rows.map((row, index) => (
+                  <SettingsRow
+                    key={row.key}
+                    {...row}
+                    isLast={index === group.rows.length - 1}
+                  />
+                ))}
+              </View>
+            </View>
           ))}
+
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+
+      <OptionsSheet
+        visible={activeSheet === 'target'}
+        title="Life List goal"
+        options={TARGET_OPTIONS}
+        selectedValue={lifeListTarget}
+        onSelect={persistTarget}
+        onClose={() => setActiveSheet(null)}
+      />
+      <OptionsSheet
+        visible={activeSheet === 'distance'}
+        title="Distance units"
+        options={DISTANCE_OPTIONS}
+        selectedValue={distanceUnit}
+        onSelect={persistDistanceUnit}
+        onClose={() => setActiveSheet(null)}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
-  scrollContent: { padding: theme.spacing.md, paddingBottom: theme.spacing.xxl },
+  scrollContent: { paddingBottom: theme.spacing.xxl, alignItems: 'center' },
+  // Centers and caps width on wide viewports (desktop / web preview) while
+  // staying full-width on phones.
+  pageInner: { width: '100%', maxWidth: 560, padding: theme.spacing.md },
 
   header: { alignItems: 'center', marginBottom: theme.spacing.lg },
   avatarRing: {
@@ -242,7 +399,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between',
     marginBottom: theme.spacing.sm,
   },
-  sectionTitle: { fontSize: 16, fontWeight: 'bold', color: theme.colors.text, marginBottom: theme.spacing.sm },
+  sectionTitle: { fontSize: 16, fontWeight: 'bold', color: theme.colors.text },
   sectionLink: { fontSize: 12.5, color: theme.colors.primaryLight, fontWeight: '600' },
 
   recentRow: { gap: theme.spacing.sm },
@@ -263,22 +420,19 @@ const styles = StyleSheet.create({
   },
   emptyNudgeText: { fontSize: 13, color: theme.colors.textDim, textAlign: 'center', lineHeight: 19 },
 
-  settingsList: {
+  settingsHeading: { marginBottom: theme.spacing.sm, marginTop: theme.spacing.xs },
+  settingsHeadingText: { fontSize: 20, fontWeight: 'bold', color: theme.colors.text },
+
+  group: { marginBottom: theme.spacing.lg },
+  groupTitle: {
+    fontSize: 12, fontWeight: '700', color: theme.colors.textDim,
+    textTransform: 'uppercase', letterSpacing: 0.6,
+    marginBottom: theme.spacing.xs, marginLeft: 4,
+  },
+  groupCard: {
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg,
     borderWidth: 1, borderColor: theme.colors.cardBorder,
     overflow: 'hidden',
   },
-  settingsRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingVertical: 14, paddingHorizontal: theme.spacing.md,
-  },
-  settingsRowBorder: { borderBottomWidth: 1, borderBottomColor: theme.colors.divider },
-  settingsRowLeft: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
-  settingsIcon: {
-    width: 28, height: 28, borderRadius: theme.radius.sm,
-    backgroundColor: theme.colors.surface,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  settingsLabel: { fontSize: 13.5, color: theme.colors.text },
 });
