@@ -10,6 +10,7 @@ import { theme } from '../constants/theme';
 import { LIFE_LIST_KEY } from './LifeListScreen';
 import SettingsRow from '../components/SettingsRow';
 import OptionsSheet from '../components/OptionsSheet';
+import EditProfileSheet from '../components/EditProfileSheet';
 
 const RECENT_COUNT = 4;
 const DEFAULT_TARGET = 50;
@@ -19,6 +20,7 @@ const TARGET_KEY = 'setting_life_list_target';
 const DISTANCE_UNIT_KEY = 'setting_distance_unit';
 const NOTIFICATIONS_KEY = 'setting_notifications_enabled';
 const NEARBY_BIRDS_KEY = 'setting_show_nearby_birds';
+const DISPLAY_NAME_KEY = 'profile_display_name';
 
 const TARGET_OPTIONS = [
   { label: '10 species — MVP roster', value: 10 },
@@ -42,8 +44,9 @@ export default function ProfileScreen({ navigation }) {
   const [distanceUnit, setDistanceUnit] = useState('km');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showNearbyBirds, setShowNearbyBirds] = useState(true);
+  const [displayName, setDisplayName] = useState('');
 
-  const [activeSheet, setActiveSheet] = useState(null); // 'target' | 'distance' | null
+  const [activeSheet, setActiveSheet] = useState(null); // 'target' | 'distance' | 'editProfile' | null
 
   useFocusEffect(
     useCallback(() => {
@@ -65,18 +68,29 @@ export default function ProfileScreen({ navigation }) {
 
   const loadSettings = async () => {
     try {
-      const [target, unit, notif, nearby] = await Promise.all([
+      const [target, unit, notif, nearby, name] = await Promise.all([
         AsyncStorage.getItem(TARGET_KEY),
         AsyncStorage.getItem(DISTANCE_UNIT_KEY),
         AsyncStorage.getItem(NOTIFICATIONS_KEY),
         AsyncStorage.getItem(NEARBY_BIRDS_KEY),
+        AsyncStorage.getItem(DISPLAY_NAME_KEY),
       ]);
       if (target) setLifeListTarget(Number(target));
       if (unit) setDistanceUnit(unit);
       if (notif !== null) setNotificationsEnabled(notif === 'true');
       if (nearby !== null) setShowNearbyBirds(nearby === 'true');
+      if (name) setDisplayName(name);
     } catch (e) {
       console.error('Failed to load profile settings', e);
+    }
+  };
+
+  const persistDisplayName = async (val) => {
+    setDisplayName(val);
+    if (val) {
+      await AsyncStorage.setItem(DISPLAY_NAME_KEY, val);
+    } else {
+      await AsyncStorage.removeItem(DISPLAY_NAME_KEY);
     }
   };
 
@@ -152,7 +166,7 @@ export default function ProfileScreen({ navigation }) {
     {
       title: 'Account',
       rows: [
-        { key: 'editProfile', icon: 'person-outline', title: 'Edit Profile', description: 'Update your birding profile', type: 'disabled' },
+        { key: 'editProfile', icon: 'person-outline', title: 'Edit Profile', description: displayName ? `Editing as ${displayName}` : 'Update your birding profile', type: 'chevron', onPress: () => setActiveSheet('editProfile') },
         { key: 'profilePhoto', icon: 'image-outline', title: 'Profile Photo', description: 'Choose a profile picture', type: 'disabled' },
         { key: 'birdingName', icon: 'create-outline', title: 'Birding Name', description: 'How you appear in the app', type: 'disabled' },
       ],
@@ -208,13 +222,17 @@ export default function ProfileScreen({ navigation }) {
       >
         <View style={styles.pageInner}>
 
-          {/* Identity block — no accounts yet, so this stays generic */}
+          {/* Identity block — local display name only, no account system yet */}
           <View style={styles.header}>
             <View style={styles.avatarRing}>
-              <Ionicons name="person" size={36} color={theme.colors.primary} />
+              {displayName ? (
+                <Text style={styles.avatarInitial}>{displayName.trim().charAt(0).toUpperCase()}</Text>
+              ) : (
+                <Ionicons name="person" size={36} color={theme.colors.primary} />
+              )}
             </View>
-            <Text style={styles.headerTitle}>Bird Explorer</Text>
-            <Text style={styles.headerSubtitle}>Tracking sightings on this device</Text>
+            <Text style={styles.headerTitle}>{displayName || 'Bird Explorer'}</Text>
+            <Text style={styles.headerSubtitle}>{displayName ? 'Bird Explorer' : 'Tracking sightings on this device'}</Text>
           </View>
 
           {/* Life List hero */}
@@ -334,6 +352,12 @@ export default function ProfileScreen({ navigation }) {
         onSelect={persistDistanceUnit}
         onClose={() => setActiveSheet(null)}
       />
+      <EditProfileSheet
+        visible={activeSheet === 'editProfile'}
+        currentName={displayName}
+        onSave={persistDisplayName}
+        onClose={() => setActiveSheet(null)}
+      />
     </View>
   );
 }
@@ -353,6 +377,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
     marginBottom: theme.spacing.sm,
   },
+  avatarInitial: { fontSize: 28, fontWeight: 'bold', color: theme.colors.primary },
   headerTitle: { fontSize: 20, fontWeight: 'bold', color: theme.colors.text },
   headerSubtitle: { fontSize: 13, color: theme.colors.textDim, marginTop: 2 },
 
