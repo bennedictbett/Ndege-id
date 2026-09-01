@@ -8,7 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { theme } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 
-const LIFE_LIST_KEY = 'ndege_life_list';
+export const LIFE_LIST_KEY = 'ndege_life_list';
 const API_URL = 'https://ndege-id.onrender.com';
 
 export async function addToLifeList(bird) {
