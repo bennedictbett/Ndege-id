@@ -23,6 +23,7 @@ const DISTANCE_UNIT_KEY = 'setting_distance_unit';
 const NOTIFICATIONS_KEY = 'setting_notifications_enabled';
 const NEARBY_BIRDS_KEY = 'setting_show_nearby_birds';
 const DISPLAY_NAME_KEY = 'profile_display_name';
+const BIO_KEY = 'profile_bio';
 const PHOTO_KEY = 'profile_photo_uri';
 
 const TARGET_OPTIONS = [
@@ -48,9 +49,10 @@ export default function ProfileScreen({ navigation }) {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showNearbyBirds, setShowNearbyBirds] = useState(true);
   const [displayName, setDisplayName] = useState('');
+  const [bio, setBio] = useState('');
   const [photoUri, setPhotoUri] = useState('');
 
-  const [activeSheet, setActiveSheet] = useState(null); // 'target' | 'distance' | 'editProfile' | 'photoActions' | null
+  const [activeSheet, setActiveSheet] = useState(null); // 'target' | 'distance' | 'editProfile' | 'editBio' | 'photoActions' | null
 
   useFocusEffect(
     useCallback(() => {
@@ -72,12 +74,13 @@ export default function ProfileScreen({ navigation }) {
 
   const loadSettings = async () => {
     try {
-      const [target, unit, notif, nearby, name, photo] = await Promise.all([
+      const [target, unit, notif, nearby, name, bioVal, photo] = await Promise.all([
         AsyncStorage.getItem(TARGET_KEY),
         AsyncStorage.getItem(DISTANCE_UNIT_KEY),
         AsyncStorage.getItem(NOTIFICATIONS_KEY),
         AsyncStorage.getItem(NEARBY_BIRDS_KEY),
         AsyncStorage.getItem(DISPLAY_NAME_KEY),
+        AsyncStorage.getItem(BIO_KEY),
         AsyncStorage.getItem(PHOTO_KEY),
       ]);
       if (target) setLifeListTarget(Number(target));
@@ -85,6 +88,7 @@ export default function ProfileScreen({ navigation }) {
       if (notif !== null) setNotificationsEnabled(notif === 'true');
       if (nearby !== null) setShowNearbyBirds(nearby === 'true');
       if (name) setDisplayName(name);
+      if (bioVal) setBio(bioVal);
       if (photo) setPhotoUri(photo);
     } catch (e) {
       console.error('Failed to load profile settings', e);
@@ -97,6 +101,15 @@ export default function ProfileScreen({ navigation }) {
       await AsyncStorage.setItem(DISPLAY_NAME_KEY, val);
     } else {
       await AsyncStorage.removeItem(DISPLAY_NAME_KEY);
+    }
+  };
+
+  const persistBio = async (val) => {
+    setBio(val);
+    if (val) {
+      await AsyncStorage.setItem(BIO_KEY, val);
+    } else {
+      await AsyncStorage.removeItem(BIO_KEY);
     }
   };
 
@@ -228,7 +241,7 @@ export default function ProfileScreen({ navigation }) {
       rows: [
         { key: 'editProfile', icon: 'person-outline', title: 'Edit Profile', description: displayName ? `Editing as ${displayName}` : 'Update your birding profile', type: 'chevron', onPress: () => setActiveSheet('editProfile') },
         { key: 'profilePhoto', icon: 'image-outline', title: 'Profile Photo', description: photoUri ? 'Tap to change or remove' : 'Choose a profile picture', type: 'chevron', onPress: handlePhotoRowPress },
-        { key: 'birdingName', icon: 'create-outline', title: 'Birding Name', description: 'How you appear in the app', type: 'disabled' },
+        { key: 'birderBio', icon: 'create-outline', title: 'Birder Bio', description: bio || 'A short line about your birding style', type: 'chevron', onPress: () => setActiveSheet('editBio') },
       ],
     },
     {
@@ -300,6 +313,7 @@ export default function ProfileScreen({ navigation }) {
             </TouchableOpacity>
             <Text style={styles.headerTitle}>{displayName || 'Bird Explorer'}</Text>
             <Text style={styles.headerSubtitle}>{displayName ? 'Bird Explorer' : 'Tracking sightings on this device'}</Text>
+            {!!bio && <Text style={styles.headerBio}>{bio}</Text>}
           </View>
 
           {/* Life List hero */}
@@ -432,8 +446,25 @@ export default function ProfileScreen({ navigation }) {
       />
       <EditProfileSheet
         visible={activeSheet === 'editProfile'}
-        currentName={displayName}
+        title="Edit Profile"
+        label="Birding name"
+        placeholder="e.g. Benedict"
+        hint="This is how you'll appear in the app — stored on this device only."
+        maxLength={30}
+        currentValue={displayName}
         onSave={persistDisplayName}
+        onClose={() => setActiveSheet(null)}
+      />
+      <EditProfileSheet
+        visible={activeSheet === 'editBio'}
+        title="Birder Bio"
+        label="Bio"
+        placeholder="e.g. Weekend birder, Nairobi"
+        hint="Shown under your name on your profile."
+        maxLength={60}
+        multiline
+        currentValue={bio}
+        onSave={persistBio}
         onClose={() => setActiveSheet(null)}
       />
     </View>
@@ -467,6 +498,7 @@ const styles = StyleSheet.create({
   avatarInitial: { fontSize: 28, fontWeight: 'bold', color: theme.colors.primary },
   headerTitle: { fontSize: 20, fontWeight: 'bold', color: theme.colors.text },
   headerSubtitle: { fontSize: 13, color: theme.colors.textDim, marginTop: 2 },
+  headerBio: { fontSize: 12.5, color: theme.colors.textSecondary, marginTop: 8, textAlign: 'center', fontStyle: 'italic' },
 
   heroCard: {
     backgroundColor: theme.colors.card,
