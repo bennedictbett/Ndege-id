@@ -1,13 +1,20 @@
-import { useState, useEffect } from 'react'; 
+import { useState, useEffect, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../constants/theme';
 import {
   View, Text, TouchableOpacity, StyleSheet,
   ScrollView, Animated, ImageBackground
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
+import { NEARBY_BIRDS_KEY, DISTANCE_UNIT_KEY, DEFAULT_LOCATION_KEY } from '../constants/settingsKeys';
+import { haversineKm, formatDistance } from '../utils/geo';
 
-const API_URL = 'https://ndege-id.onrender.com'; 
+const API_URL = 'https://ndege-id.onrender.com';
+const NEARBY_RADIUS_KM = 50; // sightings farther than this aren't "nearby" for birding purposes
+const NEARBY_FETCH_LIMIT = 30;
+const NEARBY_DISPLAY_COUNT = 6;
 
 const IdentifyCard = ({ icon, title, subtitle, onPress }) => (
   <TouchableOpacity style={styles.identifyCard} onPress={onPress}>
@@ -45,8 +52,41 @@ const RecentCard = ({ bird, confidence }) => {
   );
 };
 
+const NearbySightingCard = ({ sighting }) => {
+  const bird = sighting.birds;
+  const primaryImage = bird?.images?.find(img => img.is_primary);
+  return (
+    <View style={styles.recentCard}>
+      {primaryImage ? (
+        <View style={styles.recentImageContainer}>
+          <img
+            src={primaryImage.image_url}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            alt={bird?.common_name}
+          />
+        </View>
+      ) : (
+        <View style={[styles.recentImageContainer, styles.nearbyPlaceholder]}>
+          <Text style={{ fontSize: 32 }}>🦅</Text>
+        </View>
+      )}
+      <View style={styles.confidenceBadge}>
+        <Text style={styles.confidenceText}>{formatDistance(sighting.distanceKm, sighting.distanceUnit)}</Text>
+      </View>
+      <View style={styles.recentCardOverlay}>
+        <Text style={styles.recentBirdName}>{bird?.common_name ?? 'Unknown bird'}</Text>
+        <Text style={styles.recentLocation}>📍 {sighting.location_name || 'Unnamed location'}</Text>
+      </View>
+    </View>
+  );
+};
+
 export default function HomeScreen({ navigation }) {
   const [recentBirds, setRecentBirds] = useState([]);
+  const [nearbySightings, setNearbySightings] = useState([]);
+  const [nearbyEnabled, setNearbyEnabled] = useState(false);
+  const [nearbyLocation, setNearbyLocation] = useState(null);
+  const [nearbyLoaded, setNearbyLoaded] = useState(false);
 
   useEffect(() => {
     const fetchRecentBirds = async () => {
@@ -70,6 +110,60 @@ export default function HomeScreen({ navigation }) {
 
     fetchRecentBirds();
   }, []);
+
+  // Re-read on focus, not just mount — the settings that drive this
+  // (Show Nearby Birds, Default Location, Distance Units) live on the
+  // Profile tab, which stays mounted in the background as a sibling tab.
+  useFocusEffect(
+    useCallback(() => {
+      loadNearbySightings();
+    }, [])
+  );
+
+  const loadNearbySightings = async () => {
+    try {
+      const [enabled, unit, locationRaw] = await Promise.all([
+        AsyncStorage.getItem(NEARBY_BIRDS_KEY),
+        AsyncStorage.getItem(DISTANCE_UNIT_KEY),
+        AsyncStorage.getItem(DEFAULT_LOCATION_KEY),
+      ]);
+
+      const isEnabled = enabled === 'true';
+      const distanceUnit = unit || 'km';
+      const location = locationRaw ? JSON.parse(locationRaw) : null;
+
+      setNearbyEnabled(isEnabled);
+      setNearbyLocation(location);
+
+      if (!isEnabled || !location) {
+        setNearbySightings([]);
+        setNearbyLoaded(true);
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/sightings/recent?limit=${NEARBY_FETCH_LIMIT}`);
+      const data = await response.json();
+      const sightings = data?.sightings || [];
+
+      const withDistance = sightings
+        .filter(s => typeof s.latitude === 'number' && typeof s.longitude === 'number')
+        .map(s => ({
+          ...s,
+          distanceKm: haversineKm(location.latitude, location.longitude, s.latitude, s.longitude),
+          distanceUnit,
+        }))
+        .filter(s => s.distanceKm <= NEARBY_RADIUS_KM)
+        .sort((a, b) => a.distanceKm - b.distanceKm)
+        .slice(0, NEARBY_DISPLAY_COUNT);
+
+      setNearbySightings(withDistance);
+    } catch (e) {
+      console.error('Failed to load nearby sightings', e);
+      setNearbySightings([]);
+    } finally {
+      setNearbyLoaded(true);
+    }
+  };
   
 
   return (
@@ -184,6 +278,44 @@ export default function HomeScreen({ navigation }) {
               <RecentCard key={index} bird={item.bird} confidence={item.confidence} />
             ))}
           </ScrollView>
+        </View>
+      )}
+
+      {/* Nearby Sightings — only shown when the user has opted in via
+          Profile > Birding Preferences > Show Nearby Birds */}
+      {nearbyEnabled && (
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="radio-outline" size={18} color={theme.colors.primary} style={{ marginRight: theme.spacing.sm }} />
+            <Text style={styles.sectionTitle}>Nearby Sightings</Text>
+          </View>
+
+          {!nearbyLocation && nearbyLoaded && (
+            <View style={styles.nearbyNudge}>
+              <Text style={styles.nearbyNudgeText}>
+                Set a default location in Profile to see sightings reported near you.
+              </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('ProfileTab')}>
+                <Text style={styles.nearbyNudgeLink}>Go to Profile →</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {nearbyLocation && nearbyLoaded && nearbySightings.length === 0 && (
+            <View style={styles.nearbyNudge}>
+              <Text style={styles.nearbyNudgeText}>
+                No sightings reported within {NEARBY_RADIUS_KM}km yet — check back as more birders log sightings nearby.
+              </Text>
+            </View>
+          )}
+
+          {nearbyLocation && nearbySightings.length > 0 && (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {nearbySightings.map((sighting) => (
+                <NearbySightingCard key={sighting.id} sighting={sighting} />
+              ))}
+            </ScrollView>
+          )}
         </View>
       )}
 
@@ -448,6 +580,27 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontSize: 11,
     marginTop: 2,
+  },
+  nearbyPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.surface,
+  },
+  nearbyNudge: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+  },
+  nearbyNudgeText: {
+    fontSize: 13,
+    color: theme.colors.textDim,
+    lineHeight: 19,
+  },
+  nearbyNudgeLink: {
+    fontSize: 13,
+    color: theme.colors.primary,
+    fontWeight: '600',
+    marginTop: theme.spacing.sm,
   },
   exploreGrid: {
     flexDirection: 'row',
