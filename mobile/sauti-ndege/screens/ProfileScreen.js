@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import * as ImagePicker from 'expo-image-picker';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
+import * as Location from 'expo-location';
 import { theme } from '../constants/theme';
 import { LIFE_LIST_KEY } from './LifeListScreen';
 import SettingsRow from '../components/SettingsRow';
@@ -25,6 +26,7 @@ const NEARBY_BIRDS_KEY = 'setting_show_nearby_birds';
 const DISPLAY_NAME_KEY = 'profile_display_name';
 const BIO_KEY = 'profile_bio';
 const PHOTO_KEY = 'profile_photo_uri';
+const DEFAULT_LOCATION_KEY = 'profile_default_location';
 
 const TARGET_OPTIONS = [
   { label: '10 species — MVP roster', value: 10 },
@@ -51,8 +53,9 @@ export default function ProfileScreen({ navigation }) {
   const [displayName, setDisplayName] = useState('');
   const [bio, setBio] = useState('');
   const [photoUri, setPhotoUri] = useState('');
+  const [defaultLocation, setDefaultLocation] = useState(null); // { latitude, longitude, label } | null
 
-  const [activeSheet, setActiveSheet] = useState(null); // 'target' | 'distance' | 'editProfile' | 'editBio' | 'photoActions' | null
+  const [activeSheet, setActiveSheet] = useState(null); // 'target' | 'distance' | 'editProfile' | 'editBio' | 'photoActions' | 'locationActions' | null
 
   useFocusEffect(
     useCallback(() => {
@@ -74,7 +77,7 @@ export default function ProfileScreen({ navigation }) {
 
   const loadSettings = async () => {
     try {
-      const [target, unit, notif, nearby, name, bioVal, photo] = await Promise.all([
+      const [target, unit, notif, nearby, name, bioVal, photo, location] = await Promise.all([
         AsyncStorage.getItem(TARGET_KEY),
         AsyncStorage.getItem(DISTANCE_UNIT_KEY),
         AsyncStorage.getItem(NOTIFICATIONS_KEY),
@@ -82,6 +85,7 @@ export default function ProfileScreen({ navigation }) {
         AsyncStorage.getItem(DISPLAY_NAME_KEY),
         AsyncStorage.getItem(BIO_KEY),
         AsyncStorage.getItem(PHOTO_KEY),
+        AsyncStorage.getItem(DEFAULT_LOCATION_KEY),
       ]);
       if (target) setLifeListTarget(Number(target));
       if (unit) setDistanceUnit(unit);
@@ -90,6 +94,9 @@ export default function ProfileScreen({ navigation }) {
       if (name) setDisplayName(name);
       if (bioVal) setBio(bioVal);
       if (photo) setPhotoUri(photo);
+      if (location) {
+        try { setDefaultLocation(JSON.parse(location)); } catch { /* ignore malformed cache */ }
+      }
     } catch (e) {
       console.error('Failed to load profile settings', e);
     }
@@ -165,6 +172,59 @@ export default function ProfileScreen({ navigation }) {
   const handlePhotoAction = (action) => {
     if (action === 'choose') pickAndProcessPhoto();
     if (action === 'remove') persistPhoto('');
+  };
+
+  const persistDefaultLocation = async (locationObj) => {
+    setDefaultLocation(locationObj);
+    if (locationObj) {
+      await AsyncStorage.setItem(DEFAULT_LOCATION_KEY, JSON.stringify(locationObj));
+    } else {
+      await AsyncStorage.removeItem(DEFAULT_LOCATION_KEY);
+    }
+  };
+
+  const captureCurrentLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission needed', 'Allow location access to set your default birding location.');
+        return;
+      }
+      const position = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = position.coords;
+
+      // Coordinate fallback label — reverse geocoding isn't available on web,
+      // and can fail on native too, so this always gets set first.
+      let label = `${latitude.toFixed(2)}°, ${longitude.toFixed(2)}°`;
+      try {
+        const geocode = await Location.reverseGeocodeAsync({ latitude, longitude });
+        const place = geocode[0];
+        const readable = [place?.city || place?.subregion, place?.region || place?.country]
+          .filter(Boolean)
+          .join(', ');
+        if (readable) label = readable;
+      } catch (geocodeError) {
+        console.warn('Reverse geocoding unavailable, using coordinates instead', geocodeError);
+      }
+
+      await persistDefaultLocation({ latitude, longitude, label });
+    } catch (e) {
+      console.error('Location capture failed', e);
+      Alert.alert('Something went wrong', "Couldn't get your location. Please try again.");
+    }
+  };
+
+  const handleLocationRowPress = () => {
+    if (defaultLocation) {
+      setActiveSheet('locationActions');
+    } else {
+      captureCurrentLocation();
+    }
+  };
+
+  const handleLocationAction = (action) => {
+    if (action === 'update') captureCurrentLocation();
+    if (action === 'clear') persistDefaultLocation(null);
   };
 
   const persistTarget = async (val) => {
@@ -247,7 +307,7 @@ export default function ProfileScreen({ navigation }) {
     {
       title: 'Birding Preferences',
       rows: [
-        { key: 'defaultLocation', icon: 'compass-outline', title: 'Default Location', description: 'Used for nearby species suggestions', type: 'disabled' },
+        { key: 'defaultLocation', icon: 'compass-outline', title: 'Default Location', description: defaultLocation ? defaultLocation.label : 'Used for nearby species suggestions', type: 'chevron', onPress: handleLocationRowPress },
         { key: 'distanceUnits', icon: 'resize-outline', title: 'Distance Units', description: distanceUnit === 'km' ? 'Kilometers' : 'Miles', type: 'chevron', onPress: () => setActiveSheet('distance') },
         { key: 'nearbyBirds', icon: 'radio-outline', title: 'Show Nearby Birds', description: 'Surface sightings reported near you', type: 'toggle', value: showNearbyBirds, onToggle: toggleNearbyBirds },
         { key: 'lifeListPrefs', icon: 'list-outline', title: 'Life List Preferences', description: `Goal: ${lifeListTarget} species`, type: 'chevron', onPress: () => setActiveSheet('target') },
@@ -431,6 +491,17 @@ export default function ProfileScreen({ navigation }) {
         options={DISTANCE_OPTIONS}
         selectedValue={distanceUnit}
         onSelect={persistDistanceUnit}
+        onClose={() => setActiveSheet(null)}
+      />
+      <OptionsSheet
+        visible={activeSheet === 'locationActions'}
+        title="Default location"
+        options={[
+          { label: 'Update to current location', value: 'update' },
+          { label: 'Clear default location', value: 'clear' },
+        ]}
+        selectedValue={null}
+        onSelect={handleLocationAction}
         onClose={() => setActiveSheet(null)}
       />
       <OptionsSheet
