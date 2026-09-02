@@ -5,19 +5,29 @@ import {
 } from 'react-native';
 import { theme } from '../constants/theme';
 
-const MAX_LENGTH = 30;
-
 /**
- * Edit Profile sheet — local-only display name (no account system yet).
- * Same visual family as OptionsSheet, but with a text field + Save/Cancel.
+ * Generic single-field text sheet — local-only, no account system yet.
+ * Same visual family as OptionsSheet. Used for both "Edit Profile"
+ * (birding name) and "Birder Bio", each with their own copy/limits.
  */
-export default function EditProfileSheet({ visible, currentName, onSave, onClose }) {
-  const [draft, setDraft] = useState(currentName || '');
+export default function EditProfileSheet({
+  visible,
+  title = 'Edit Profile',
+  label = 'Birding name',
+  placeholder = 'e.g. Benedict',
+  hint = "Stored on this device only.",
+  maxLength = 30,
+  multiline = false,
+  currentValue,
+  onSave,
+  onClose,
+}) {
+  const [draft, setDraft] = useState(currentValue || '');
 
   // Reset the draft to the saved value each time the sheet opens.
   useEffect(() => {
-    if (visible) setDraft(currentName || '');
-  }, [visible, currentName]);
+    if (visible) setDraft(currentValue || '');
+  }, [visible, currentValue]);
 
   const handleSave = () => {
     onSave(draft.trim());
@@ -32,18 +42,19 @@ export default function EditProfileSheet({ visible, currentName, onSave, onClose
       >
         <Pressable style={styles.overlayTouchable} onPress={onClose} />
         <View style={styles.sheet}>
-          <Text style={styles.sheetTitle}>Edit Profile</Text>
-          <Text style={styles.label}>Birding name</Text>
+          <Text style={styles.sheetTitle}>{title}</Text>
+          <Text style={styles.label}>{label}</Text>
           <TextInput
             value={draft}
             onChangeText={setDraft}
-            placeholder="e.g. Benedict"
+            placeholder={placeholder}
             placeholderTextColor={theme.colors.textDim}
-            maxLength={MAX_LENGTH}
+            maxLength={maxLength}
+            multiline={multiline}
             autoFocus
-            style={styles.input}
+            style={[styles.input, multiline && styles.inputMultiline]}
           />
-          <Text style={styles.hint}>This is how you'll appear in the app — stored on this device only.</Text>
+          <Text style={styles.hint}>{hint}</Text>
 
           <View style={styles.actions}>
             <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={onClose} activeOpacity={0.7}>
@@ -88,6 +99,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: theme.colors.text,
   },
+  inputMultiline: { minHeight: 72, textAlignVertical: 'top' },
   hint: { fontSize: 11.5, color: theme.colors.textDim, marginTop: 8, marginBottom: theme.spacing.lg, lineHeight: 16 },
   actions: { flexDirection: 'row', gap: theme.spacing.sm },
   button: { flex: 1, borderRadius: theme.radius.md, paddingVertical: 13, alignItems: 'center' },
