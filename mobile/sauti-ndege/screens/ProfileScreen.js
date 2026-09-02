@@ -10,6 +10,10 @@ import * as ImagePicker from 'expo-image-picker';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as Location from 'expo-location';
 import { theme } from '../constants/theme';
+import {
+  TARGET_KEY, DISTANCE_UNIT_KEY, NOTIFICATIONS_KEY, NEARBY_BIRDS_KEY,
+  DISPLAY_NAME_KEY, BIO_KEY, PHOTO_KEY, DEFAULT_LOCATION_KEY,
+} from '../constants/settingsKeys';
 import { LIFE_LIST_KEY } from './LifeListScreen';
 import SettingsRow from '../components/SettingsRow';
 import OptionsSheet from '../components/OptionsSheet';
@@ -18,15 +22,6 @@ import EditProfileSheet from '../components/EditProfileSheet';
 const RECENT_COUNT = 4;
 const DEFAULT_TARGET = 50;
 const APP_VERSION = Constants.expoConfig?.version ?? '1.0.0';
-
-const TARGET_KEY = 'setting_life_list_target';
-const DISTANCE_UNIT_KEY = 'setting_distance_unit';
-const NOTIFICATIONS_KEY = 'setting_notifications_enabled';
-const NEARBY_BIRDS_KEY = 'setting_show_nearby_birds';
-const DISPLAY_NAME_KEY = 'profile_display_name';
-const BIO_KEY = 'profile_bio';
-const PHOTO_KEY = 'profile_photo_uri';
-const DEFAULT_LOCATION_KEY = 'profile_default_location';
 
 const TARGET_OPTIONS = [
   { label: '10 species — MVP roster', value: 10 },
