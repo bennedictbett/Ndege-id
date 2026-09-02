@@ -6,6 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
+import * as ImagePicker from 'expo-image-picker';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { theme } from '../constants/theme';
 import { LIFE_LIST_KEY } from './LifeListScreen';
 import SettingsRow from '../components/SettingsRow';
@@ -21,6 +23,7 @@ const DISTANCE_UNIT_KEY = 'setting_distance_unit';
 const NOTIFICATIONS_KEY = 'setting_notifications_enabled';
 const NEARBY_BIRDS_KEY = 'setting_show_nearby_birds';
 const DISPLAY_NAME_KEY = 'profile_display_name';
+const PHOTO_KEY = 'profile_photo_uri';
 
 const TARGET_OPTIONS = [
   { label: '10 species — MVP roster', value: 10 },
@@ -45,8 +48,9 @@ export default function ProfileScreen({ navigation }) {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showNearbyBirds, setShowNearbyBirds] = useState(true);
   const [displayName, setDisplayName] = useState('');
+  const [photoUri, setPhotoUri] = useState('');
 
-  const [activeSheet, setActiveSheet] = useState(null); // 'target' | 'distance' | 'editProfile' | null
+  const [activeSheet, setActiveSheet] = useState(null); // 'target' | 'distance' | 'editProfile' | 'photoActions' | null
 
   useFocusEffect(
     useCallback(() => {
@@ -68,18 +72,20 @@ export default function ProfileScreen({ navigation }) {
 
   const loadSettings = async () => {
     try {
-      const [target, unit, notif, nearby, name] = await Promise.all([
+      const [target, unit, notif, nearby, name, photo] = await Promise.all([
         AsyncStorage.getItem(TARGET_KEY),
         AsyncStorage.getItem(DISTANCE_UNIT_KEY),
         AsyncStorage.getItem(NOTIFICATIONS_KEY),
         AsyncStorage.getItem(NEARBY_BIRDS_KEY),
         AsyncStorage.getItem(DISPLAY_NAME_KEY),
+        AsyncStorage.getItem(PHOTO_KEY),
       ]);
       if (target) setLifeListTarget(Number(target));
       if (unit) setDistanceUnit(unit);
       if (notif !== null) setNotificationsEnabled(notif === 'true');
       if (nearby !== null) setShowNearbyBirds(nearby === 'true');
       if (name) setDisplayName(name);
+      if (photo) setPhotoUri(photo);
     } catch (e) {
       console.error('Failed to load profile settings', e);
     }
@@ -92,6 +98,60 @@ export default function ProfileScreen({ navigation }) {
     } else {
       await AsyncStorage.removeItem(DISPLAY_NAME_KEY);
     }
+  };
+
+  const persistPhoto = async (dataUri) => {
+    setPhotoUri(dataUri);
+    if (dataUri) {
+      await AsyncStorage.setItem(PHOTO_KEY, dataUri);
+    } else {
+      await AsyncStorage.removeItem(PHOTO_KEY);
+    }
+  };
+
+  // Picks a photo, then resizes it down to a small square before storing —
+  // storing a full-resolution photo as base64 in AsyncStorage would be
+  // multiple MB per photo; 300x300 keeps it well under 200KB.
+  const pickAndProcessPhoto = async () => {
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert('Permission needed', 'Allow photo library access to set a profile picture.');
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.9,
+      });
+      if (result.canceled) return;
+
+      const asset = result.assets[0];
+      const context = ImageManipulator.manipulate(asset.uri);
+      const renderedImage = await context.resize({ width: 300, height: 300 }).renderAsync();
+      const saved = await renderedImage.saveAsync({ format: SaveFormat.JPEG, compress: 0.7, base64: true });
+      context.release?.();
+      renderedImage.release?.();
+
+      await persistPhoto(`data:image/jpeg;base64,${saved.base64}`);
+    } catch (e) {
+      console.error('Photo pick/process failed', e);
+      Alert.alert('Something went wrong', "Couldn't set your profile photo. Please try again.");
+    }
+  };
+
+  const handlePhotoRowPress = () => {
+    if (photoUri) {
+      setActiveSheet('photoActions');
+    } else {
+      pickAndProcessPhoto();
+    }
+  };
+
+  const handlePhotoAction = (action) => {
+    if (action === 'choose') pickAndProcessPhoto();
+    if (action === 'remove') persistPhoto('');
   };
 
   const persistTarget = async (val) => {
@@ -167,7 +227,7 @@ export default function ProfileScreen({ navigation }) {
       title: 'Account',
       rows: [
         { key: 'editProfile', icon: 'person-outline', title: 'Edit Profile', description: displayName ? `Editing as ${displayName}` : 'Update your birding profile', type: 'chevron', onPress: () => setActiveSheet('editProfile') },
-        { key: 'profilePhoto', icon: 'image-outline', title: 'Profile Photo', description: 'Choose a profile picture', type: 'disabled' },
+        { key: 'profilePhoto', icon: 'image-outline', title: 'Profile Photo', description: photoUri ? 'Tap to change or remove' : 'Choose a profile picture', type: 'chevron', onPress: handlePhotoRowPress },
         { key: 'birdingName', icon: 'create-outline', title: 'Birding Name', description: 'How you appear in the app', type: 'disabled' },
       ],
     },
@@ -222,15 +282,22 @@ export default function ProfileScreen({ navigation }) {
       >
         <View style={styles.pageInner}>
 
-          {/* Identity block — local display name only, no account system yet */}
+          {/* Identity block — local display name + photo only, no account system yet */}
           <View style={styles.header}>
-            <View style={styles.avatarRing}>
-              {displayName ? (
-                <Text style={styles.avatarInitial}>{displayName.trim().charAt(0).toUpperCase()}</Text>
-              ) : (
-                <Ionicons name="person" size={36} color={theme.colors.primary} />
-              )}
-            </View>
+            <TouchableOpacity onPress={handlePhotoRowPress} activeOpacity={0.8} style={styles.avatarWrap}>
+              <View style={styles.avatarRing}>
+                {photoUri ? (
+                  <Image source={{ uri: photoUri }} style={styles.avatarImage} />
+                ) : displayName ? (
+                  <Text style={styles.avatarInitial}>{displayName.trim().charAt(0).toUpperCase()}</Text>
+                ) : (
+                  <Ionicons name="person" size={36} color={theme.colors.primary} />
+                )}
+              </View>
+              <View style={styles.editBadge}>
+                <Ionicons name="camera" size={11} color={theme.colors.background} />
+              </View>
+            </TouchableOpacity>
             <Text style={styles.headerTitle}>{displayName || 'Bird Explorer'}</Text>
             <Text style={styles.headerSubtitle}>{displayName ? 'Bird Explorer' : 'Tracking sightings on this device'}</Text>
           </View>
@@ -352,6 +419,17 @@ export default function ProfileScreen({ navigation }) {
         onSelect={persistDistanceUnit}
         onClose={() => setActiveSheet(null)}
       />
+      <OptionsSheet
+        visible={activeSheet === 'photoActions'}
+        title="Profile photo"
+        options={[
+          { label: 'Choose new photo', value: 'choose' },
+          { label: 'Remove photo', value: 'remove' },
+        ]}
+        selectedValue={null}
+        onSelect={handlePhotoAction}
+        onClose={() => setActiveSheet(null)}
+      />
       <EditProfileSheet
         visible={activeSheet === 'editProfile'}
         currentName={displayName}
@@ -370,12 +448,21 @@ const styles = StyleSheet.create({
   pageInner: { width: '100%', maxWidth: 560, padding: theme.spacing.md },
 
   header: { alignItems: 'center', marginBottom: theme.spacing.lg },
+  avatarWrap: { width: 72, height: 72, marginBottom: theme.spacing.sm, position: 'relative' },
   avatarRing: {
     width: 72, height: 72, borderRadius: 36,
     backgroundColor: theme.colors.primaryDim,
     borderWidth: 1, borderColor: theme.colors.primary,
     alignItems: 'center', justifyContent: 'center',
-    marginBottom: theme.spacing.sm,
+    overflow: 'hidden',
+  },
+  avatarImage: { width: '100%', height: '100%' },
+  editBadge: {
+    position: 'absolute', bottom: -2, right: -2,
+    width: 22, height: 22, borderRadius: 11,
+    backgroundColor: theme.colors.primary,
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 2, borderColor: theme.colors.background,
   },
   avatarInitial: { fontSize: 28, fontWeight: 'bold', color: theme.colors.primary },
   headerTitle: { fontSize: 20, fontWeight: 'bold', color: theme.colors.text },
