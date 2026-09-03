@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import {
-  View, Text, ScrollView, Image, TouchableOpacity, Platform, Share, Alert, StyleSheet
+  View, Text, ScrollView, Image, TouchableOpacity, Platform, Share, Alert, Linking, StyleSheet
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
@@ -11,7 +11,7 @@ import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as Location from 'expo-location';
 import { theme } from '../constants/theme';
 import {
-  TARGET_KEY, DISTANCE_UNIT_KEY, NOTIFICATIONS_KEY, NEARBY_BIRDS_KEY,
+  TARGET_KEY, DISTANCE_UNIT_KEY, NOTIFICATIONS_KEY, NEARBY_BIRDS_KEY, ATTACH_LOCATION_KEY,
   DISPLAY_NAME_KEY, BIO_KEY, PHOTO_KEY, DEFAULT_LOCATION_KEY,
 } from '../constants/settingsKeys';
 import { LIFE_LIST_KEY } from './LifeListScreen';
@@ -45,6 +45,7 @@ export default function ProfileScreen({ navigation }) {
   const [distanceUnit, setDistanceUnit] = useState('km');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showNearbyBirds, setShowNearbyBirds] = useState(true);
+  const [attachLocation, setAttachLocation] = useState(true);
   const [displayName, setDisplayName] = useState('');
   const [bio, setBio] = useState('');
   const [photoUri, setPhotoUri] = useState('');
@@ -72,11 +73,12 @@ export default function ProfileScreen({ navigation }) {
 
   const loadSettings = async () => {
     try {
-      const [target, unit, notif, nearby, name, bioVal, photo, location] = await Promise.all([
+      const [target, unit, notif, nearby, attachLoc, name, bioVal, photo, location] = await Promise.all([
         AsyncStorage.getItem(TARGET_KEY),
         AsyncStorage.getItem(DISTANCE_UNIT_KEY),
         AsyncStorage.getItem(NOTIFICATIONS_KEY),
         AsyncStorage.getItem(NEARBY_BIRDS_KEY),
+        AsyncStorage.getItem(ATTACH_LOCATION_KEY),
         AsyncStorage.getItem(DISPLAY_NAME_KEY),
         AsyncStorage.getItem(BIO_KEY),
         AsyncStorage.getItem(PHOTO_KEY),
@@ -86,6 +88,7 @@ export default function ProfileScreen({ navigation }) {
       if (unit) setDistanceUnit(unit);
       if (notif !== null) setNotificationsEnabled(notif === 'true');
       if (nearby !== null) setShowNearbyBirds(nearby === 'true');
+      if (attachLoc !== null) setAttachLocation(attachLoc === 'true');
       if (name) setDisplayName(name);
       if (bioVal) setBio(bioVal);
       if (photo) setPhotoUri(photo);
@@ -239,6 +242,11 @@ export default function ProfileScreen({ navigation }) {
     await AsyncStorage.setItem(NEARBY_BIRDS_KEY, String(val));
   };
 
+  const toggleAttachLocation = async (val) => {
+    setAttachLocation(val);
+    await AsyncStorage.setItem(ATTACH_LOCATION_KEY, String(val));
+  };
+
   const speciesCount = lifeList.length;
   const progress = Math.min(speciesCount / lifeListTarget, 1);
 
@@ -290,6 +298,20 @@ export default function ProfileScreen({ navigation }) {
     );
   };
 
+  const showPrivacy = () => {
+    Alert.alert(
+      'Privacy',
+      "Your profile (name, bio, photo), Life List, and settings are stored only on this device — there's no account or cloud sync.\n\nWhen you identify a bird by sound, the audio clip is sent to our server to run the identification. If \"Attach Location to Sightings\" is on, your coordinates and place name are saved with that sighting and may be shown to other users in Nearby Sightings."
+    );
+  };
+
+  const openHelp = () => {
+    Linking.openURL('https://github.com/bennedictbett/Ndege-id/issues').catch((e) => {
+      console.error('Failed to open help link', e);
+      Alert.alert('Something went wrong', "Couldn't open the support page. Please try again.");
+    });
+  };
+
   const SETTINGS_GROUPS = [
     {
       title: 'Account',
@@ -321,7 +343,7 @@ export default function ProfileScreen({ navigation }) {
       rows: [
         { key: 'soundId', icon: 'mic-outline', title: 'Sound Identification', description: 'Identify birds from audio recordings', type: 'disabled' },
         { key: 'photoId', icon: 'camera-outline', title: 'Photo Identification', description: 'Identify birds from photos', type: 'disabled' },
-        { key: 'locationSighting', icon: 'pin-outline', title: 'Location & Sighting Settings', description: "Control what's captured with each sighting", type: 'disabled' },
+        { key: 'attachLocation', icon: 'pin-outline', title: 'Attach Location to Sightings', description: 'Include your coordinates when you identify a bird', type: 'toggle', value: attachLocation, onToggle: toggleAttachLocation },
       ],
     },
     {
@@ -329,13 +351,13 @@ export default function ProfileScreen({ navigation }) {
       rows: [
         { key: 'mySightings', icon: 'albums-outline', title: 'My Sightings', description: `${speciesCount} logged`, type: 'chevron', onPress: goToLifeList },
         { key: 'exportData', icon: 'download-outline', title: 'Export Data', description: 'Download your life list as JSON', type: 'chevron', onPress: handleExport },
-        { key: 'privacy', icon: 'shield-checkmark-outline', title: 'Privacy', description: 'How your data is handled', type: 'disabled' },
+        { key: 'privacy', icon: 'shield-checkmark-outline', title: 'Privacy', description: 'How your data is handled', type: 'chevron', onPress: showPrivacy },
       ],
     },
     {
       title: 'About',
       rows: [
-        { key: 'help', icon: 'help-circle-outline', title: 'Help & Support', description: 'Get help using the app', type: 'disabled' },
+        { key: 'help', icon: 'help-circle-outline', title: 'Help & Support', description: 'Report an issue or ask a question on GitHub', type: 'chevron', onPress: openHelp },
         { key: 'about', icon: 'information-circle-outline', title: 'About Sauti ya Ndege', description: 'Learn more about the project', type: 'chevron', onPress: showAbout },
         { key: 'version', icon: 'apps-outline', title: 'App Version', description: 'Current release', type: 'value', rightText: APP_VERSION },
       ],
