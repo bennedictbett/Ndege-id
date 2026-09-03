@@ -7,6 +7,7 @@ export const TARGET_KEY = 'setting_life_list_target';
 export const DISTANCE_UNIT_KEY = 'setting_distance_unit';
 export const NOTIFICATIONS_KEY = 'setting_notifications_enabled';
 export const NEARBY_BIRDS_KEY = 'setting_show_nearby_birds';
+export const ATTACH_LOCATION_KEY = 'setting_attach_location';
 export const DISPLAY_NAME_KEY = 'profile_display_name';
 export const BIO_KEY = 'profile_bio';
 export const PHOTO_KEY = 'profile_photo_uri';
