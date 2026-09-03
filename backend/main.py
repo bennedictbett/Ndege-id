@@ -10,6 +10,7 @@ import shutil
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ml.predict import predict
+from ml.predict_photo import predict_photo
 
 load_dotenv()
 
@@ -122,7 +123,60 @@ async def identify_bird(
 
         return {
             "prediction": result,
-            "bird": bird_data
+            "bird": bird_data,
+            "method": "sound",
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
+    finally:
+        os.unlink(tmp_path)
+
+
+@app.post("/identify-photo")
+async def identify_bird_photo(
+    photo: UploadFile = File(...),
+    latitude: float = Form(None),
+    longitude: float = Form(None),
+    location_name: str = Form(None),
+):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
+        shutil.copyfileobj(photo.file, tmp)
+        tmp_path = tmp.name
+
+    try:
+        result = predict_photo(tmp_path)
+
+        bird_response = supabase.table("birds")\
+            .select("*")\
+            .eq("id", result["bird_id"])\
+            .execute()
+
+        bird_data = bird_response.data[0] if bird_response.data else None
+
+        if bird_data:
+            images = supabase.table("bird_images")\
+                .select("*")\
+                .eq("bird_id", bird_data["id"])\
+                .execute()
+            bird_data["images"] = images.data
+
+            # Reuses the existing sightings table/columns as-is — no
+            # schema change needed. "confidence" here holds the visual
+            # similarity score, same as the sound path's confidence.
+            supabase.table("sightings").insert({
+                "bird_id": bird_data["id"],
+                "confidence": result["confidence"],
+                "latitude": latitude,
+                "longitude": longitude,
+                "location_name": location_name,
+            }).execute()
+
+        return {
+            "prediction": result,
+            "bird": bird_data,
+            "method": "photo",
         }
 
     except Exception as e:
