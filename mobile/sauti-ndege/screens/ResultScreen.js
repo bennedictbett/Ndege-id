@@ -8,7 +8,10 @@ import { addToLifeList } from './LifeListScreen';
 
 export default function ResultScreen({ route, navigation }) {
   const { result } = route.params;
-  const { prediction, bird } = result;
+  const { prediction, bird, method } = result;
+  const isPhotoMatch = method === 'photo';
+  const badgeLabel = isPhotoMatch ? 'Visual Similarity' : 'AI Confidence';
+  const predictionsTitle = isPhotoMatch ? 'Closest Matches' : 'Top Predictions';
   const primaryImage = bird?.images?.find(img => img.is_primary);
   const otherImages = bird?.images?.filter(img => !img.is_primary) || [];
   const [addedToList, setAddedToList] = useState(false);
@@ -61,7 +64,7 @@ export default function ResultScreen({ route, navigation }) {
         <View style={[styles.confidenceBadge, {
           backgroundColor: getConfidenceColor(prediction.confidence)
         }]}>
-          <Text style={styles.confidenceLabel}>AI Confidence</Text>
+          <Text style={styles.confidenceLabel}>{badgeLabel}</Text>
           <Text style={styles.confidenceValue}>{prediction.confidence}%</Text>
         </View>
 
@@ -114,7 +117,7 @@ export default function ResultScreen({ route, navigation }) {
 
         {/* Top 3 Predictions */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Top Predictions</Text>
+          <Text style={styles.sectionTitle}>{predictionsTitle}</Text>
           {prediction.top3.map((item, index) => (
             <View key={index} style={styles.predictionRow}>
               <View style={styles.predictionRank}>
