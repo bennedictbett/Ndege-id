@@ -251,7 +251,7 @@ export default function HomeScreen({ navigation }) {
         icon="camera"
         title="By Photo"
         subtitle="Take or upload a photo"
-        onPress={() => alert('Coming soon!')}
+        onPress={() => navigation.navigate('PhotoIdentify')}
       />
       <IdentifyCard
         icon="eye-outline"
