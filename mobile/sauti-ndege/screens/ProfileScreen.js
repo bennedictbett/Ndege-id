@@ -480,13 +480,16 @@ export default function ProfileScreen({ navigation }) {
             <View key={group.title} style={styles.group}>
               <Text style={styles.groupTitle}>{group.title}</Text>
               <View style={styles.groupCard}>
-                {group.rows.map((row, index) => (
-                  <SettingsRow
-                    key={row.key}
-                    {...row}
-                    isLast={index === group.rows.length - 1}
-                  />
-                ))}
+                {group.rows.map((row, index) => {
+                  const { key, ...rowProps } = row;
+                  return (
+                    <SettingsRow
+                      key={key}
+                      {...rowProps}
+                      isLast={index === group.rows.length - 1}
+                    />
+                  );
+                })}
               </View>
             </View>
           ))}
