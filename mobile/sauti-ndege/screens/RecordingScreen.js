@@ -3,7 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import * as Location from 'expo-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { theme } from '../constants/theme';
+import { ATTACH_LOCATION_KEY } from '../constants/settingsKeys';
 
 const API_URL = 'https://ndege-id.onrender.com';
 
@@ -140,13 +142,17 @@ export default function RecordingScreen({ navigation }) {
       const uri = recording.getURI();
 
       let latitude = null, longitude = null, locationName = null;
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === 'granted') {
-        const loc = await Location.getCurrentPositionAsync({});
-        latitude = loc.coords.latitude;
-        longitude = loc.coords.longitude;
-        const geocode = await Location.reverseGeocodeAsync(loc.coords);
-        locationName = geocode[0]?.city || geocode[0]?.region || null;
+      const attachLocationSetting = await AsyncStorage.getItem(ATTACH_LOCATION_KEY);
+      const shouldAttachLocation = attachLocationSetting === null ? true : attachLocationSetting === 'true';
+      if (shouldAttachLocation) {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === 'granted') {
+          const loc = await Location.getCurrentPositionAsync({});
+          latitude = loc.coords.latitude;
+          longitude = loc.coords.longitude;
+          const geocode = await Location.reverseGeocodeAsync(loc.coords);
+          locationName = geocode[0]?.city || geocode[0]?.region || null;
+        }
       }
 
       const formData = new FormData();
