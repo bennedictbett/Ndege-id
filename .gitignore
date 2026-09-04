@@ -61,3 +61,7 @@ ml/spectrograms/
 data/images/
 data/raw/
 ml/models/
+# Exception: this is a small precomputed embedding table (~200KB text),
+# not a model checkpoint — it needs to ship with the backend for
+# /identify-photo to work on deploy, so it's tracked despite the rule above.
+!ml/models/photo_embeddings.json
