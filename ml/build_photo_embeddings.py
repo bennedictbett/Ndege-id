@@ -35,7 +35,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTPUT_PATH = os.path.join(BASE_DIR, "ml", "models", "photo_embeddings.json")
 IMG_SIZE = 224
 
-load_dotenv(os.path.join(BASE_DIR, "backend", ".env"))
+# Same call main.py uses — python-dotenv searches upward from the
+# current directory automatically, so this finds .env wherever it
+# actually lives rather than assuming a specific path.
+load_dotenv()
 supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 
 transform = transforms.Compose([
