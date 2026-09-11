@@ -262,6 +262,7 @@ export default function ProfileScreen({ navigation }) {
   const recent = lifeList.slice(0, RECENT_COUNT);
 
   const goToLifeList = () => navigation.navigate('HomeTab', { screen: 'LifeList' });
+  const goToPhotoIdentify = () => navigation.navigate('HomeTab', { screen: 'PhotoIdentify' });
 
   const handleExport = async () => {
     if (lifeList.length === 0) {
@@ -342,7 +343,7 @@ export default function ProfileScreen({ navigation }) {
       title: 'Identification',
       rows: [
         { key: 'soundId', icon: 'mic-outline', title: 'Sound Identification', description: 'Identify birds from audio recordings', type: 'disabled' },
-        { key: 'photoId', icon: 'camera-outline', title: 'Photo Identification', description: 'Identify birds from photos', type: 'disabled' },
+        { key: 'photoId', icon: 'camera-outline', title: 'Photo Identification', description: 'Identify a bird from a photo', type: 'chevron', onPress: goToPhotoIdentify },
         { key: 'attachLocation', icon: 'pin-outline', title: 'Attach Location to Sightings', description: 'Include your coordinates when you identify a bird', type: 'toggle', value: attachLocation, onToggle: toggleAttachLocation },
       ],
     },
