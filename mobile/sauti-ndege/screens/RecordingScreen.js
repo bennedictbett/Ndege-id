@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Audio } from 'expo-av';
+import { useAudioRecorder, AudioModule, RecordingPresets, setAudioModeAsync } from 'expo-audio';
 import { theme } from '../constants/theme';
 import { captureLocationIfEnabled } from '../utils/attachLocation';
 
@@ -27,9 +27,13 @@ const BAR_COUNT = 12;
 export default function RecordingScreen({ navigation }) {
   const [phase, setPhase] = useState('listening'); // 'listening' | 'analyzing'
   const [seconds, setSeconds] = useState(0);
-  const [recording, setRecording] = useState(null);
   const [listeningMsgIndex, setListeningMsgIndex] = useState(0);
   const [analyzingMsgIndex, setAnalyzingMsgIndex] = useState(0);
+
+  // Hook must be called unconditionally at the top level — expo-audio's
+  // recorder is a stable object across renders, not something you
+  // create/destroy per recording like expo-av's Audio.Recording did.
+  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
 
   const pulseScale = useRef(new Animated.Value(1)).current;
   const pulseOpacity = useRef(new Animated.Value(0.5)).current;
@@ -97,15 +101,15 @@ export default function RecordingScreen({ navigation }) {
 
   const startRecording = async () => {
     try {
-      const { status } = await Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
+      const status = await AudioModule.requestRecordingPermissionsAsync();
+      if (!status.granted) {
         alert('Microphone permission is required to identify by sound.');
         navigation.goBack();
         return;
       }
-      await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
-      const { recording: newRecording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
-      setRecording(newRecording);
+      await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
+      await audioRecorder.prepareToRecordAsync();
+      audioRecorder.record();
 
       timerRef.current = setInterval(() => {
         setSeconds((s) => s + 1);
@@ -121,9 +125,7 @@ export default function RecordingScreen({ navigation }) {
     if (timerRef.current) clearInterval(timerRef.current);
     if (msgIntervalRef.current) clearInterval(msgIntervalRef.current);
     if (barIntervalRef.current) clearInterval(barIntervalRef.current);
-    if (recording) {
-      try { await recording.stopAndUnloadAsync(); } catch (e) {}
-    }
+    try { await audioRecorder.stop(); } catch (e) {}
     navigation.goBack();
   };
 
@@ -136,8 +138,8 @@ export default function RecordingScreen({ navigation }) {
     startAnalyzingCycle();
 
     try {
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
+      await audioRecorder.stop();
+      const uri = audioRecorder.uri;
 
       const { latitude, longitude, locationName } = await captureLocationIfEnabled();
 
