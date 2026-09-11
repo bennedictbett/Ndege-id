@@ -2,10 +2,8 @@ import { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import * as Location from 'expo-location';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { theme } from '../constants/theme';
-import { ATTACH_LOCATION_KEY } from '../constants/settingsKeys';
+import { captureLocationIfEnabled } from '../utils/attachLocation';
 
 const API_URL = 'https://ndege-id.onrender.com';
 
@@ -26,23 +24,7 @@ export default function PhotoIdentifyScreen({ navigation }) {
     setErrorMessage('');
 
     try {
-      let latitude = null, longitude = null, locationName = null;
-      const attachLocationSetting = await AsyncStorage.getItem(ATTACH_LOCATION_KEY);
-      const shouldAttachLocation = attachLocationSetting === null ? true : attachLocationSetting === 'true';
-      if (shouldAttachLocation) {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status === 'granted') {
-          const loc = await Location.getCurrentPositionAsync({});
-          latitude = loc.coords.latitude;
-          longitude = loc.coords.longitude;
-          try {
-            const geocode = await Location.reverseGeocodeAsync(loc.coords);
-            locationName = geocode[0]?.city || geocode[0]?.region || null;
-          } catch {
-            // Reverse geocoding isn't available on web — coordinates alone still get sent.
-          }
-        }
-      }
+      const { latitude, longitude, locationName } = await captureLocationIfEnabled();
 
       const formData = new FormData();
       formData.append('photo', { uri: asset.uri, name: 'photo.jpg', type: 'image/jpeg' });
