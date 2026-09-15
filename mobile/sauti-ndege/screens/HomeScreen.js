@@ -28,31 +28,7 @@ const IdentifyCard = ({ icon, title, subtitle, onPress }) => (
   </TouchableOpacity>
 );
 
-const RecentCard = ({ bird, confidence }) => {
-  const primaryImage = bird?.images?.find(img => img.is_primary);
-  return (
-    <View style={styles.recentCard}>
-      {primaryImage && (
-        <View style={styles.recentImageContainer}>
-          <img
-            src={primaryImage.image_url}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            alt={bird.common_name}
-          />
-        </View>
-      )}
-      <View style={styles.confidenceBadge}>
-        <Text style={styles.confidenceText}>{confidence}%</Text>
-      </View>
-      <View style={styles.recentCardOverlay}>
-        <Text style={styles.recentBirdName}>{bird.common_name}</Text>
-        <Text style={styles.recentLocation}>📍 Eldoret • Just now</Text>
-      </View>
-    </View>
-  );
-};
-
-const NearbySightingCard = ({ sighting }) => {
+const SightingCard = ({ sighting, badgeText }) => {
   const bird = sighting.birds;
   const primaryImage = bird?.images?.find(img => img.is_primary);
   return (
@@ -71,7 +47,7 @@ const NearbySightingCard = ({ sighting }) => {
         </View>
       )}
       <View style={styles.confidenceBadge}>
-        <Text style={styles.confidenceText}>{formatDistance(sighting.distanceKm, sighting.distanceUnit)}</Text>
+        <Text style={styles.confidenceText}>{badgeText}</Text>
       </View>
       <View style={styles.recentCardOverlay}>
         <Text style={styles.recentBirdName}>{bird?.common_name ?? 'Unknown bird'}</Text>
@@ -81,34 +57,39 @@ const NearbySightingCard = ({ sighting }) => {
   );
 };
 
+const formatRelativeTime = (dateString) => {
+  const diffMin = Math.floor((Date.now() - new Date(dateString).getTime()) / 60000);
+  if (diffMin < 1) return 'Just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  return `${Math.floor(diffHr / 24)}d ago`;
+};
+
 export default function HomeScreen({ navigation }) {
-  const [recentBirds, setRecentBirds] = useState([]);
+  const [recentSightings, setRecentSightings] = useState([]);
   const [nearbySightings, setNearbySightings] = useState([]);
   const [nearbyEnabled, setNearbyEnabled] = useState(false);
   const [nearbyLocation, setNearbyLocation] = useState(null);
   const [nearbyLoaded, setNearbyLoaded] = useState(false);
 
   useEffect(() => {
-    const fetchRecentBirds = async () => {
+    const fetchRecentSightings = async () => {
       const { data, error } = await supabase
-        .from('birds')
-        .select('*, images:bird_images(*)')
+        .from('sightings')
+        .select('*, birds(*, images:bird_images(*))')
+        .order('created_at', { ascending: false })
         .limit(4);
 
       if (error) {
-        console.error('Error fetching birds:', error);
+        console.error('Error fetching recent sightings:', error);
         return;
       }
 
-      const withFakeConfidence = data.map((bird) => ({
-        bird,
-        confidence: Math.floor(Math.random() * (99 - 90 + 1)) + 90,
-      }));
-
-      setRecentBirds(withFakeConfidence);
+      setRecentSightings(data || []);
     };
 
-    fetchRecentBirds();
+    fetchRecentSightings();
   }, []);
 
   // Re-read on focus, not just mount — the settings that drive this
@@ -264,7 +245,7 @@ export default function HomeScreen({ navigation }) {
 </View>
 
       {/* Recent Sightings */}
-      {recentBirds.length > 0 && (
+      {recentSightings.length > 0 && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionIcon}>📍</Text>
@@ -274,8 +255,8 @@ export default function HomeScreen({ navigation }) {
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {recentBirds.map((item, index) => (
-              <RecentCard key={index} bird={item.bird} confidence={item.confidence} />
+            {recentSightings.map((sighting) => (
+              <SightingCard key={sighting.id} sighting={sighting} badgeText={formatRelativeTime(sighting.created_at)} />
             ))}
           </ScrollView>
         </View>
@@ -312,7 +293,7 @@ export default function HomeScreen({ navigation }) {
           {nearbyLocation && nearbySightings.length > 0 && (
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {nearbySightings.map((sighting) => (
-                <NearbySightingCard key={sighting.id} sighting={sighting} />
+                <SightingCard key={sighting.id} sighting={sighting} badgeText={formatDistance(sighting.distanceKm, sighting.distanceUnit)} />
               ))}
             </ScrollView>
           )}
