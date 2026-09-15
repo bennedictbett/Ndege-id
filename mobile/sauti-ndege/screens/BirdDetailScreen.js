@@ -10,6 +10,7 @@ import { theme } from '../constants/theme';
 import { addToLifeList } from './LifeListScreen';
 import { Ionicons } from '@expo/vector-icons';
 import SpeciesMap from '../components/SpeciesMap';
+import { getBirds } from '../utils/birdsRepository';
 
 const LIFE_LIST_KEY = 'ndege_life_list';
 const API_URL = 'https://ndege-id.onrender.com';
@@ -125,29 +126,25 @@ export default function BirdDetailScreen({ route, navigation }) {
 
 
   useEffect(() => {
-    fetch(`${API_URL}/birds`)
-      .then(res => res.json())
-      .then(data => {
-        const allBirds = data.birds || [];
-        const genus = bird.scientific_name?.split(' ')[0] || '';
+    getBirds().then(({ birds: allBirds }) => {
+      const genus = bird.scientific_name?.split(' ')[0] || '';
 
-        const sameGenus = allBirds.filter(b =>
-          b.id !== bird.id && b.scientific_name?.split(' ')[0] === genus
+      const sameGenus = allBirds.filter(b =>
+        b.id !== bird.id && b.scientific_name?.split(' ')[0] === genus
+      );
+
+      let similar = sameGenus;
+      if (similar.length < 3) {
+        const sameFamily = allBirds.filter(b =>
+          b.id !== bird.id &&
+          b.family === bird.family &&
+          !similar.some(s => s.id === b.id)
         );
+        similar = [...similar, ...sameFamily];
+      }
 
-        let similar = sameGenus;
-        if (similar.length < 3) {
-          const sameFamily = allBirds.filter(b =>
-            b.id !== bird.id &&
-            b.family === bird.family &&
-            !similar.some(s => s.id === b.id)
-          );
-          similar = [...similar, ...sameFamily];
-        }
-
-        setSimilarBirds(similar.slice(0, 6));
-      })
-      .catch(() => setSimilarBirds([]));
+      setSimilarBirds(similar.slice(0, 6));
+    });
   }, [bird.id]);
 
   const handleAddToLifeList = async () => {
