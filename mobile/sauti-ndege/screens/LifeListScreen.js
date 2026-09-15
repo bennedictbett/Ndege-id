@@ -7,9 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { theme } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { getBirds } from '../utils/birdsRepository';
 
 export const LIFE_LIST_KEY = 'ndege_life_list';
-const API_URL = 'https://ndege-id.onrender.com';
 
 export async function addToLifeList(bird) {
   try {
@@ -75,13 +75,10 @@ export default function LifeListScreen({ navigation }) {
     setJustAdded({});
     if (allBirds.length === 0) {
       setLoadingBirds(true);
-      fetch(`${API_URL}/birds`)
-        .then(res => res.json())
-        .then(data => {
-          setAllBirds(data.birds || []);
-          setLoadingBirds(false);
-        })
-        .catch(() => setLoadingBirds(false));
+      getBirds().then(({ birds }) => {
+        setAllBirds(birds);
+        setLoadingBirds(false);
+      });
     }
   };
 
