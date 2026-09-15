@@ -11,7 +11,6 @@ import { supabase } from '../lib/supabase';
 import { NEARBY_BIRDS_KEY, DISTANCE_UNIT_KEY, DEFAULT_LOCATION_KEY } from '../constants/settingsKeys';
 import { haversineKm, formatDistance } from '../utils/geo';
 
-const API_URL = 'https://ndege-id.onrender.com';
 const NEARBY_RADIUS_KM = 50; // sightings farther than this aren't "nearby" for birding purposes
 const NEARBY_FETCH_LIMIT = 30;
 const NEARBY_DISPLAY_COUNT = 6;
@@ -122,9 +121,18 @@ export default function HomeScreen({ navigation }) {
         return;
       }
 
-      const response = await fetch(`${API_URL}/sightings/recent?limit=${NEARBY_FETCH_LIMIT}`);
-      const data = await response.json();
-      const sightings = data?.sightings || [];
+      const { data, error } = await supabase
+        .from('sightings')
+        .select('*, birds(*, images:bird_images(*))')
+        .order('created_at', { ascending: false })
+        .limit(NEARBY_FETCH_LIMIT);
+
+      if (error) {
+        console.error('Failed to load nearby sightings', error);
+        setNearbySightings([]);
+        return;
+      }
+      const sightings = data || [];
 
       const withDistance = sightings
         .filter(s => typeof s.latitude === 'number' && typeof s.longitude === 'number')
