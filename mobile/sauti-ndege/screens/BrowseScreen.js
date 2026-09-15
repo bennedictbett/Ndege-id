@@ -5,14 +5,15 @@ import {
 } from 'react-native';
 import { theme } from '../constants/theme';
 import { addToLifeList } from './LifeListScreen';
+import { getBirds } from '../utils/birdsRepository';
 import { Ionicons } from '@expo/vector-icons';
 
-const API_URL = 'https://ndege-id.onrender.com';
 const GRID_GAP = 10;
 
 export default function BrowseScreen({ navigation }) {
   const [birds, setBirds] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showingOffline, setShowingOffline] = useState(false);
   const [search, setSearch] = useState('');
   const [added, setAdded] = useState({});
   const sectionListRef = useRef(null);
@@ -25,13 +26,11 @@ export default function BrowseScreen({ navigation }) {
   const cardWidth = (width - contentPadding - GRID_GAP * (numColumns - 1)) / numColumns;
 
   useEffect(() => {
-    fetch(`${API_URL}/birds`)
-      .then(res => res.json())
-      .then(data => {
-        setBirds(data.birds || []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    getBirds().then(({ birds, fromCache }) => {
+      setBirds(birds);
+      setShowingOffline(fromCache && birds.length > 0);
+      setLoading(false);
+    });
   }, []);
 
   const handleAdd = async (bird) => {
@@ -105,6 +104,13 @@ export default function BrowseScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {showingOffline && (
+        <View style={styles.offlineBanner}>
+          <Ionicons name="cloud-offline-outline" size={14} color={theme.colors.warning} />
+          <Text style={styles.offlineBannerText}>Offline — showing saved species data</Text>
+        </View>
+      )}
+
       <View style={styles.searchContainer}>
         <Ionicons
           name="search"
@@ -218,6 +224,12 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   loadingText: { color: theme.colors.textSecondary, marginTop: 12 },
+  offlineBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: theme.colors.surface,
+    paddingVertical: 8, paddingHorizontal: theme.spacing.md,
+  },
+  offlineBannerText: { fontSize: 12, color: theme.colors.warning, fontWeight: '600' },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
