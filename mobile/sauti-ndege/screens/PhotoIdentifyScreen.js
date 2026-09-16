@@ -3,9 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Image } fr
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { theme } from '../constants/theme';
+import { API_URL } from '../constants/api';
 import { captureLocationIfEnabled } from '../utils/attachLocation';
-
-const API_URL = 'https://ndege-id.onrender.com';
+import { isOnline } from '../utils/network';
+import { queueCapture } from '../utils/pendingQueue';
 
 export default function PhotoIdentifyScreen({ navigation }) {
   const [phase, setPhase] = useState('choose'); // 'choose' | 'analyzing' | 'error'
@@ -25,6 +26,17 @@ export default function PhotoIdentifyScreen({ navigation }) {
 
     try {
       const { latitude, longitude, locationName } = await captureLocationIfEnabled();
+      const online = await isOnline();
+
+      if (!online) {
+        await queueCapture({
+          type: 'photo', uri: asset.uri, mimeType: 'image/jpeg', fileName: 'photo.jpg',
+          latitude, longitude, locationName,
+        });
+        setErrorMessage("You're offline — this photo is saved and will be identified automatically once you're back online.");
+        setPhase('error');
+        return;
+      }
 
       const formData = new FormData();
       formData.append('photo', { uri: asset.uri, name: 'photo.jpg', type: 'image/jpeg' });
@@ -32,8 +44,22 @@ export default function PhotoIdentifyScreen({ navigation }) {
       if (longitude) formData.append('longitude', String(longitude));
       if (locationName) formData.append('location_name', locationName);
 
-      const response = await fetch(`${API_URL}/identify-photo`, { method: 'POST', body: formData });
-      const result = await response.json();
+      let result;
+      try {
+        const response = await fetch(`${API_URL}/identify-photo`, { method: 'POST', body: formData });
+        result = await response.json();
+      } catch (networkError) {
+        // Preflight said online, but the actual upload still failed —
+        // a flaky connection, not a permanent error. Queue it the same
+        // way rather than showing a dead-end error.
+        await queueCapture({
+          type: 'photo', uri: asset.uri, mimeType: 'image/jpeg', fileName: 'photo.jpg',
+          latitude, longitude, locationName,
+        });
+        setErrorMessage("Couldn't reach the server — this photo is saved and will be identified automatically once you're back online.");
+        setPhase('error');
+        return;
+      }
 
       if (result.bird) {
         navigation.replace('Result', { result });
