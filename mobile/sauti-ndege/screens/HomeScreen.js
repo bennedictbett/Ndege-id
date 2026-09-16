@@ -10,6 +10,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
 import { NEARBY_BIRDS_KEY, DISTANCE_UNIT_KEY, DEFAULT_LOCATION_KEY } from '../constants/settingsKeys';
 import { haversineKm, formatDistance } from '../utils/geo';
+import { isOnline } from '../utils/network';
+import { processQueue, consumeFlushSummary } from '../utils/pendingQueue';
 
 const NEARBY_RADIUS_KM = 50; // sightings farther than this aren't "nearby" for birding purposes
 const NEARBY_FETCH_LIMIT = 30;
@@ -71,23 +73,24 @@ export default function HomeScreen({ navigation }) {
   const [nearbyEnabled, setNearbyEnabled] = useState(false);
   const [nearbyLocation, setNearbyLocation] = useState(null);
   const [nearbyLoaded, setNearbyLoaded] = useState(false);
+  const [queueFlushMessage, setQueueFlushMessage] = useState(null);
+
+  const fetchRecentSightings = async () => {
+    const { data, error } = await supabase
+      .from('sightings')
+      .select('*, birds(*, images:bird_images(*))')
+      .order('created_at', { ascending: false })
+      .limit(4);
+
+    if (error) {
+      console.error('Error fetching recent sightings:', error);
+      return;
+    }
+
+    setRecentSightings(data || []);
+  };
 
   useEffect(() => {
-    const fetchRecentSightings = async () => {
-      const { data, error } = await supabase
-        .from('sightings')
-        .select('*, birds(*, images:bird_images(*))')
-        .order('created_at', { ascending: false })
-        .limit(4);
-
-      if (error) {
-        console.error('Error fetching recent sightings:', error);
-        return;
-      }
-
-      setRecentSightings(data || []);
-    };
-
     fetchRecentSightings();
   }, []);
 
@@ -97,8 +100,30 @@ export default function HomeScreen({ navigation }) {
   useFocusEffect(
     useCallback(() => {
       loadNearbySightings();
+      flushPendingQueue();
     }, [])
   );
+
+  // Only ever triggered by opening/returning to this screen — there's
+  // no background task or persistent connectivity listener here, so a
+  // capture made offline resolves the next time the app is open with a
+  // connection, not the instant connectivity actually returns.
+  const flushPendingQueue = async () => {
+    const online = await isOnline();
+    if (!online) return;
+
+    await processQueue();
+    const summary = await consumeFlushSummary();
+    if (summary) {
+      const names = summary.map(s => s.commonName).join(', ');
+      setQueueFlushMessage(
+        summary.length === 1
+          ? `Identified while you were offline: ${names}`
+          : `Identified ${summary.length} sightings while you were offline: ${names}`
+      );
+      fetchRecentSightings(); // surface the newly-submitted sighting(s) right away
+    }
+  };
 
   const loadNearbySightings = async () => {
     try {
@@ -157,6 +182,14 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+
+      {queueFlushMessage && (
+        <TouchableOpacity style={styles.flushBanner} onPress={() => setQueueFlushMessage(null)} activeOpacity={0.8}>
+          <Ionicons name="checkmark-circle" size={16} color={theme.colors.primary} />
+          <Text style={styles.flushBannerText}>{queueFlushMessage}</Text>
+          <Ionicons name="close" size={16} color={theme.colors.textDim} />
+        </TouchableOpacity>
+      )}
 
       {/* Hero */}
 <View style={styles.heroContainer}>
@@ -348,6 +381,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
+  flushBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    backgroundColor: theme.colors.primaryDim,
+    paddingVertical: 10, paddingHorizontal: theme.spacing.md,
+  },
+  flushBannerText: { flex: 1, fontSize: 12.5, color: theme.colors.text, fontWeight: '600' },
   heroContainer: {
   position: 'relative',
   overflow: 'visible', 
