@@ -3,9 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native
 import { Ionicons } from '@expo/vector-icons';
 import { useAudioRecorder, AudioModule, RecordingPresets, setAudioModeAsync } from 'expo-audio';
 import { theme } from '../constants/theme';
+import { API_URL } from '../constants/api';
 import { captureLocationIfEnabled } from '../utils/attachLocation';
-
-const API_URL = 'https://ndege-id.onrender.com';
+import { isOnline } from '../utils/network';
+import { queueCapture } from '../utils/pendingQueue';
 
 const LISTENING_MESSAGES = [
   'Listening...',
@@ -142,6 +143,18 @@ export default function RecordingScreen({ navigation }) {
       const uri = audioRecorder.uri;
 
       const { latitude, longitude, locationName } = await captureLocationIfEnabled();
+      const online = await isOnline();
+
+      if (!online) {
+        await queueCapture({
+          type: 'sound', uri, mimeType: 'audio/m4a', fileName: 'recording.m4a',
+          latitude, longitude, locationName,
+        });
+        if (msgIntervalRef.current) clearInterval(msgIntervalRef.current);
+        alert("You're offline — this recording is saved and will be identified automatically once you're back online.");
+        navigation.goBack();
+        return;
+      }
 
       const formData = new FormData();
       formData.append('audio', { uri, name: 'recording.m4a', type: 'audio/m4a' });
@@ -149,8 +162,23 @@ export default function RecordingScreen({ navigation }) {
       if (longitude) formData.append('longitude', String(longitude));
       if (locationName) formData.append('location_name', locationName);
 
-      const response = await fetch(`${API_URL}/identify`, { method: 'POST', body: formData });
-      const result = await response.json();
+      let result;
+      try {
+        const response = await fetch(`${API_URL}/identify`, { method: 'POST', body: formData });
+        result = await response.json();
+      } catch (networkError) {
+        // The preflight check said online, but the actual upload still
+        // failed — a flaky connection, not a permanent error. Queue it
+        // the same way, rather than showing a dead-end error.
+        await queueCapture({
+          type: 'sound', uri, mimeType: 'audio/m4a', fileName: 'recording.m4a',
+          latitude, longitude, locationName,
+        });
+        if (msgIntervalRef.current) clearInterval(msgIntervalRef.current);
+        alert("Couldn't reach the server — this recording is saved and will be identified automatically once you're back online.");
+        navigation.goBack();
+        return;
+      }
 
       if (msgIntervalRef.current) clearInterval(msgIntervalRef.current);
       Animated.timing(progressAnim, { toValue: 1, duration: 300, useNativeDriver: false }).start();
