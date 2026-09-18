@@ -29,12 +29,20 @@ function loadLeaflet() {
 
 /**
  * gbifPoints: [{ lat, lon }]           -- broader real occurrence records (base layer)
- * sightingPoints: [{ lat, lon, location_name, date }] -- this user's own logged sightings (highlighted)
+ * sightingPoints: [{ lat, lon, location_name, title }] -- logged sightings (highlighted)
+ * hotspotPoint: { lat, lon, name } -- optional single distinguished marker, e.g. a hotspot's own location
+ * center: { lat, lon } -- optional override for the initial map center (defaults to central Kenya)
+ * zoom: number -- optional override for initial zoom level (defaults to 6)
  */
-export default function SpeciesMap({ gbifPoints = [], sightingPoints = [], height = 260 }) {
+export default function SpeciesMap({
+  gbifPoints = [], sightingPoints = [], hotspotPoint = null,
+  center = null, zoom = 6, height = 260,
+}) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
+
+  const initialCenter = center ? [center.lat, center.lon] : [0.5, 37.5]; // roughly central Kenya
 
   // Initialize the map once
   useEffect(() => {
@@ -43,8 +51,8 @@ export default function SpeciesMap({ gbifPoints = [], sightingPoints = [], heigh
       .then((L) => {
         if (cancelled || !containerRef.current || mapRef.current) return;
         mapRef.current = L.map(containerRef.current, {
-          center: [0.5, 37.5], // roughly central Kenya
-          zoom: 6,
+          center: initialCenter,
+          zoom,
         });
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '\u00A9 OpenStreetMap contributors',
@@ -55,6 +63,7 @@ export default function SpeciesMap({ gbifPoints = [], sightingPoints = [], heigh
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Redraw markers whenever the point sets change
@@ -76,6 +85,19 @@ export default function SpeciesMap({ gbifPoints = [], sightingPoints = [], heigh
       markersRef.current.push(marker);
     });
 
+    if (hotspotPoint) {
+      const marker = L.circleMarker([hotspotPoint.lat, hotspotPoint.lon], {
+        radius: 9,
+        color: theme.colors.accent,
+        fillColor: theme.colors.accent,
+        fillOpacity: 0.95,
+        weight: 2,
+      })
+        .bindPopup(hotspotPoint.name || 'Hotspot')
+        .addTo(mapRef.current);
+      markersRef.current.push(marker);
+    }
+
     sightingPoints.forEach((p) => {
       const marker = L.circleMarker([p.lat, p.lon], {
         radius: 7,
@@ -84,11 +106,11 @@ export default function SpeciesMap({ gbifPoints = [], sightingPoints = [], heigh
         fillOpacity: 0.95,
         weight: 2,
       })
-        .bindPopup(p.location_name ? `Your sighting \u2014 ${p.location_name}` : 'Your sighting')
+        .bindPopup(p.title || (p.location_name ? `Your sighting \u2014 ${p.location_name}` : 'Your sighting'))
         .addTo(mapRef.current);
       markersRef.current.push(marker);
     });
-  }, [gbifPoints, sightingPoints]);
+  }, [gbifPoints, sightingPoints, hotspotPoint]);
 
   // Tear the map down on unmount so navigating back and forth doesn't
   // accumulate duplicate Leaflet instances
