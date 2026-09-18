@@ -41,7 +41,10 @@ export default function HotspotsScreen({ navigation }) {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.card}>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => navigation.navigate('HotspotDetail', { hotspot: item })}
+>
               <ImageBackground
                 source={{ uri: item.image_url }}
                 style={styles.cardBg}
