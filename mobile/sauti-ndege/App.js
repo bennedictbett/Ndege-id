@@ -15,7 +15,7 @@ import ProfileScreen from './screens/ProfileScreen';
 import RecordingScreen from './screens/RecordingScreen';
 import PhotoIdentifyScreen from './screens/PhotoIdentifyScreen';
 import HotspotsScreen from './screens/HotspotsScreen';
-
+import HotspotDetailScreen from './screens/HotspotDetailScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -36,6 +36,7 @@ function HomeStack() {
       <Stack.Screen name="BirdDetail" component={BirdDetailScreen} options={{ title: 'Bird Detail' }} />
       <Stack.Screen name="LifeList" component={LifeListScreen} options={{ title: 'My Life List' }} />
       <Stack.Screen name="Hotspots" component={HotspotsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="HotspotDetail" component={HotspotDetailScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }
@@ -62,6 +63,8 @@ function MapStack() {
     <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen name="MapMain" component={MapScreen} options={{ headerShown: false }} />
       <Stack.Screen name="BirdDetail" component={BirdDetailScreen} options={{ title: 'Bird Detail' }} />
+      <Stack.Screen name="Hotspots" component={HotspotsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="HotspotDetail" component={HotspotDetailScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }
