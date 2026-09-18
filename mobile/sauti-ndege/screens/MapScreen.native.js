@@ -6,9 +6,10 @@ import { theme } from '../constants/theme';
 
 const API_URL = 'https://ndege-id.onrender.com';
 
-export default function MapScreen({ navigation }) {
+export default function MapScreen({ navigation, route }) {
   const [sightings, setSightings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const focus = route?.params;
 
   useEffect(() => {
     const fetchSightings = async () => {
@@ -28,18 +29,32 @@ export default function MapScreen({ navigation }) {
     fetchSightings();
   }, []);
 
-  // Default region — Eldoret, Kenya
-  const initialRegion = {
-    latitude: 0.5143,
-    longitude: 35.2698,
-    latitudeDelta: 0.5,
-    longitudeDelta: 0.5,
-  };
+  // Default region — Eldoret, Kenya, unless a hotspot asked us to focus elsewhere
+  const initialRegion = focus?.focusLatitude != null && focus?.focusLongitude != null
+    ? {
+        latitude: focus.focusLatitude,
+        longitude: focus.focusLongitude,
+        latitudeDelta: 0.2,
+        longitudeDelta: 0.2,
+      }
+    : {
+        latitude: 0.5143,
+        longitude: 35.2698,
+        latitudeDelta: 0.5,
+        longitudeDelta: 0.5,
+      };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Sighting Map</Text>
+        <TouchableOpacity
+          style={styles.hotspotsButton}
+          onPress={() => navigation.navigate('Hotspots')}
+        >
+          <Ionicons name="location-outline" size={14} color={theme.colors.text} />
+          <Text style={styles.hotspotsButtonText}>Hotspots</Text>
+        </TouchableOpacity>
       </View>
 
       {loading ? (
@@ -88,12 +103,29 @@ export default function MapScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
     paddingTop: 50,
     paddingBottom: theme.spacing.md,
   },
   headerTitle: {
     fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.text,
+  },
+  hotspotsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.full,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: 6,
+  },
+  hotspotsButtonText: {
+    fontSize: 12,
     fontWeight: '600',
     color: theme.colors.text,
   },
