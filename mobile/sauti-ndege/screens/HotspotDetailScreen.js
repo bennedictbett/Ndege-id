@@ -122,6 +122,18 @@ export default function HotspotDetailScreen({ route, navigation }) {
             <Ionicons name="expand-outline" size={14} color={theme.colors.text} />
             <Text style={styles.viewOnMapText}>View on full map</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.logSightingButton}
+            onPress={() =>
+              navigation.navigate('LogSighting', {
+                presetLocation: { lat: hotspot.latitude, lon: hotspot.longitude, name: hotspot.name },
+              })
+            }
+          >
+            <Ionicons name="add-circle-outline" size={16} color={theme.colors.background} />
+            <Text style={styles.logSightingButtonText}>Log a sighting here</Text>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -249,6 +261,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: theme.colors.text,
+  },
+  logSightingButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.primary,
+  },
+  logSightingButtonText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: theme.colors.background,
   },
   section: {
     paddingHorizontal: theme.spacing.md,
