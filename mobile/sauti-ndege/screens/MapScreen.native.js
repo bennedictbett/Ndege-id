@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+\import { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Modal, ScrollView } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
@@ -248,6 +248,14 @@ export default function MapScreen({ navigation, route }) {
           </View>
         </View>
       </Modal>
+
+      <TouchableOpacity
+        style={styles.logFab}
+        onPress={() => navigation.navigate('LogSighting')}
+        activeOpacity={0.85}
+      >
+        <Ionicons name="add" size={26} color={theme.colors.background} />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -434,5 +442,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: theme.colors.background,
+  },
+  logFab: {
+    position: 'absolute',
+    right: theme.spacing.md,
+    bottom: theme.spacing.xl,
+    width: 56,
+    height: 56,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 6,
   },
 });
