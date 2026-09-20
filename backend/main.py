@@ -75,14 +75,6 @@ def get_recent_sightings(limit: int = 10):
         .execute()
     return {"sightings": sightings.data}
 
-@app.get("/sightings/recent")
-def get_recent_sightings(limit: int = 10):
-    sightings = supabase.table("sightings")\
-        .select("*, birds(*)")\
-        .order("created_at", desc=True)\
-        .limit(limit)\
-        .execute()
-    return {"sightings": sightings.data}
 
 @app.post("/identify")
 async def identify_bird(
