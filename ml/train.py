@@ -76,6 +76,12 @@ SPECIES_LABELS = {
     "Falco_tinnunculus": 46,
     "Falco_peregrinus": 47,
     "Polyboroides_typus": 48,
+    # Thrushes
+    "Turdus_pelios": 49,
+    "Turdus_abyssinicus": 50,
+    "Geokichla_piaggiae": 51,
+    "Monticola_rufocinereus": 52,
+    "Monticola_saxatilis": 53,
 }
 
 LABEL_TO_SPECIES = {v: k for k, v in SPECIES_LABELS.items()}
