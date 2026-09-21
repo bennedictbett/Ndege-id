@@ -100,6 +100,13 @@ SPECIES = [
     # Secretarybird
     "Sagittarius serpentarius",
 
+    # Thrushes
+    "Turdus pelios",
+    "Turdus abyssinicus",
+    "Geokichla piaggiae",
+    "Monticola rufocinereus",
+    "Monticola saxatilis",
+
 ]
 
 def get_recordings(scientific_name, max_recordings=20):
