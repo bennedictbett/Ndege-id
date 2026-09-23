@@ -107,6 +107,15 @@ SPECIES = [
     "Monticola rufocinereus",
     "Monticola saxatilis",
 
+    # Ducks & waterfowl
+    "Alopochen aegyptiaca",
+    "Anas capensis",
+    "Anas erythrorhyncha",
+    "Anas sparsa",
+    "Anas undulata",
+    "Spatula hottentota",
+    "Dendrocygna viduata",
+
 ]
 
 def get_recordings(scientific_name, max_recordings=20):
