@@ -82,6 +82,14 @@ SPECIES_LABELS = {
     "Geokichla_piaggiae": 51,
     "Monticola_rufocinereus": 52,
     "Monticola_saxatilis": 53,
+     # Ducks & waterfowl
+    "Alopochen_aegyptiaca": 54,
+    "Anas_capensis": 55,
+    "Anas_erythrorhyncha": 56,
+    "Anas_sparsa": 57,
+    "Anas_undulata": 58,
+    "Spatula_hottentota": 59,
+    "Dendrocygna_viduata": 60,
 }
 
 LABEL_TO_SPECIES = {v: k for k, v in SPECIES_LABELS.items()}
