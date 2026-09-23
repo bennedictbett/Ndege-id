@@ -69,6 +69,11 @@ LABEL_TO_SPECIES = {
     46: "Falco_tinnunculus",
     47: "Falco_peregrinus",
     48: "Polyboroides_typus",
+    49: "Turdus_pelios",
+    50: "Turdus_abyssinicus",
+    51: "Geokichla_piaggiae",
+    52: "Monticola_rufocinereus",
+    53: "Monticola_saxatilis",
 }
 
 SPECIES_TO_COMMON = {
@@ -121,6 +126,11 @@ SPECIES_TO_COMMON = {
     "Falco_tinnunculus": "Common Kestrel",
     "Falco_peregrinus": "Peregrine Falcon",
     "Polyboroides_typus": "African Harrier-Hawk",
+    "Turdus_pelios": "African Thrush",
+    "Turdus_abyssinicus": "Abyssinian Thrush",
+    "Geokichla_piaggiae": "African Ground-Thrush",
+    "Monticola_rufocinereus": "Rufous-tailed Rock Thrush",
+    "Monticola_saxatilis": "Common Rock Thrush",
 }
 
 transform = transforms.Compose([
