@@ -95,6 +95,15 @@ SPECIES_LABELS = {
     "Centropus_monachus": 62,       
     "Centropus_senegalensis": 63,   
     "Centropus_superciliosus": 64,  
+    # Turacos
+    "Corythaeola_cristata": 65,
+    "Tauraco_schalowi": 66,
+    "Tauraco_schuettii": 67,
+    "Tauraco_leucolophus": 68,
+    "Tauraco_fischeri": 69,
+    "Tauraco_hartlaubi": 70,
+    "Gallirex_porphyreolophus": 71,
+    "Musophaga_rossae": 72,
 }
 
 LABEL_TO_SPECIES = {v: k for k, v in SPECIES_LABELS.items()}
