@@ -122,6 +122,15 @@ SPECIES = [
     "Centropus senegalensis",
     "Centropus superciliosus",
 
+    # Turacos
+    "Corythaeola cristata",
+    "Tauraco schalowi",
+    "Tauraco schuettii",
+    "Tauraco leucolophus",
+    "Tauraco fischeri",
+    "Tauraco hartlaubi",
+    "Gallirex porphyreolophus",
+    "Musophaga rossae",
 ]
 
 def get_recordings(scientific_name, max_recordings=20):
