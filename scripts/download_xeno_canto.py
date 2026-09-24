@@ -116,6 +116,12 @@ SPECIES = [
     "Spatula hottentota",
     "Dendrocygna viduata",
 
+    # Coucals
+    "Centropus grillii",
+    "Centropus monachus",
+    "Centropus senegalensis",
+    "Centropus superciliosus",
+
 ]
 
 def get_recordings(scientific_name, max_recordings=20):
