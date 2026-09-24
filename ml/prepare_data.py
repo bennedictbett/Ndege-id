@@ -84,6 +84,11 @@ SPECIES_LABELS = {
     "Anas_undulata": 58,
     "Spatula_hottentota": 59,
     "Dendrocygna_viduata": 60,
+    # Coucals
+    "Centropus_grillii": 61,       
+    "Centropus_monachus": 62,       
+    "Centropus_senegalensis": 63,   
+    "Centropus_superciliosus": 64,  
     }
 
 def audio_to_spectrogram(audio_path, save_path):
