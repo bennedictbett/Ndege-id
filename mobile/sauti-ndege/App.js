@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Text, View } from 'react-native';
+import { ensureAnonymousSession } from './utils/identity';
 import MapScreen from './screens/MapScreen';
 import { theme } from './constants/theme';
 
@@ -17,6 +19,7 @@ import PhotoIdentifyScreen from './screens/PhotoIdentifyScreen';
 import HotspotsScreen from './screens/HotspotsScreen';
 import HotspotDetailScreen from './screens/HotspotDetailScreen';
 import LogSightingScreen from './screens/LogSightingScreen';
+import BackupRecoveryScreen from './screens/BackupRecoveryScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -56,6 +59,7 @@ function ProfileStack() {
   return (
     <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen name="ProfileMain" component={ProfileScreen} options={{ title: 'Profile' }} />
+      <Stack.Screen name="BackupRecovery" component={BackupRecoveryScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }
@@ -74,6 +78,12 @@ function MapStack() {
 
 
 export default function App() {
+  // Silently ensures every device has a stable identity to attach a
+  // Life List backup to, before the person ever opens the backup screen.
+  useEffect(() => {
+    ensureAnonymousSession();
+  }, []);
+
   return (
   <NavigationContainer>
     <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
