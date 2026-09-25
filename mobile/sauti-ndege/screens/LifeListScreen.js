@@ -8,6 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { theme } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { getBirds } from '../utils/birdsRepository';
+import { syncAddToCloud, syncRemoveFromCloud } from '../utils/identity';
 
 export const LIFE_LIST_KEY = 'ndege_life_list';
 
@@ -23,6 +24,7 @@ export async function addToLifeList(bird) {
       };
       list.unshift(entry);
       await AsyncStorage.setItem(LIFE_LIST_KEY, JSON.stringify(list));
+      syncAddToCloud(bird.id, entry.date_seen); // best-effort, not awaited — never blocks the local UX
       return true;
     }
     return false;
@@ -64,6 +66,7 @@ export default function LifeListScreen({ navigation }) {
           const updated = lifeList.filter(b => b.id !== birdId);
           setLifeList(updated);
           await AsyncStorage.setItem(LIFE_LIST_KEY, JSON.stringify(updated));
+          syncRemoveFromCloud(birdId); // best-effort, not awaited
         }
       }
     ]);
