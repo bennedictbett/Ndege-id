@@ -15,6 +15,7 @@ import {
   DISPLAY_NAME_KEY, BIO_KEY, PHOTO_KEY, DEFAULT_LOCATION_KEY,
 } from '../constants/settingsKeys';
 import { LIFE_LIST_KEY } from './LifeListScreen';
+import { getLinkedEmail } from '../utils/identity';
 import SettingsRow from '../components/SettingsRow';
 import OptionsSheet from '../components/OptionsSheet';
 import EditProfileSheet from '../components/EditProfileSheet';
@@ -50,6 +51,7 @@ export default function ProfileScreen({ navigation }) {
   const [bio, setBio] = useState('');
   const [photoUri, setPhotoUri] = useState('');
   const [defaultLocation, setDefaultLocation] = useState(null); // { latitude, longitude, label } | null
+  const [linkedEmail, setLinkedEmail] = useState(null);
 
   const [activeSheet, setActiveSheet] = useState(null); // 'target' | 'distance' | 'editProfile' | 'editBio' | 'photoActions' | 'locationActions' | null
 
@@ -57,6 +59,7 @@ export default function ProfileScreen({ navigation }) {
     useCallback(() => {
       loadLifeList();
       loadSettings();
+      getLinkedEmail().then(setLinkedEmail);
     }, [])
   );
 
@@ -302,7 +305,7 @@ export default function ProfileScreen({ navigation }) {
   const showPrivacy = () => {
     Alert.alert(
       'Privacy',
-      "Your profile (name, bio, photo), Life List, and settings are stored only on this device — there's no account or cloud sync.\n\nWhen you identify a bird by sound, the audio clip is sent to our server to run the identification. If \"Attach Location to Sightings\" is on, your coordinates and place name are saved with that sighting and may be shown to other users in Nearby Sightings."
+      "Your profile (name, bio, photo), Life List, and settings are stored on this device by default — there's no required account.\n\nIf you choose to back up your Life List (Data & Privacy → Back Up Life List), it's linked to an email using a one-time code, not a password, and synced to our server so you can recover it on another device. This is entirely optional.\n\nWhen you identify a bird by sound, the audio clip is sent to our server to run the identification. If \"Attach Location to Sightings\" is on, your coordinates and place name are saved with that sighting and may be shown to other users in Nearby Sightings."
     );
   };
 
@@ -351,6 +354,7 @@ export default function ProfileScreen({ navigation }) {
       title: 'Data & Privacy',
       rows: [
         { key: 'mySightings', icon: 'albums-outline', title: 'My Sightings', description: `${speciesCount} logged`, type: 'chevron', onPress: goToLifeList },
+        { key: 'backupRecovery', icon: 'cloud-outline', title: 'Back Up Life List', description: linkedEmail ? `Backed up to ${linkedEmail}` : 'Recover your list on a new device', type: 'chevron', onPress: () => navigation.navigate('BackupRecovery') },
         { key: 'exportData', icon: 'download-outline', title: 'Export Data', description: 'Download your life list as JSON', type: 'chevron', onPress: handleExport },
         { key: 'privacy', icon: 'shield-checkmark-outline', title: 'Privacy', description: 'How your data is handled', type: 'chevron', onPress: showPrivacy },
       ],
