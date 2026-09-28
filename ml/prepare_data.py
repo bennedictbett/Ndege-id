@@ -1,164 +1,126 @@
+"""
+ml/prepare_data.py: turn each recording into several 5s mel-spectrogram PNGs.
+
+Run from the repo root:  python ml/prepare_data.py
+
+Changes from the old version:
+- Uses up to MAX_CLIPS_PER_RECORDING of the LOUDEST 5s windows in the first
+  MAX_SECONDS_PER_RECORDING seconds, instead of only the first 5 seconds
+  (which is often silence or a spoken intro). Loud is not always "bird", but
+  it is a much better bet than the start of the file.
+- Files are named <recordingID>_<windowIndex>.png so train_v2.py can keep all
+  clips from one recording on the same side of the train/val/test split.
+- Image rendering is IDENTICAL to before (same figure size, same specshow), so
+  your backend's inference preprocessing still matches.
+- Runs in parallel across CPU cores.
+
+Tip: delete ml/spectrograms first so old one-clip-per-recording PNGs
+(<id>.png) don't mix with the new ones.
+"""
 import os
-import librosa
-import numpy as np
-import matplotlib.pyplot as plt
+import sys
+from multiprocessing import Pool
 from pathlib import Path
 
-RAW_AUDIO_DIR = "data/raw"
-SPECTROGRAM_DIR = "ml/spectrograms"
+import librosa
+import librosa.display
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from ml.labels import SPECIES_LABELS  # noqa: E402
+
+RAW_AUDIO_DIR = ROOT / "data" / "raw"
+SPECTROGRAM_DIR = ROOT / "ml" / "spectrograms"
 SAMPLE_RATE = 22050
-DURATION = 5        # seconds per clip
-N_MELS = 128        # mel bands
+DURATION = 5                    # seconds per clip
+N_MELS = 128
 HOP_LENGTH = 512
+MAX_SECONDS_PER_RECORDING = 90  # only look at the first 90s of each file
+MAX_CLIPS_PER_RECORDING = 8
+MIN_RMS = 1e-3                  # windows quieter than this count as silence
+WORKERS = max(1, (os.cpu_count() or 2) - 1)
 
-os.makedirs(SPECTROGRAM_DIR, exist_ok=True)
 
-SPECIES_LABELS = {
-   # Original
-    "Haliaeetus_vocifer": 0,
-    "Bostrychia_hagedash": 1,
-    "Cuculus_solitarius": 2,
-    "Ceryle_rudis": 3,
-    "Milvus_migrans": 4,
-    "Lophoceros_nasutus": 5,
-    "Laniarius_aethiopicus": 6,
-    "Pycnonotus_barbatus": 7,
-    "Lamprotornis_superbus": 8,
-    "Cossypha_heuglini": 9,
-    # Starlings
-    "Lamprotornis_hildebrandti": 10,
-    "Cinnyricinclus_leucogaster": 11,
-    "Lamprotornis_chalybaeus": 12,
-    "Onychognathus_morio": 13,
-    "Creatophora_cinerea": 14,
-    "Lamprotornis_purpuroptera": 15,
-    "Lamprotornis_unicolor": 16,
-    "Onychognathus_tenuirostris": 17,
-    # Doves
-    "Streptopelia_capicola": 18,
-    "Columba_guinea": 19,
-    "Turtur_chalcospilos": 20,
-    # Weavers
-    "Ploceus_cucullatus": 21,
-    "Ploceus_intermedius": 22,
-    "Ploceus_baglafecht": 23,
-    "Ploceus_spekei": 24,
-    "Ploceus_jacksoni": 25,
-    "Ploceus_xanthops": 26,
-    "Ploceus_ocularis": 27,
-    "Ploceus_melanocephalus": 28,
-    # Sunbirds
-    "Cinnyris_venustus": 29,
-    "Chalcomitra_senegalensis": 30,
-    "Nectarinia_kilimensis": 31,
-    "Cinnyris_mediocris": 32,
-    "Cinnyris_erythrocercus": 33,
-    "Cinnyris_mariquensis": 34,
-    "Hedydipna_collaris": 35,
-    "Anthreptes_orientalis": 36,
-    # Kingfishers
-    "Megaceryle_maxima": 37,
-    "Halcyon_senegalensis": 38,
-    "Halcyon_chelicuti": 39,
-    "Halcyon_albiventris": 40,
-    "Halcyon_leucocephala": 41,
-    # Eagles & Raptors
-    "Stephanoaetus_coronatus": 42,
-    "Lophaetus_occipitalis": 43,
-    "Buteo_buteo": 44,
-    "Elanus_caeruleus": 45,
-    "Falco_tinnunculus": 46,
-    "Falco_peregrinus": 47,
-    "Polyboroides_typus": 48,
-    # Thrushes
-    "Turdus_pelios": 49,
-    "Turdus_abyssinicus": 50,
-    "Geokichla_piaggiae": 51,
-    "Monticola_rufocinereus": 52,
-    "Monticola_saxatilis": 53,
-    # Ducks & waterfowl
-    "Alopochen_aegyptiaca": 54,
-    "Anas_capensis": 55,
-    "Anas_erythrorhyncha": 56,
-    "Anas_sparsa": 57,
-    "Anas_undulata": 58,
-    "Spatula_hottentota": 59,
-    "Dendrocygna_viduata": 60,
-    # Coucals
-    "Centropus_grillii": 61,       
-    "Centropus_monachus": 62,       
-    "Centropus_senegalensis": 63,   
-    "Centropus_superciliosus": 64,  
-    # Turacos
-    "Corythaeola_cristata": 65,
-    "Tauraco_schalowi": 66,
-    "Tauraco_schuettii": 67,
-    "Tauraco_leucolophus": 68,
-    "Tauraco_fischeri": 69,
-    "Tauraco_hartlaubi": 70,
-    "Gallirex_porphyreolophus": 71,
-    "Musophaga_rossae": 72,
-}
+def pick_windows(y):
+    """Return [(window_index, samples)] for the loudest non-silent windows."""
+    n = SAMPLE_RATE * DURATION
+    if len(y) < n:
+        return [(0, np.pad(y, (0, n - len(y))))]
+    count = len(y) // n
+    windows = [y[i * n:(i + 1) * n] for i in range(count)]
+    rms = np.array([np.sqrt(np.mean(w ** 2)) for w in windows])
+    order = np.argsort(rms)[::-1][:MAX_CLIPS_PER_RECORDING]
+    keep = sorted(int(i) for i in order if rms[i] >= MIN_RMS)
+    if not keep:                       # whole recording is very quiet
+        keep = [int(order[0])]
+    return [(i, windows[i]) for i in keep]
 
-def audio_to_spectrogram(audio_path, save_path):
+
+def render(window, save_path):
+    mel = librosa.feature.melspectrogram(
+        y=window, sr=SAMPLE_RATE, n_mels=N_MELS, hop_length=HOP_LENGTH)
+    mel_db = librosa.power_to_db(mel, ref=np.max)
+    fig = plt.figure(figsize=(2.24, 2.24), dpi=100)
+    plt.axis("off")
+    librosa.display.specshow(mel_db, sr=SAMPLE_RATE, hop_length=HOP_LENGTH)
+    plt.tight_layout(pad=0)
+    fig.savefig(save_path, bbox_inches="tight", pad_inches=0)
+    plt.close(fig)
+
+
+def process(task):
+    audio_path, spec_dir = task
+    audio_path, spec_dir = Path(audio_path), Path(spec_dir)
+    if any(spec_dir.glob(f"{audio_path.stem}_*.png")):
+        return audio_path.name, 0, None            # already done
     try:
-        # Load audio, trim to DURATION seconds
-        y, sr = librosa.load(audio_path, sr=SAMPLE_RATE, duration=DURATION)
+        y, _ = librosa.load(str(audio_path), sr=SAMPLE_RATE,
+                            duration=MAX_SECONDS_PER_RECORDING, mono=True)
+        made = 0
+        for idx, window in pick_windows(y):
+            render(window, spec_dir / f"{audio_path.stem}_{idx}.png")
+            made += 1
+        return audio_path.name, made, None
+    except Exception as e:                          # noqa: BLE001
+        return audio_path.name, 0, str(e)
 
-        # Pad if shorter than DURATION
-        target_length = SAMPLE_RATE * DURATION
-        if len(y) < target_length:
-            y = np.pad(y, (0, target_length - len(y)))
-
-        # Convert to mel spectrogram
-        mel_spec = librosa.feature.melspectrogram(
-            y=y, sr=sr, n_mels=N_MELS, hop_length=HOP_LENGTH
-        )
-        mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)
-
-        # Save as image
-        plt.figure(figsize=(2.24, 2.24), dpi=100)
-        plt.axis("off")
-        librosa.display.specshow(mel_spec_db, sr=sr, hop_length=HOP_LENGTH)
-        plt.tight_layout(pad=0)
-        plt.savefig(save_path, bbox_inches="tight", pad_inches=0)
-        plt.close()
-        return True
-
-    except Exception as e:
-        print(f"  ✗ Error: {e}")
-        return False
 
 def main():
-    total = 0
-    errors = 0
-
-    for species_folder, label in SPECIES_LABELS.items():
-        audio_dir = os.path.join(RAW_AUDIO_DIR, species_folder)
-        spec_dir = os.path.join(SPECTROGRAM_DIR, species_folder)
-        os.makedirs(spec_dir, exist_ok=True)
-
-        if not os.path.exists(audio_dir):
-            print(f"  ✗ Missing: {audio_dir}")
+    tasks = []
+    for species in SPECIES_LABELS:
+        audio_dir = RAW_AUDIO_DIR / species
+        if not audio_dir.exists():
+            print(f"  x Missing: {audio_dir}")
             continue
+        spec_dir = SPECTROGRAM_DIR / species
+        spec_dir.mkdir(parents=True, exist_ok=True)
+        tasks += [(str(p), str(spec_dir)) for p in sorted(audio_dir.glob("*.mp3"))]
 
-        audio_files = list(Path(audio_dir).glob("*.mp3"))
-        print(f"\n{species_folder} (label={label}): {len(audio_files)} files")
+    print(f"{len(tasks)} recordings, {WORKERS} workers")
+    made_total, errors = 0, []
+    with Pool(WORKERS) as pool:
+        for i, (name, made, err) in enumerate(pool.imap_unordered(process, tasks, chunksize=4), 1):
+            made_total += made
+            if err:
+                errors.append((name, err))
+            if i % 100 == 0:
+                print(f"  {i}/{len(tasks)} recordings processed, {made_total} new clips")
 
-        for audio_path in audio_files:
-            save_path = os.path.join(spec_dir, audio_path.stem + ".png")
-            if os.path.exists(save_path):
-                print(f"  Already exists: {audio_path.name}")
-                total += 1
-                continue
-            success = audio_to_spectrogram(str(audio_path), save_path)
-            if success:
-                print(f"  ✓ {audio_path.name}")
-                total += 1
-            else:
-                errors += 1
+    print(f"\nDone. {made_total} new spectrograms, {len(errors)} errors.")
+    for name, err in errors[:20]:
+        print(f"  x {name}: {err}")
 
-    print(f"\n✓ Done. {total} spectrograms created, {errors} errors.")
+    print("\nClips per species (fewest first):")
+    counts = {s: len(list((SPECTROGRAM_DIR / s).glob("*.png"))) for s in SPECIES_LABELS
+              if (SPECTROGRAM_DIR / s).exists()}
+    for s, n in sorted(counts.items(), key=lambda kv: kv[1])[:15]:
+        print(f"  {s}: {n}")
+
 
 if __name__ == "__main__":
     main()
