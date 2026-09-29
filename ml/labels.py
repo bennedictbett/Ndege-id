@@ -2,7 +2,7 @@
 ml/labels.py: single source of truth for species and class indices.
 
 Used by scripts/download_xeno_canto.py, ml/prepare_data.py and ml/train_v2.py
-(and import it in your backend too, so predictions map back to the same names).
+(and import it in on backend too, so predictions map back to the same names).
 
 RULES
 - The position in CORE_SPECIES IS the class index. Never reorder or insert;
@@ -53,6 +53,11 @@ CORE_SPECIES = [
     "Corythaeola_cristata", "Tauraco_schalowi", "Tauraco_schuettii",
     "Tauraco_leucolophus", "Tauraco_fischeri", "Tauraco_hartlaubi",
     "Gallirex_porphyreolophus", "Musophaga_rossae",
+        # Hornbills (73-83)
+    "Bucorvus_leadbeateri", "Bucorvus_abyssinicus", "Tockus_erythrorhynchus",
+    "Tockus_deckeni", "Tockus_jacksoni", "Tockus_flavirostris",
+    "Lophoceros_alboterminatus", "Lophoceros_hemprichii", "Bycanistes_brevis",
+    "Bycanistes_subcylindricus", "Bycanistes_bucinator",
 ]
 
 # These 12 were in the old download list but never in the label maps, so they
