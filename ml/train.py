@@ -1,11 +1,14 @@
 """
-ml/train_v2.py: recording-aware split, safer augmentation, honest metrics.
+ml/train.py: recording-aware split, safer augmentation, honest metrics.
 
-Run from the repo root:   python ml/train_v2.py
-Species and class indices come from ml/labels.py (same indices as the old ml/train.py).
+Run from the repo root:   python ml/train.py
+The roster is every species in ml/labels.py that has at least MIN_RECORDINGS recordings
+in ml/spectrograms; class indices are re-numbered 0..K-1 over that roster (saved in the
+checkpoint under "classes").
 Saves to ml/models/best_model_v2.pth (does NOT overwrite best_model.pth,
 so your deployed backend keeps working until you switch it over).
 """
+import json
 import os
 import sys
 from collections import Counter
@@ -16,14 +19,14 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from PIL import Image
-from sklearn.metrics import classification_report, f1_score
+from sklearn.metrics import accuracy_score, classification_report, f1_score
 from sklearn.model_selection import StratifiedGroupKFold
 from torch.utils.data import DataLoader, Dataset
 from torchvision import models, transforms
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from ml.labels import LABEL_TO_SPECIES, SPECIES_LABELS  # noqa: E402
+from ml.labels import SPECIES_LABELS  # noqa: E402
 
 SPECTROGRAM_DIR = str(ROOT / "ml" / "spectrograms")
 MODEL_DIR = str(ROOT / "ml" / "models")
@@ -37,6 +40,7 @@ LR_HEAD = 1e-3
 LR_BACKBONE = 1e-4
 SEED = 42
 MODEL_VERSION = "v2"
+MIN_RECORDINGS = 10   # species with fewer recordings are excluded (too few to split)
 
 torch.manual_seed(SEED)
 np.random.seed(SEED)
@@ -50,23 +54,38 @@ def recording_id(path: Path) -> str:
 
 
 def load_data():
-    paths, labels, groups = [], [], []
-    for species, label in SPECIES_LABELS.items():
+    by_species = {}
+    for species in SPECIES_LABELS:
         d = Path(SPECTROGRAM_DIR) / species
-        if not d.exists():
-            print(f"  x Missing: {d}")
-            continue
-        for f in sorted(d.glob("*.png")):
+        files = sorted(d.glob("*.png")) if d.exists() else []
+        if files:
+            by_species[species] = files
+
+    roster, dropped = [], []
+    for species, files in by_species.items():
+        n_rec = len({recording_id(f) for f in files})
+        (roster if n_rec >= MIN_RECORDINGS else dropped).append((species, n_rec))
+    class_names = sorted(s for s, _ in roster)
+    index = {s: i for i, s in enumerate(class_names)}
+    print(f"Roster: {len(class_names)} species with >= {MIN_RECORDINGS} recordings")
+    if dropped:
+        print("Excluded (too few recordings): "
+              + ", ".join(f"{s} ({n})" for s, n in sorted(dropped)))
+
+    paths, labels, groups = [], [], []
+    for species in class_names:
+        for f in by_species[species]:
             paths.append(str(f))
-            labels.append(label)
+            labels.append(index[species])
             groups.append(recording_id(f))
     paths, labels, groups = np.array(paths), np.array(labels), np.array(groups)
     n_rec = len(set(groups))
     print(f"{len(paths)} clips from {n_rec} recordings")
     if n_rec == len(paths):
-        print("WARNING: every clip counts as its own recording. Fix recording_id(), "
-              "otherwise the split still leaks.")
-    return paths, labels, groups
+        print("NOTE: one clip per recording (old-style spectrograms). Re-run "
+              "prepare_data.py after deleting ml/spectrograms to get several clips "
+              "per recording.")
+    return paths, labels, groups, class_names
 
 
 def group_split(paths, labels, groups):
@@ -156,8 +175,16 @@ def predict(model, loader, device):
 
 # ---------------------------------------------------------------- main
 def train():
-    paths, labels, groups = load_data()
+    paths, labels, groups, class_names = load_data()
     tr, va, te = group_split(paths, labels, groups)
+
+    # Save the split so the experiment can be reproduced and audited.
+    split = {"seed": SEED, "min_recordings": MIN_RECORDINGS, "classes": class_names,
+             "train": sorted(set(groups[tr])), "val": sorted(set(groups[va])),
+             "test": sorted(set(groups[te]))}
+    s_tr, s_va, s_te = set(split["train"]), set(split["val"]), set(split["test"])
+    assert not (s_tr & s_va or s_tr & s_te or s_va & s_te), "a recording is in two splits"
+    Path(MODEL_DIR, "split_v2.json").write_text(json.dumps(split, indent=2))
     print(f"Train {len(tr)} | Val {len(va)} | Test {len(te)} clips "
           f"({len(set(groups[tr]))}/{len(set(groups[va]))}/{len(set(groups[te]))} recordings)")
 
@@ -169,8 +196,14 @@ def train():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")
-    n_cls = len(SPECIES_LABELS)
+    n_cls = len(class_names)
     model = build_model(n_cls).to(device)
+
+    majority = int(np.bincount(labels[tr], minlength=n_cls).argmax())
+    base_majority = float((labels[te] == majority).mean())
+    base_chance = 1.0 / n_cls
+    print(f"Baselines on test -> majority class: {base_majority:.1%} | "
+          f"uniform chance: {base_chance:.1%}")
 
     counts = np.maximum(np.bincount(labels[tr], minlength=n_cls), 1)
     weights = torch.tensor(len(tr) / (n_cls * counts), dtype=torch.float32).to(device)
@@ -210,7 +243,7 @@ def train():
         if v_f1 > best_f1:
             best_f1, bad_epochs = v_f1, 0
             torch.save({"state_dict": model.state_dict(),
-                        "classes": LABEL_TO_SPECIES,
+                        "classes": dict(enumerate(class_names)),
                         "img_size": IMG_SIZE,
                         "model_version": MODEL_VERSION}, ckpt)
             print("  saved best model")
@@ -230,12 +263,31 @@ def train():
     present = sorted(set(y_np) | set(p_np))
     report = classification_report(
         y_np, p_np, labels=present,
-        target_names=[LABEL_TO_SPECIES[i] for i in present], zero_division=0)
+        target_names=[class_names[i] for i in present], zero_division=0)
     print("\n=== TEST SET ===\n" + report)
     Path(MODEL_DIR, "test_report_v2.txt").write_text(report)
 
+    per_species = classification_report(
+        y_np, p_np, labels=present, target_names=[class_names[i] for i in present],
+        zero_division=0, output_dict=True)
+    results = {
+        "seed": SEED,
+        "n_species": n_cls,
+        "n_test_clips": int(len(y_np)),
+        "n_test_recordings": int(len(set(groups[te]))),
+        "test_accuracy": float(accuracy_score(y_np, p_np)),
+        "test_macro_f1": float(f1_score(y_np, p_np, average="macro", zero_division=0)),
+        "baseline_majority_class": base_majority,
+        "baseline_uniform_chance": base_chance,
+        "per_species": {k: v for k, v in per_species.items()
+                        if k not in ("accuracy", "macro avg", "weighted avg")},
+    }
+    Path(MODEL_DIR, "results_v2.json").write_text(json.dumps(results, indent=2))
+    print(f"Test accuracy {results['test_accuracy']:.1%} | macro-F1 "
+          f"{results['test_macro_f1']:.3f} (see results_v2.json)")
+
     print("Most common confusions (true -> predicted):")
-    pairs = Counter((LABEL_TO_SPECIES[a], LABEL_TO_SPECIES[b])
+    pairs = Counter((class_names[a], class_names[b])
                     for a, b in zip(y_np, p_np) if a != b)
     for (a, b), n in pairs.most_common(15):
         print(f"  {n:3d}x  {a} -> {b}")
