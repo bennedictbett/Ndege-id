@@ -1,0 +1,144 @@
+Roster: 49 species with >= 10 recordings
+6509 clips from 1459 recordings
+Train 3983 | Val 1298 | Test 1228 clips (874/293/292 recordings)
+Device: cuda
+Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /root/.cache/torch/hub/checkpoints/resnet18-f37072fd.pth
+  0%|          | 0.00/44.7M [00:00<?, ?B/s] 44%|████▎     | 19.5M/44.7M [00:00<00:00, 204MB/s] 94%|█████████▍| 42.1M/44.7M [00:00<00:00, 223MB/s]100%|██████████| 44.7M/44.7M [00:00<00:00, 222MB/s]
+Baselines on test -> majority class: 8.2% | uniform chance: 2.0%
+Epoch 01/40 | train loss 3.610 acc 18.3% | val acc 34.1% macro-F1 0.247
+  saved best model
+Epoch 02/40 | train loss 2.708 acc 41.4% | val acc 43.8% macro-F1 0.339
+  saved best model
+Epoch 03/40 | train loss 2.307 acc 53.6% | val acc 47.6% macro-F1 0.383
+  saved best model
+Epoch 04/40 | train loss 2.047 acc 62.6% | val acc 48.3% macro-F1 0.380
+Epoch 05/40 | train loss 1.899 acc 67.9% | val acc 49.2% macro-F1 0.383
+Epoch 06/40 | train loss 1.749 acc 73.5% | val acc 53.9% macro-F1 0.432
+  saved best model
+Epoch 07/40 | train loss 1.664 acc 76.6% | val acc 51.8% macro-F1 0.436
+  saved best model
+Epoch 08/40 | train loss 1.595 acc 78.6% | val acc 55.7% macro-F1 0.465
+  saved best model
+Epoch 09/40 | train loss 1.547 acc 81.4% | val acc 51.2% macro-F1 0.432
+Epoch 10/40 | train loss 1.491 acc 83.1% | val acc 53.8% macro-F1 0.441
+Epoch 11/40 | train loss 1.461 acc 85.0% | val acc 55.5% macro-F1 0.442
+Epoch 12/40 | train loss 1.419 acc 85.3% | val acc 54.9% macro-F1 0.459
+Epoch 13/40 | train loss 1.383 acc 87.2% | val acc 56.4% macro-F1 0.467
+  saved best model
+Epoch 14/40 | train loss 1.344 acc 88.5% | val acc 54.4% macro-F1 0.452
+Epoch 15/40 | train loss 1.322 acc 89.5% | val acc 57.7% macro-F1 0.471
+  saved best model
+Epoch 16/40 | train loss 1.294 acc 90.4% | val acc 57.2% macro-F1 0.457
+Epoch 17/40 | train loss 1.304 acc 90.5% | val acc 58.6% macro-F1 0.474
+  saved best model
+Epoch 18/40 | train loss 1.249 acc 92.2% | val acc 56.3% macro-F1 0.456
+Epoch 19/40 | train loss 1.230 acc 93.5% | val acc 59.6% macro-F1 0.468
+Epoch 20/40 | train loss 1.227 acc 93.3% | val acc 58.6% macro-F1 0.469
+Epoch 21/40 | train loss 1.215 acc 94.0% | val acc 58.6% macro-F1 0.480
+  saved best model
+Epoch 22/40 | train loss 1.206 acc 94.2% | val acc 58.6% macro-F1 0.479
+Epoch 23/40 | train loss 1.200 acc 94.9% | val acc 59.6% macro-F1 0.478
+Epoch 24/40 | train loss 1.182 acc 95.1% | val acc 58.2% macro-F1 0.473
+Epoch 25/40 | train loss 1.169 acc 95.6% | val acc 58.1% macro-F1 0.473
+Epoch 26/40 | train loss 1.160 acc 95.7% | val acc 59.0% macro-F1 0.484
+  saved best model
+Epoch 27/40 | train loss 1.159 acc 95.8% | val acc 59.9% macro-F1 0.491
+  saved best model
+Epoch 28/40 | train loss 1.142 acc 96.5% | val acc 60.0% macro-F1 0.481
+Epoch 29/40 | train loss 1.141 acc 96.5% | val acc 58.2% macro-F1 0.484
+Epoch 30/40 | train loss 1.131 acc 96.7% | val acc 59.4% macro-F1 0.495
+  saved best model
+Epoch 31/40 | train loss 1.126 acc 97.1% | val acc 60.2% macro-F1 0.505
+  saved best model
+Epoch 32/40 | train loss 1.120 acc 97.1% | val acc 59.7% macro-F1 0.493
+Epoch 33/40 | train loss 1.110 acc 97.2% | val acc 59.8% macro-F1 0.494
+Epoch 34/40 | train loss 1.111 acc 97.2% | val acc 59.7% macro-F1 0.498
+Epoch 35/40 | train loss 1.101 acc 97.5% | val acc 59.8% macro-F1 0.493
+Epoch 36/40 | train loss 1.104 acc 97.5% | val acc 59.8% macro-F1 0.494
+Epoch 37/40 | train loss 1.108 acc 97.4% | val acc 60.6% macro-F1 0.499
+Epoch 38/40 | train loss 1.104 acc 97.7% | val acc 60.2% macro-F1 0.494
+Epoch 39/40 | train loss 1.107 acc 97.6% | val acc 59.9% macro-F1 0.494
+Early stopping.
+
+=== TEST SET ===
+                            precision    recall  f1-score   support
+
+     Anthreptes_orientalis       0.53      0.34      0.42        29
+       Bostrychia_hagedash       0.92      0.93      0.92        70
+               Buteo_buteo       0.61      0.41      0.49        27
+              Ceryle_rudis       0.76      0.64      0.69        55
+  Chalcomitra_senegalensis       0.07      0.04      0.05        23
+Cinnyricinclus_leucogaster       0.25      0.23      0.24        13
+    Cinnyris_erythrocercus       0.53      1.00      0.70         8
+      Cinnyris_mariquensis       0.29      0.50      0.37        22
+        Cinnyris_mediocris       0.50      0.15      0.24        13
+         Cinnyris_venustus       0.67      0.67      0.67        15
+            Columba_guinea       0.74      1.00      0.85        14
+         Cossypha_heuglini       0.50      0.67      0.57        12
+       Creatophora_cinerea       0.00      0.00      0.00         8
+        Cuculus_solitarius       0.98      0.95      0.96        83
+          Elanus_caeruleus       0.52      0.86      0.65        14
+          Falco_peregrinus       0.76      0.78      0.77        37
+         Falco_tinnunculus       0.06      0.20      0.10         5
+       Halcyon_albiventris       0.60      0.90      0.72        10
+         Halcyon_chelicuti       1.00      0.45      0.62        20
+      Halcyon_leucocephala       0.50      0.58      0.54        19
+      Halcyon_senegalensis       0.64      0.70      0.67        10
+        Haliaeetus_vocifer       0.69      0.84      0.76        44
+        Hedydipna_collaris       0.62      0.88      0.73        17
+   Lamprotornis_chalybaeus       0.54      0.60      0.57        35
+ Lamprotornis_hildebrandti       0.00      0.00      0.00         6
+ Lamprotornis_purpuroptera       0.33      0.28      0.30        18
+     Lamprotornis_superbus       0.29      0.28      0.29        25
+     Lamprotornis_unicolor       0.69      0.46      0.55        24
+     Laniarius_aethiopicus       0.52      0.80      0.63        15
+     Lophaetus_occipitalis       0.59      0.87      0.70        15
+        Lophoceros_nasutus       0.82      0.74      0.78       101
+         Megaceryle_maxima       0.58      0.41      0.48        17
+            Milvus_migrans       0.88      0.70      0.78        66
+     Nectarinia_kilimensis       0.25      0.20      0.22        25
+       Onychognathus_morio       0.62      0.77      0.69        30
+Onychognathus_tenuirostris       0.64      0.75      0.69        12
+        Ploceus_baglafecht       0.33      0.20      0.25        10
+        Ploceus_cucullatus       0.71      0.50      0.59        20
+       Ploceus_intermedius       0.36      1.00      0.53         8
+          Ploceus_jacksoni       0.15      0.25      0.19         8
+    Ploceus_melanocephalus       0.76      0.76      0.76        21
+          Ploceus_ocularis       0.22      0.22      0.22        27
+            Ploceus_spekei       0.21      0.46      0.29        13
+          Ploceus_xanthops       0.42      0.42      0.42        24
+        Polyboroides_typus       0.09      0.09      0.09        22
+       Pycnonotus_barbatus       0.88      0.65      0.75        55
+   Stephanoaetus_coronatus       0.58      0.33      0.42        21
+     Streptopelia_capicola       0.71      0.91      0.80        11
+       Turtur_chalcospilos       0.96      0.84      0.90        31
+
+                  accuracy                           0.62      1228
+                 macro avg       0.53      0.56      0.52      1228
+              weighted avg       0.64      0.62      0.62      1228
+
+Test accuracy 62.1% | macro-F1 0.522 (see results_v2.json)
+Most common confusions (true -> predicted):
+    9x  Chalcomitra_senegalensis -> Cinnyris_mariquensis
+    8x  Stephanoaetus_coronatus -> Haliaeetus_vocifer
+    7x  Buteo_buteo -> Onychognathus_morio
+    7x  Lamprotornis_purpuroptera -> Lamprotornis_superbus
+    6x  Nectarinia_kilimensis -> Ploceus_spekei
+    6x  Polyboroides_typus -> Lophoceros_nasutus
+    5x  Ceryle_rudis -> Cinnyris_mariquensis
+    5x  Halcyon_chelicuti -> Ploceus_spekei
+    5x  Lamprotornis_superbus -> Onychognathus_tenuirostris
+    5x  Milvus_migrans -> Ploceus_ocularis
+    5x  Ploceus_spekei -> Chalcomitra_senegalensis
+    5x  Ploceus_xanthops -> Polyboroides_typus
+    4x  Anthreptes_orientalis -> Falco_peregrinus
+    4x  Ceryle_rudis -> Ploceus_melanocephalus
+    4x  Cinnyricinclus_leucogaster -> Ploceus_ocularis
+
+Confidence threshold trade-off (for an 'unknown' answer):
+  threshold 0.3: answers 66% of clips, 78.2% correct
+  threshold 0.5: answers 43% of clips, 88.2% correct
+  threshold 0.6: answers 33% of clips, 91.3% correct
+  threshold 0.7: answers 25% of clips, 93.3% correct
+  threshold 0.8: answers 18% of clips, 95.0% correct
+  threshold 0.9: answers 11% of clips, 96.3% correct

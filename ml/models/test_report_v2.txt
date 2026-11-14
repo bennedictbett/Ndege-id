@@ -1,0 +1,55 @@
+                            precision    recall  f1-score   support
+
+     Anthreptes_orientalis       0.53      0.34      0.42        29
+       Bostrychia_hagedash       0.92      0.93      0.92        70
+               Buteo_buteo       0.61      0.41      0.49        27
+              Ceryle_rudis       0.76      0.64      0.69        55
+  Chalcomitra_senegalensis       0.07      0.04      0.05        23
+Cinnyricinclus_leucogaster       0.25      0.23      0.24        13
+    Cinnyris_erythrocercus       0.53      1.00      0.70         8
+      Cinnyris_mariquensis       0.29      0.50      0.37        22
+        Cinnyris_mediocris       0.50      0.15      0.24        13
+         Cinnyris_venustus       0.67      0.67      0.67        15
+            Columba_guinea       0.74      1.00      0.85        14
+         Cossypha_heuglini       0.50      0.67      0.57        12
+       Creatophora_cinerea       0.00      0.00      0.00         8
+        Cuculus_solitarius       0.98      0.95      0.96        83
+          Elanus_caeruleus       0.52      0.86      0.65        14
+          Falco_peregrinus       0.76      0.78      0.77        37
+         Falco_tinnunculus       0.06      0.20      0.10         5
+       Halcyon_albiventris       0.60      0.90      0.72        10
+         Halcyon_chelicuti       1.00      0.45      0.62        20
+      Halcyon_leucocephala       0.50      0.58      0.54        19
+      Halcyon_senegalensis       0.64      0.70      0.67        10
+        Haliaeetus_vocifer       0.69      0.84      0.76        44
+        Hedydipna_collaris       0.62      0.88      0.73        17
+   Lamprotornis_chalybaeus       0.54      0.60      0.57        35
+ Lamprotornis_hildebrandti       0.00      0.00      0.00         6
+ Lamprotornis_purpuroptera       0.33      0.28      0.30        18
+     Lamprotornis_superbus       0.29      0.28      0.29        25
+     Lamprotornis_unicolor       0.69      0.46      0.55        24
+     Laniarius_aethiopicus       0.52      0.80      0.63        15
+     Lophaetus_occipitalis       0.59      0.87      0.70        15
+        Lophoceros_nasutus       0.82      0.74      0.78       101
+         Megaceryle_maxima       0.58      0.41      0.48        17
+            Milvus_migrans       0.88      0.70      0.78        66
+     Nectarinia_kilimensis       0.25      0.20      0.22        25
+       Onychognathus_morio       0.62      0.77      0.69        30
+Onychognathus_tenuirostris       0.64      0.75      0.69        12
+        Ploceus_baglafecht       0.33      0.20      0.25        10
+        Ploceus_cucullatus       0.71      0.50      0.59        20
+       Ploceus_intermedius       0.36      1.00      0.53         8
+          Ploceus_jacksoni       0.15      0.25      0.19         8
+    Ploceus_melanocephalus       0.76      0.76      0.76        21
+          Ploceus_ocularis       0.22      0.22      0.22        27
+            Ploceus_spekei       0.21      0.46      0.29        13
+          Ploceus_xanthops       0.42      0.42      0.42        24
+        Polyboroides_typus       0.09      0.09      0.09        22
+       Pycnonotus_barbatus       0.88      0.65      0.75        55
+   Stephanoaetus_coronatus       0.58      0.33      0.42        21
+     Streptopelia_capicola       0.71      0.91      0.80        11
+       Turtur_chalcospilos       0.96      0.84      0.90        31
+
+                  accuracy                           0.62      1228
+                 macro avg       0.53      0.56      0.52      1228
+              weighted avg       0.64      0.62      0.62      1228

@@ -1,0 +1,306 @@
+{
+  "seed": 7,
+  "n_species": 49,
+  "n_test_clips": 1257,
+  "n_test_recordings": 291,
+  "test_accuracy": 0.5266507557677009,
+  "test_macro_f1": 0.4415311759845638,
+  "baseline_majority_class": 0.08353221957040573,
+  "baseline_uniform_chance": 0.02040816326530612,
+  "per_species": {
+    "Anthreptes_orientalis": {
+      "precision": 0.5238095238095238,
+      "recall": 0.5789473684210527,
+      "f1-score": 0.55,
+      "support": 19.0
+    },
+    "Bostrychia_hagedash": {
+      "precision": 0.8823529411764706,
+      "recall": 0.8450704225352113,
+      "f1-score": 0.8633093525179856,
+      "support": 71.0
+    },
+    "Buteo_buteo": {
+      "precision": 0.6,
+      "recall": 0.28125,
+      "f1-score": 0.3829787234042553,
+      "support": 32.0
+    },
+    "Ceryle_rudis": {
+      "precision": 0.7209302325581395,
+      "recall": 0.6458333333333334,
+      "f1-score": 0.6813186813186813,
+      "support": 48.0
+    },
+    "Chalcomitra_senegalensis": {
+      "precision": 0.2,
+      "recall": 0.375,
+      "f1-score": 0.2608695652173913,
+      "support": 8.0
+    },
+    "Cinnyricinclus_leucogaster": {
+      "precision": 0.1,
+      "recall": 0.06896551724137931,
+      "f1-score": 0.08163265306122448,
+      "support": 29.0
+    },
+    "Cinnyris_erythrocercus": {
+      "precision": 0.4,
+      "recall": 0.4444444444444444,
+      "f1-score": 0.42105263157894735,
+      "support": 18.0
+    },
+    "Cinnyris_mariquensis": {
+      "precision": 0.4666666666666667,
+      "recall": 0.6774193548387096,
+      "f1-score": 0.5526315789473685,
+      "support": 31.0
+    },
+    "Cinnyris_mediocris": {
+      "precision": 0.08333333333333333,
+      "recall": 0.125,
+      "f1-score": 0.1,
+      "support": 16.0
+    },
+    "Cinnyris_venustus": {
+      "precision": 0.5,
+      "recall": 0.125,
+      "f1-score": 0.2,
+      "support": 24.0
+    },
+    "Columba_guinea": {
+      "precision": 0.7894736842105263,
+      "recall": 0.9375,
+      "f1-score": 0.8571428571428571,
+      "support": 16.0
+    },
+    "Cossypha_heuglini": {
+      "precision": 0.25,
+      "recall": 0.5882352941176471,
+      "f1-score": 0.3508771929824561,
+      "support": 17.0
+    },
+    "Creatophora_cinerea": {
+      "precision": 0.75,
+      "recall": 0.5454545454545454,
+      "f1-score": 0.631578947368421,
+      "support": 11.0
+    },
+    "Cuculus_solitarius": {
+      "precision": 0.9753086419753086,
+      "recall": 0.7523809523809524,
+      "f1-score": 0.8494623655913979,
+      "support": 105.0
+    },
+    "Elanus_caeruleus": {
+      "precision": 0.5833333333333334,
+      "recall": 0.56,
+      "f1-score": 0.5714285714285714,
+      "support": 25.0
+    },
+    "Falco_peregrinus": {
+      "precision": 0.38461538461538464,
+      "recall": 0.3333333333333333,
+      "f1-score": 0.35714285714285715,
+      "support": 15.0
+    },
+    "Falco_tinnunculus": {
+      "precision": 0.42857142857142855,
+      "recall": 0.6,
+      "f1-score": 0.5,
+      "support": 5.0
+    },
+    "Halcyon_albiventris": {
+      "precision": 0.2222222222222222,
+      "recall": 0.8888888888888888,
+      "f1-score": 0.35555555555555557,
+      "support": 9.0
+    },
+    "Halcyon_chelicuti": {
+      "precision": 0.47058823529411764,
+      "recall": 0.5714285714285714,
+      "f1-score": 0.5161290322580645,
+      "support": 14.0
+    },
+    "Halcyon_leucocephala": {
+      "precision": 0.42857142857142855,
+      "recall": 0.2727272727272727,
+      "f1-score": 0.3333333333333333,
+      "support": 11.0
+    },
+    "Halcyon_senegalensis": {
+      "precision": 0.42424242424242425,
+      "recall": 0.6666666666666666,
+      "f1-score": 0.5185185185185185,
+      "support": 21.0
+    },
+    "Haliaeetus_vocifer": {
+      "precision": 0.8333333333333334,
+      "recall": 0.8928571428571429,
+      "f1-score": 0.8620689655172413,
+      "support": 28.0
+    },
+    "Hedydipna_collaris": {
+      "precision": 0.7222222222222222,
+      "recall": 0.43333333333333335,
+      "f1-score": 0.5416666666666666,
+      "support": 30.0
+    },
+    "Lamprotornis_chalybaeus": {
+      "precision": 0.06666666666666667,
+      "recall": 0.07692307692307693,
+      "f1-score": 0.07142857142857142,
+      "support": 13.0
+    },
+    "Lamprotornis_hildebrandti": {
+      "precision": 0.16666666666666666,
+      "recall": 0.14285714285714285,
+      "f1-score": 0.15384615384615385,
+      "support": 7.0
+    },
+    "Lamprotornis_purpuroptera": {
+      "precision": 0.2962962962962963,
+      "recall": 0.8888888888888888,
+      "f1-score": 0.4444444444444444,
+      "support": 9.0
+    },
+    "Lamprotornis_superbus": {
+      "precision": 0.06666666666666667,
+      "recall": 0.05,
+      "f1-score": 0.05714285714285714,
+      "support": 20.0
+    },
+    "Lamprotornis_unicolor": {
+      "precision": 0.17391304347826086,
+      "recall": 0.5714285714285714,
+      "f1-score": 0.26666666666666666,
+      "support": 7.0
+    },
+    "Laniarius_aethiopicus": {
+      "precision": 0.92,
+      "recall": 0.71875,
+      "f1-score": 0.8070175438596491,
+      "support": 32.0
+    },
+    "Lophaetus_occipitalis": {
+      "precision": 0.5454545454545454,
+      "recall": 0.9230769230769231,
+      "f1-score": 0.6857142857142857,
+      "support": 13.0
+    },
+    "Lophoceros_nasutus": {
+      "precision": 0.9117647058823529,
+      "recall": 0.5904761904761905,
+      "f1-score": 0.7167630057803468,
+      "support": 105.0
+    },
+    "Megaceryle_maxima": {
+      "precision": 0.36363636363636365,
+      "recall": 0.2857142857142857,
+      "f1-score": 0.32,
+      "support": 14.0
+    },
+    "Milvus_migrans": {
+      "precision": 0.9117647058823529,
+      "recall": 0.3522727272727273,
+      "f1-score": 0.5081967213114754,
+      "support": 88.0
+    },
+    "Nectarinia_kilimensis": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 12.0
+    },
+    "Onychognathus_morio": {
+      "precision": 0.4090909090909091,
+      "recall": 0.5625,
+      "f1-score": 0.47368421052631576,
+      "support": 16.0
+    },
+    "Onychognathus_tenuirostris": {
+      "precision": 0.8461538461538461,
+      "recall": 0.3235294117647059,
+      "f1-score": 0.46808510638297873,
+      "support": 34.0
+    },
+    "Ploceus_baglafecht": {
+      "precision": 0.5,
+      "recall": 0.26666666666666666,
+      "f1-score": 0.34782608695652173,
+      "support": 15.0
+    },
+    "Ploceus_cucullatus": {
+      "precision": 0.7619047619047619,
+      "recall": 0.7441860465116279,
+      "f1-score": 0.7529411764705882,
+      "support": 43.0
+    },
+    "Ploceus_intermedius": {
+      "precision": 0.75,
+      "recall": 0.625,
+      "f1-score": 0.6818181818181818,
+      "support": 24.0
+    },
+    "Ploceus_jacksoni": {
+      "precision": 0.17647058823529413,
+      "recall": 0.16666666666666666,
+      "f1-score": 0.17142857142857143,
+      "support": 18.0
+    },
+    "Ploceus_melanocephalus": {
+      "precision": 0.75,
+      "recall": 0.24,
+      "f1-score": 0.36363636363636365,
+      "support": 25.0
+    },
+    "Ploceus_ocularis": {
+      "precision": 0.09090909090909091,
+      "recall": 0.16666666666666666,
+      "f1-score": 0.11764705882352941,
+      "support": 12.0
+    },
+    "Ploceus_spekei": {
+      "precision": 0.19444444444444445,
+      "recall": 0.7777777777777778,
+      "f1-score": 0.3111111111111111,
+      "support": 9.0
+    },
+    "Ploceus_xanthops": {
+      "precision": 0.07142857142857142,
+      "recall": 0.1,
+      "f1-score": 0.08333333333333333,
+      "support": 30.0
+    },
+    "Polyboroides_typus": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 8.0
+    },
+    "Pycnonotus_barbatus": {
+      "precision": 0.4915254237288136,
+      "recall": 0.5918367346938775,
+      "f1-score": 0.5370370370370371,
+      "support": 49.0
+    },
+    "Stephanoaetus_coronatus": {
+      "precision": 0.2631578947368421,
+      "recall": 0.8333333333333334,
+      "f1-score": 0.4,
+      "support": 6.0
+    },
+    "Streptopelia_capicola": {
+      "precision": 0.8888888888888888,
+      "recall": 1.0,
+      "f1-score": 0.9411764705882353,
+      "support": 24.0
+    },
+    "Turtur_chalcospilos": {
+      "precision": 0.6666666666666666,
+      "recall": 0.5714285714285714,
+      "f1-score": 0.6153846153846154,
+      "support": 21.0
+    }
+  }
+}

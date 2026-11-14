@@ -65,3 +65,8 @@ ml/models/
 # not a model checkpoint — it needs to ship with the backend for
 # /identify-photo to work on deploy, so it's tracked despite the rule above.
 !ml/models/photo_embeddings.json
+ml/models/best_model_v2.pth
+
+ml/models/best_model_v2.pth
+
+spectrograms.tar.gz

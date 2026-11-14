@@ -1,0 +1,140 @@
+Roster: 49 species with >= 10 recordings
+6509 clips from 1459 recordings
+638 (species, recordist) groups; 0 unknown-recordist
+Device: cuda
+Fold 0: train 3934 | val 1220 | test 1355 clips
+Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /root/.cache/torch/hub/checkpoints/resnet18-f37072fd.pth
+  0%|          | 0.00/44.7M [00:00<?, ?B/s] 28%|██▊       | 12.5M/44.7M [00:00<00:00, 131MB/s] 69%|██████▉   | 30.8M/44.7M [00:00<00:00, 166MB/s]100%|██████████| 44.7M/44.7M [00:00<00:00, 170MB/s]
+    epoch 01 val macro-F1 0.149
+    epoch 02 val macro-F1 0.211
+    epoch 03 val macro-F1 0.245
+    epoch 04 val macro-F1 0.231
+    epoch 05 val macro-F1 0.257
+    epoch 06 val macro-F1 0.241
+    epoch 07 val macro-F1 0.246
+    epoch 08 val macro-F1 0.249
+    epoch 09 val macro-F1 0.240
+    epoch 10 val macro-F1 0.263
+    epoch 11 val macro-F1 0.252
+    epoch 12 val macro-F1 0.253
+    epoch 13 val macro-F1 0.277
+    epoch 14 val macro-F1 0.269
+    epoch 15 val macro-F1 0.245
+    epoch 16 val macro-F1 0.259
+    epoch 17 val macro-F1 0.256
+    epoch 18 val macro-F1 0.260
+    epoch 19 val macro-F1 0.250
+    epoch 20 val macro-F1 0.273
+    epoch 21 val macro-F1 0.266
+Fold 0: test accuracy 37.1% macro-F1 0.246
+Fold 1: train 3598 | val 1432 | test 1479 clips
+    epoch 01 val macro-F1 0.118
+    epoch 02 val macro-F1 0.147
+    epoch 03 val macro-F1 0.160
+    epoch 04 val macro-F1 0.188
+    epoch 05 val macro-F1 0.195
+    epoch 06 val macro-F1 0.208
+    epoch 07 val macro-F1 0.214
+    epoch 08 val macro-F1 0.228
+    epoch 09 val macro-F1 0.227
+    epoch 10 val macro-F1 0.222
+    epoch 11 val macro-F1 0.219
+    epoch 12 val macro-F1 0.213
+    epoch 13 val macro-F1 0.217
+    epoch 14 val macro-F1 0.235
+    epoch 15 val macro-F1 0.233
+    epoch 16 val macro-F1 0.243
+    epoch 17 val macro-F1 0.234
+    epoch 18 val macro-F1 0.248
+    epoch 19 val macro-F1 0.239
+    epoch 20 val macro-F1 0.257
+    epoch 21 val macro-F1 0.222
+    epoch 22 val macro-F1 0.244
+    epoch 23 val macro-F1 0.239
+    epoch 24 val macro-F1 0.238
+    epoch 25 val macro-F1 0.254
+    epoch 26 val macro-F1 0.260
+    epoch 27 val macro-F1 0.246
+    epoch 28 val macro-F1 0.252
+    epoch 29 val macro-F1 0.263
+    epoch 30 val macro-F1 0.252
+    epoch 31 val macro-F1 0.250
+    epoch 32 val macro-F1 0.257
+    epoch 33 val macro-F1 0.248
+    epoch 34 val macro-F1 0.247
+    epoch 35 val macro-F1 0.252
+    epoch 36 val macro-F1 0.259
+    epoch 37 val macro-F1 0.253
+Fold 1: test accuracy 32.5% macro-F1 0.250
+Fold 2: train 4193 | val 1149 | test 1167 clips
+    epoch 01 val macro-F1 0.116
+    epoch 02 val macro-F1 0.164
+    epoch 03 val macro-F1 0.183
+    epoch 04 val macro-F1 0.216
+    epoch 05 val macro-F1 0.212
+    epoch 06 val macro-F1 0.200
+    epoch 07 val macro-F1 0.220
+    epoch 08 val macro-F1 0.226
+    epoch 09 val macro-F1 0.235
+    epoch 10 val macro-F1 0.243
+    epoch 11 val macro-F1 0.230
+    epoch 12 val macro-F1 0.261
+    epoch 13 val macro-F1 0.233
+    epoch 14 val macro-F1 0.227
+    epoch 15 val macro-F1 0.251
+    epoch 16 val macro-F1 0.258
+    epoch 17 val macro-F1 0.228
+    epoch 18 val macro-F1 0.244
+    epoch 19 val macro-F1 0.234
+    epoch 20 val macro-F1 0.239
+Fold 2: test accuracy 36.2% macro-F1 0.262
+Fold 3: train 4009 | val 1141 | test 1359 clips
+    epoch 01 val macro-F1 0.123
+    epoch 02 val macro-F1 0.157
+    epoch 03 val macro-F1 0.175
+    epoch 04 val macro-F1 0.197
+    epoch 05 val macro-F1 0.209
+    epoch 06 val macro-F1 0.207
+    epoch 07 val macro-F1 0.213
+    epoch 08 val macro-F1 0.211
+    epoch 09 val macro-F1 0.230
+    epoch 10 val macro-F1 0.221
+    epoch 11 val macro-F1 0.231
+    epoch 12 val macro-F1 0.227
+    epoch 13 val macro-F1 0.228
+    epoch 14 val macro-F1 0.219
+    epoch 15 val macro-F1 0.218
+    epoch 16 val macro-F1 0.221
+    epoch 17 val macro-F1 0.210
+    epoch 18 val macro-F1 0.208
+    epoch 19 val macro-F1 0.219
+Fold 3: test accuracy 37.9% macro-F1 0.208
+Fold 4: train 3931 | val 1429 | test 1149 clips
+    epoch 01 val macro-F1 0.152
+    epoch 02 val macro-F1 0.230
+    epoch 03 val macro-F1 0.205
+    epoch 04 val macro-F1 0.226
+    epoch 05 val macro-F1 0.244
+    epoch 06 val macro-F1 0.229
+    epoch 07 val macro-F1 0.236
+    epoch 08 val macro-F1 0.242
+    epoch 09 val macro-F1 0.254
+    epoch 10 val macro-F1 0.253
+    epoch 11 val macro-F1 0.267
+    epoch 12 val macro-F1 0.261
+    epoch 13 val macro-F1 0.269
+    epoch 14 val macro-F1 0.281
+    epoch 15 val macro-F1 0.268
+    epoch 16 val macro-F1 0.258
+    epoch 17 val macro-F1 0.272
+    epoch 18 val macro-F1 0.247
+    epoch 19 val macro-F1 0.271
+    epoch 20 val macro-F1 0.270
+    epoch 21 val macro-F1 0.261
+    epoch 22 val macro-F1 0.257
+Fold 4: test accuracy 40.7% macro-F1 0.258
+
+Pooled out-of-fold, recordist-grouped (5 folds)
+  clip level     : accuracy 36.7% | macro-F1 0.276
+  recording level: accuracy 45.7% | macro-F1 0.332
+  per-fold accuracy: 37.1%, 32.5%, 36.2%, 37.9%, 40.7%

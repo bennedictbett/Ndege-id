@@ -73,7 +73,7 @@ There's no account system. The mobile app also queries Supabase directly for rea
 Audio Recording (.m4a)  →  Mel Spectrogram (128 bands, 5s clips)  →  ResNet18 CNN (fine-tuned)  →  Species Prediction + Confidence
 ```
 
-**Current performance:** 49 species, ~200 recordings, 75% validation accuracy. Training improves with more data per species — several species in the roster still have thin recording counts, and accuracy on those is correspondingly less reliable than the headline number suggests.
+**Current performance:** see [RESULTS.md](RESULTS.md). Under recordist-grouped 5-fold cross-validation (the strictest protocol I tested), 49 species: 36.7% clip-level accuracy, macro-F1 0.28, against 2% chance. Earlier, looser splits gave 53 to 62%, which were inflated by recordist overlap.
 
 ### Photo Identification (untrained — similarity search, not a classifier)
 
@@ -198,7 +198,7 @@ Stated explicitly rather than left for someone to discover:
 - **No account system.** Life List and all preferences are local to the device. There's nothing to sync across devices, and no way to recover a Life List if the app is uninstalled. This was a deliberate scope decision for the MVP, not an oversight — but it's the first thing a "real product" version would need to address.
 - **Photo ID is similarity search, not a classifier.** Covered above, but worth repeating: it will confidently return a *plausible* match even when wrong, especially within visually similar families. The UI labels this "Visual Similarity" specifically so the number isn't misread as calibrated confidence.
 - **Offline capture queueing is foreground-only.** A capture made with no connection resolves the next time the app is *opened* with a connection — not the instant connectivity actually returns while the app is closed. True background sync would need `expo-task-manager`/background fetch, a meaningfully bigger and harder-to-verify addition that was deliberately deferred.
-- **Sound model accuracy varies by species** in proportion to how many training recordings that species has — the 75% headline figure is an average, not a floor.
+- **Sound model accuracy varies a lot by species.** Distinctive callers (e.g. red-chested cuckoo, hadada ibis) do well; starlings, weavers and sunbirds are near chance. Per-species results are in [RESULTS.md](RESULTS.md).
 - **Community sightings have no identity or moderation layer.** Anyone can submit a sighting via `/identify` or `/identify-photo`; there's no way to distinguish a careful observation from a mistaken one, or to attribute it to a person.
 
 ---
